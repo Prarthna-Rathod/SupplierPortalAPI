@@ -63,7 +63,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="periodSupplierId"></param>
     /// <returns></returns>
-    bool UpdateLockUnlockPeriodSupplier(int periodSupplierId);
+   // bool UpdateLockUnlockPeriodSupplier(int periodSupplierId);
 
 
 

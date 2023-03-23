@@ -58,13 +58,8 @@ namespace DataAccess.DataActions.Interfaces
         IEnumerable<DocumentRequiredStatusEntity> GetDocumentRequiredStatus();
 
         IEnumerable<DocumentStatusEntity> GetDocumentStatus();
-
         IEnumerable<DocumentTypeEntity> GetDocumentType();
-
         IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType();
-        IEnumerable<ReportingTypeEntity> GetReportingTypes();
-        
-
         IEnumerable<ReportingTypeEntity> GetReportingTypes();
 
         #endregion

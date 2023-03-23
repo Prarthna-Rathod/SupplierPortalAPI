@@ -36,15 +36,6 @@ namespace Services.Mappers.ReportingPeriodMappers
             }
         }
 
-
-        public IEnumerable<ReportingType> GetReportingTypeLookUp(IEnumerable<ReportingTypeEntity> reportingTypeEntities)
-        {
-            foreach (var item in reportingTypeEntities)
-            {
-                yield return new ReportingType(item.Id, item.Name);
-            }
-        }
-
         public IEnumerable<SupplierReportingPeriodStatus> GetSupplierReportingPeriodStatusesLookUp(IEnumerable<SupplierReportingPeriodStatusEntity> supplierReportingPeriodStatusEntities)
         {
             foreach (var item in supplierReportingPeriodStatusEntities)

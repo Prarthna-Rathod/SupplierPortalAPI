@@ -38,11 +38,11 @@ namespace SupplierPortalAPI.Controllers
             return await _services.SetPeriodFacility(reportingPeriodFacilityDto);
         }
 
-        [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
+       /* [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
         public bool PeriodSupplierLockUnlock(int periodSupplierId)
         {
             return _services.UpdateLockUnlockPeriodSupplier(periodSupplierId);
-        }
+        }*/
 
         #endregion
 
