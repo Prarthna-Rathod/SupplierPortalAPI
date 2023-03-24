@@ -16,8 +16,8 @@ namespace Services.Mappers.SupplierMappers
                 contactDtos.Add(new ContactDto(item.Id, item.SupplierId, supplier.Name, item.UserVO.Id, item.UserVO.Name, item.UserVO.Email, item.UserVO.ContactNo, item.UserVO.IsActive));
             }
             foreach (var item in supplier.Facilities)
-            {
-                facilityDtos.Add(new FacilityDto(item.Id, item.Name, item.Description, item.IsPrimary, item.SupplierId, supplier.Name, item.GHGHRPFacilityId, item.AssociatePipelines.Id, item.AssociatePipelines.Name, item.ReportingTypes.Id, item.ReportingTypes.Name, item.SupplyChainStages.Id, item.SupplyChainStages.Name, item.IsActive));
+            {   
+                facilityDtos.Add(new FacilityDto(item.Id, item.Name, item.Description, item.IsPrimary, item.SupplierId, supplier.Name, item.GHGHRPFacilityId, item.AssociatePipelines?.Id, item.AssociatePipelines?.Name, item.ReportingTypes.Id, item.ReportingTypes.Name, item.SupplyChainStages.Id, item.SupplyChainStages.Name, item.IsActive));
             }
             return new SupplierDto(supplier.Id, supplier.Name, supplier.Alias, supplier.Email, supplier.ContactNo, supplier.IsActive, facilityDtos, contactDtos);
         }
