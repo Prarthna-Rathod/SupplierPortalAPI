@@ -29,19 +29,28 @@ namespace Services.Mappers.SupplierMappers
 
         public FacilityEntity ConvertFacilityDomainToEntity(Facility facility)
         {
-            return new FacilityEntity
+            var facilityEntity = new FacilityEntity();
+            facilityEntity.Id = facility.Id;
+            facilityEntity.Name = facility.Name;
+            facilityEntity.Description = facility.Description;
+            facilityEntity.IsPrimary = facility.IsPrimary;
+            facilityEntity.GhgrpfacilityId = facility.GHGHRPFacilityId;
+            facilityEntity.SupplierId = facility.SupplierId;
+
+            if (facility.AssociatePipelines != null)
             {
-                Id = facility.Id,
-                Name = facility.Name,
-                Description = facility.Description,
-                IsPrimary = facility.IsPrimary,
-                GhgrpfacilityId = facility.GHGHRPFacilityId,
-                SupplierId = facility.SupplierId,
-                AssociatePipelineId = facility.AssociatePipelines.Id,
-                ReportingTypeId = facility.ReportingTypes.Id,
-                SupplyChainStageId = facility.SupplyChainStages.Id,
-                IsActive = facility.IsActive
-            };
+                var associatedPipelineEntity = new AssociatePipelineEntity();
+                associatedPipelineEntity.Id = facility.AssociatePipelines.Id;
+                associatedPipelineEntity.Name = facility.AssociatePipelines.Name;
+
+                facilityEntity.AssociatePipelineId = associatedPipelineEntity.Id;
+                facilityEntity.AssociatePipeline = associatedPipelineEntity;
+            }
+           facilityEntity.ReportingTypeId = facility.ReportingTypes.Id;
+           facilityEntity.SupplyChainStageId = facility.SupplyChainStages.Id;
+           facilityEntity.IsActive = facility.IsActive;
+
+            return facilityEntity;
         }
 
         public SupplierEntity ConvertSupplierDomainToEntity(Supplier supplier)

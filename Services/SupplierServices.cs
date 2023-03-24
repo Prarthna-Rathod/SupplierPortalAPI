@@ -125,27 +125,17 @@ namespace Services
         /// <exception cref="Exception"></exception>
         public string AddFacility(FacilityDto facilityDto)
         {
-            IEnumerable<AssociatePipeline> associatePipelines = new List<AssociatePipeline>();
-            //Retrieve AssociatePipeline from Id
-            AssociatePipeline? associatePipeline = null;
-
-            if(facilityDto.AssociatePipelineId != null)
+            var associatePipeline = new AssociatePipeline();
+            if (facilityDto.AssociatePipelineId != null)
             {
-                if(facilityDto.AssociatePipelineId == 0)
+                if (facilityDto.AssociatePipelineId == 0)
                 {
-                    facilityDto.AssociatePipelineId = _persister.AddAssociatePipeline(facilityDto.AssociatePipelineName);
-
-                    associatePipelines = GetAndConvertAssociatePipelines();
-                    associatePipeline = associatePipelines.Where(x => x.Id == facilityDto.AssociatePipelineId).FirstOrDefault();
-
-                    if(associatePipeline == null) 
-                    {
-                        throw new Exception("Cannot found AssociatePipeline !!");
-                    }
+                    associatePipeline.Name = facilityDto.AssociatePipelineName;
                 }
             }
+            else
+                associatePipeline = null;
 
-            //ent to domain
             var supplier = RetrieveAndConvertSupplier(facilityDto.SupplierId);
 
             var reportingType = GetAndConvertReportingType()
@@ -183,18 +173,8 @@ namespace Services
         #region GetById Methods
         public SupplierDto GetSupplierById(int supplierId)
         {
-            var supplierEntity = _persister.GetSupplierById(supplierId);
+            var supplier = RetrieveAndConvertSupplier(supplierId);
 
-            if(supplierEntity == null)
-            {
-                throw new Exception("Supplier not found !!");
-            }
-
-            var reportingTypes = GetAndConvertReportingType();
-            var supplyChainStages = GetAndConvertSupplyChainStages();
-            var associatePipelines = GetAndConvertAssociatePipelines();
-
-            var supplier = _supplierEntityDomainMapper.ConvertSupplierEntityToDomain(supplierEntity, reportingTypes, supplyChainStages, associatePipelines);
             var supplierDto = _supplierDomainDtoMapper.ConvertSupplierDomainToDto(supplier);
             return supplierDto;
         }

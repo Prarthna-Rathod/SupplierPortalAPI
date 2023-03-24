@@ -9,7 +9,7 @@ namespace DataAccess.DataActions.Interfaces
         bool AddSupplier(SupplierEntity supplier);
         bool AddContact(ContactEntity contact);
         bool AddFacility(FacilityEntity facility);
-        int AddAssociatePipeline(string associatePipelineName);
+        AssociatePipelineEntity AddAssociatePipeline(string associatePipelineName);
 
         #endregion
 

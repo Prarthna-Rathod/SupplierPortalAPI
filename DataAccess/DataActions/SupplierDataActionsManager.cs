@@ -75,7 +75,6 @@ namespace DataAccess.DataActions
                 IsActive = contact.User.IsActive
             });
 
-
             contact.CreatedOn = DateTime.UtcNow;
             contact.CreatedBy = "System";
             contact.User = user;
@@ -89,13 +88,22 @@ namespace DataAccess.DataActions
         //Facility
         public bool AddFacility(FacilityEntity facility)
         {
+            if (facility.AssociatePipeline != null)
+            {
+                var associatePipeline = AddAssociatePipeline(facility.AssociatePipeline.Name);
+                facility.AssociatePipeline = associatePipeline;
+                facility.AssociatePipelineId = associatePipeline.Id;
+            }
+            
+            facility.CreatedOn = DateTime.UtcNow;
+            facility.CreatedBy = "System";
             _context.FacilityEntities.Add(facility);
             _context.SaveChanges();
             return true;
         }
 
         //AssociatePipeline
-        public int AddAssociatePipeline(string associatePipelineName)
+        public AssociatePipelineEntity AddAssociatePipeline(string associatePipelineName)
         {
             var associatePipeline = new AssociatePipelineEntity();
             associatePipeline.Name = associatePipelineName;
@@ -103,7 +111,7 @@ namespace DataAccess.DataActions
             associatePipeline.CreatedBy = "System";
             _context.AssociatePipelineEntities.Add(associatePipeline);
             _context.SaveChanges();
-            return associatePipeline.Id;
+            return associatePipeline;
         }
         #endregion
 
