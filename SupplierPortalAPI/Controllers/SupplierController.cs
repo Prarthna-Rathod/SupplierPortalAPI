@@ -1,12 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Services.DTOs;
 using Services.Interfaces;
 
 namespace SupplierPortalAPI.Controllers
 {
-
     //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -53,6 +50,16 @@ namespace SupplierPortalAPI.Controllers
         {
             var list = _service.GetAllSuppliers();
             return list;
+        }
+
+        #endregion
+
+        #region Update Methods
+
+        [HttpPut("UpdateFacility")]
+        public string UpdateFacility(FacilityDto facilityDto) 
+        {
+            return "";
         }
 
         #endregion

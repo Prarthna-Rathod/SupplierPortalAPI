@@ -19,11 +19,11 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             Alias = alias;
             Email = email;
             ValidateUserContactNo(contactNo);
+            ContactNo = contactNo;
             IsActive = isActive;
 
             _facilities = new HashSet<Facility>();
             _contacts = new HashSet<Contact>();
-
         }
 
         public Supplier(int id, string name, string alias, string email,
@@ -70,7 +70,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             UpdateName(name);
             UpdateAlias(alias);
             UpdateEmail(email);
-            ValidateUserContactNo(contactNo);
+            UpdateContactNo(contactNo);
             UpdateIsActive(isActive);
         }
 
@@ -89,16 +89,16 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             Alias = alias;
         }
 
-
         private void UpdateEmail(string email)
         {
             Email = email;
         }
 
-       /* private void UpdateContactNo(string contactNo)
+        private void UpdateContactNo(string contactNo)
         {
+            ValidateUserContactNo(contactNo);
             ContactNo = contactNo;
-        }*/
+        }
 
         private void UpdateIsActive(bool isActive)
         {
@@ -114,52 +114,66 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             {
                 throw new Exception("Please enter valid ContactNumber !!");
             }
-            else
-                ContactNo = contactNo;
         }
 
-        public Contact AddSupplierContact(int contactId, Supplier supplier, int userId, string userName, string email, string contactNo, bool isActive)
+        public Contact AddSupplierContact(int contactId, int userId, string userName, string email, string contactNo, bool isActive)
         {
-                if (supplier.IsActive == true)
-                {
-                    ValidateUserContactNo(contactNo);
-                    var userVO = new UserVO(userId, userName, email, contactNo, isActive);
-                    var contact = new Contact(contactId, supplier.Id, userVO);
-                    _contacts.Add(contact);
+            if (IsActive == true)
+            {
+                ValidateUserContactNo(contactNo);
+                var userVO = new UserVO(userId, userName, email, contactNo, isActive);
+                var contact = new Contact(contactId, Id, userVO);
+                _contacts.Add(contact);
 
-                    return contact;
-                }
-                else
-                    throw new Exception("Supplier is not active for add contacts !!");
-           
+                return contact;
+            }
+            else
+                throw new Exception("Supplier is not active for add contacts !!");
+
         }
 
-        public Contact UpdateSupplierContact(int contactId, Supplier supplier, int userId, string userName, string email, string contactNo, bool isActive)
+        public Contact UpdateSupplierContact(int contactId, int userId, string userName, string email, string contactNo, bool isActive)
         {
             var contact = _contacts.FirstOrDefault(x => x.Id == contactId);
-
-            contact.UserVO.Id = userId;
-            contact.UserVO.Name = userName;
-            contact.UserVO.Email = email;
-            ValidateUserContactNo(contactNo);
-            contact.UserVO.ContactNo = contactNo;
-            contact.UserVO.IsActive = isActive;
+            contact.UpdateUser(userName, email, contactNo, isActive);
 
             return contact;
         }
 
-
-        public Facility AddSupplierFacility(int faciltiyId, string name, string description, bool isPrimary, int supplierId, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
+        public Facility AddSupplierFacility(int faciltiyId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
         {
-            CheckFacilityValidations(ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage);
+            if (IsActive == true)
+            {
+                CheckFacilityValidations(ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive);
 
-            var facility = new Facility(faciltiyId, name, description, isPrimary, supplierId, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive);
-            
-            _facilities.Add(facility);
-            return facility;
+                if (reportingType.Name == ReportingTypeValues.GHGRP)
+                {
+                    //Check IsPrimaryFacility
+                    var primaryFacility = _facilities.Where(x =>
+                        x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
+                        x.GHGHRPFacilityId == ghgrpFacilityId &&
+                        x.IsPrimary &&
+                        x.IsActive).FirstOrDefault();
+
+                    if (primaryFacility != null && isPrimary == true)
+                        primaryFacility.IsPrimary = false;
+                    else
+                        isPrimary = true;
+                }
+                else
+                    isPrimary = true;
+
+
+                var facility = new Facility(faciltiyId, name, description, isPrimary, Id, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive);
+
+                _facilities.Add(facility);
+                return facility;
+            }
+            else
+                throw new Exception("Supplier is not active for add facility !!");
         }
 
-        private void CheckFacilityValidations(string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage)
+        private void CheckFacilityValidations(string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
         {
             if (reportingType.Name == ReportingTypeValues.NonGHGRP)
             {
@@ -168,10 +182,6 @@ namespace BusinessLogic.SupplierRoot.DomainModels
                     throw new Exception("GHGRP-FacilityId is not allowed !!");
                 }
             }
-            else
-            {
-                //check primary concept
-            }
 
             if (supplyChainStage.Name != SupplyChainStagesValues.TransmissionCompression)
             {
@@ -179,6 +189,11 @@ namespace BusinessLogic.SupplierRoot.DomainModels
                 {
                     throw new Exception("Associate Pipeline is not allowed !!");
                 }
+            }
+
+            if(isActive == false)
+            {
+                throw new Exception("Can't add InActive facility !!");
             }
         }
 

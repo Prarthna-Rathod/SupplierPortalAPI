@@ -9,7 +9,7 @@ public class Facility
     public int Id { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; }
-    public bool IsPrimary { get; private set; }
+    public bool IsPrimary { get; set; }
     public int SupplierId { get; private set; }
     public string? GHGHRPFacilityId { get; private set; }
     public AssociatePipeline AssociatePipelines { get; private set; }

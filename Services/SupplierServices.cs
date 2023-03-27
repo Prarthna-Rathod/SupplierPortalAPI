@@ -1,11 +1,9 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.SupplierRoot.DomainModels;
-using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using Microsoft.Extensions.Logging;
 using Services.DTOs;
-using Services.Factories.Interface;
 using Services.Factories.Interfaces;
 using Services.Interfaces;
 using Services.Mappers.Interfaces;
@@ -26,7 +24,7 @@ namespace Services
             ISupplierEntityDomainMapper supplierEntityDomainMapper,
             ISupplierDomainDtoMapper supplierDomainDtoMapper,
             ISupplierDataActions persister, IReferenceLookUpMapper referenceLookUpMapper,
-            IReportingPeriodDataActions reportingPeriodDataActions )
+            IReportingPeriodDataActions reportingPeriodDataActions)
         {
             _logger = loggerFactory.CreateLogger<SupplierServices>();
             _supplierFactory = supplierFactory;
@@ -86,7 +84,7 @@ namespace Services
             var supplier = _supplierEntityDomainMapper.ConvertSupplierEntityToDomain(supplierEntity, reportingTypes, supplyChainStages, associatePipelines);
             return supplier;
         }
-       /// <summary>
+        /// <summary>
         /// AddUpdateContact
         /// Supplier should be active for add contacts
         /// Add user details and put foreign key in contact
@@ -100,14 +98,14 @@ namespace Services
 
             if (contactDto.Id == 0)
             {
-                var contact = supplier.AddSupplierContact(contactDto.Id, supplier, contactDto.UserId, contactDto.UserName, contactDto.UserEmail, contactDto.UserContactNo, contactDto.IsActive);
+                var contact = supplier.AddSupplierContact(contactDto.Id, contactDto.UserId, contactDto.UserName, contactDto.UserEmail, contactDto.UserContactNo, contactDto.IsActive);
 
                 var contactEntity = _supplierEntityDomainMapper.ConvertContactDomainToEntity(contact);
                 _persister.AddContact(contactEntity);
             }
             else
             {
-                var contact = supplier.UpdateSupplierContact(contactDto.Id, supplier, contactDto.UserId, contactDto.UserName, contactDto.UserEmail, contactDto.UserContactNo, contactDto.IsActive);
+                var contact = supplier.UpdateSupplierContact(contactDto.Id, contactDto.UserId, contactDto.UserName, contactDto.UserEmail, contactDto.UserContactNo, contactDto.IsActive);
 
                 var contactEntity = _supplierEntityDomainMapper.ConvertContactDomainToEntity(contact);
                 _persister.UpdateContact(contactEntity);
@@ -125,16 +123,20 @@ namespace Services
         /// <exception cref="Exception"></exception>
         public string AddFacility(FacilityDto facilityDto)
         {
-            var associatePipeline = new AssociatePipeline();
+            AssociatePipeline? associatePipeline = null;
             if (facilityDto.AssociatePipelineId != null)
             {
-                if (facilityDto.AssociatePipelineId == 0)
+                if (facilityDto.AssociatePipelineId == 0 && facilityDto.AssociatePipelineName is not null)
                 {
-                    associatePipeline.Name = facilityDto.AssociatePipelineName;
+                    associatePipeline = new AssociatePipeline(0, facilityDto.AssociatePipelineName);
+                }
+                else
+                {
+                    associatePipeline = GetAndConvertAssociatePipelines().FirstOrDefault(x => x.Id == facilityDto.AssociatePipelineId);
+                    if (associatePipeline is null) 
+                        throw new Exception("Can't found AssociatePipeline !!");
                 }
             }
-            else
-                associatePipeline = null;
 
             var supplier = RetrieveAndConvertSupplier(facilityDto.SupplierId);
 
@@ -143,14 +145,37 @@ namespace Services
             var supplyChainStage = GetAndConvertSupplyChainStages()
                .Where(x => x.Id == facilityDto.SupplyChainStageId).FirstOrDefault();
 
-            var facility = supplier.AddSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary, facilityDto.SupplierId, facilityDto.GHGRPFacilityId, associatePipeline, reportingType, supplyChainStage, facilityDto.IsActive);
+            var facility = supplier.AddSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary, facilityDto.GHGRPFacilityId, associatePipeline, reportingType, supplyChainStage, facilityDto.IsActive);
 
             //Convert Domain to Entity
             var facilityEntity = _supplierEntityDomainMapper.ConvertFacilityDomainToEntity(facility);
-            
+
             _persister.AddFacility(facilityEntity);
 
             return "Facility added successfully..";
+        }
+
+        /// <summary>
+        /// Update Facility
+        /// </summary>
+        /// <returns></returns>
+        public string UpdateFacility(FacilityDto facilityDto)
+        {
+            var associatePipeline = new AssociatePipeline();
+
+            var reportingType = GetAndConvertReportingType()
+               .Where(x => x.Id == facilityDto.ReportingTypeId).FirstOrDefault();
+            var supplyChainStage = GetAndConvertSupplyChainStages()
+               .Where(x => x.Id == facilityDto.SupplyChainStageId).FirstOrDefault();
+
+            var supplier = RetrieveAndConvertSupplier(facilityDto.SupplierId);
+            var facility = supplier.UpdateSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary, associatePipeline, reportingType, supplyChainStage);
+
+            var facilityEntity = _supplierEntityDomainMapper.ConvertFacilityDomainToEntity(facility);
+
+            _persister.UpdateFacility(facilityEntity);
+
+            return "Facility updated successfully";
         }
         #endregion
 

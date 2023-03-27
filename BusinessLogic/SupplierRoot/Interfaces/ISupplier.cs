@@ -16,11 +16,11 @@ namespace BusinessLogic.SupplierRoot.Interfaces
         IEnumerable<Facility> Facilities { get; }
         IEnumerable<Contact> Contacts { get; }
 
-        Facility AddSupplierFacility(int facilityId, string name, string description, bool isPrimary, int supplierId, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive);
+        Facility AddSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive);
         Facility UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage);
 
-        Contact AddSupplierContact(int contactId, Supplier supplier, int userId, string userName, string email, string contactNo, bool isActive);
-        Contact UpdateSupplierContact(int contactId, Supplier supplier, int userId, string userName, string email, string contactNo, bool isActive);
+        Contact AddSupplierContact(int contactId, int userId, string userName, string email, string contactNo, bool isActive);
+        Contact UpdateSupplierContact(int contactId, int userId, string userName, string email, string contactNo, bool isActive);
         void ValidateUserContactNo(string contactNo);
 
     }

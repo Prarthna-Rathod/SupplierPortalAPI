@@ -8,6 +8,7 @@ namespace DataAccess.DataActions
     public class SupplierDataActionsManager : ISupplierDataActions
     {
         private readonly SupplierPortalDBContext _context;
+        private readonly string REPORTING_TYPE_GHGRP = "GHGRP";
 
         public SupplierDataActionsManager(SupplierPortalDBContext context)
         {
@@ -61,7 +62,6 @@ namespace DataAccess.DataActions
                 _context.SupplierEntities.Add(supplier);
                 _context.SaveChanges();
                 return true;
-            
         }
 
         //Contact
@@ -88,13 +88,43 @@ namespace DataAccess.DataActions
         //Facility
         public bool AddFacility(FacilityEntity facility)
         {
-            if (facility.AssociatePipeline != null)
+            if (facility.AssociatePipelineId != null)
             {
-                var associatePipeline = AddAssociatePipeline(facility.AssociatePipeline.Name);
-                facility.AssociatePipeline = associatePipeline;
-                facility.AssociatePipelineId = associatePipeline.Id;
+                if(facility.AssociatePipelineId == 0 && facility.AssociatePipeline.Name != null)
+                {
+                    var associatePipeline = AddAssociatePipeline(facility.AssociatePipeline.Name);
+                    facility.AssociatePipeline = associatePipeline;
+                    facility.AssociatePipelineId = associatePipeline.Id;
+                }
             }
-            
+
+            var reportingType = _context.ReportingTypeEntities.FirstOrDefault(x => x.Id == facility.ReportingTypeId);
+
+            if (reportingType?.Name == REPORTING_TYPE_GHGRP)
+            {
+                var primaryFacility = _context.FacilityEntities.Where(x =>
+                    x.ReportingTypeId == reportingType.Id &&
+                    x.GhgrpfacilityId == facility.GhgrpfacilityId &&
+                    x.SupplierId == facility.SupplierId &&
+                    x.IsPrimary &&
+                    x.IsActive).FirstOrDefault();
+
+                if (primaryFacility != null)
+                {
+                    if (facility.IsPrimary == true)
+                    {
+                        primaryFacility.IsPrimary = false;
+                        _context.FacilityEntities.Update(primaryFacility);
+                        _context.SaveChanges();
+                    }
+                }
+                else
+                    facility.IsPrimary = true;
+            }
+            else
+                facility.IsPrimary = true;
+
+
             facility.CreatedOn = DateTime.UtcNow;
             facility.CreatedBy = "System";
             _context.FacilityEntities.Add(facility);
@@ -328,9 +358,9 @@ namespace DataAccess.DataActions
             _context.SaveChanges();
             return true;
         }
-        public bool UpdateFacility(FacilityEntity facility, int facilityId)
+        public bool UpdateFacility(FacilityEntity facility)
         {
-            var facilityEntity = _context.FacilityEntities.Where(x => x.Id == facilityId).FirstOrDefault();
+            var facilityEntity = _context.FacilityEntities.Where(x => x.Id == facility.Id).FirstOrDefault();
             facilityEntity.Name = facility.Name;
             facilityEntity.Description = facility.Description;
             facilityEntity.IsPrimary = facility.IsPrimary;
