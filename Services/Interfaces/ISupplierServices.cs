@@ -37,5 +37,12 @@ namespace Services.Interfaces
         /// <param name="facilityDto"></param>
         /// <returns></returns>
         string AddFacility(FacilityDto facilityDto);
+        
+        /// <summary>
+        /// Update Supplier Facility
+        /// </summary>
+        /// <param name="facilityDto"></param>
+        /// <returns></returns>
+        string UpdateFacility(FacilityDto facilityDto);
     }
 }

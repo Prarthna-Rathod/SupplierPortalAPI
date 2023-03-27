@@ -36,7 +36,7 @@ namespace DataAccess.DataActions.Interfaces
         UserEntity UpdateUser(UserEntity user);
         bool UpdateSupplier(SupplierEntity supplier);
         bool UpdateContact(ContactEntity contact);
-        bool UpdateFacility(FacilityEntity facility, int facilityId);
+        bool UpdateFacility(FacilityEntity facility);
         bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId);
 
         #endregion

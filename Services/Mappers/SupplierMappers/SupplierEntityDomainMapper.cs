@@ -39,12 +39,14 @@ namespace Services.Mappers.SupplierMappers
 
             if (facility.AssociatePipelines != null)
             {
-                var associatedPipelineEntity = new AssociatePipelineEntity();
-                associatedPipelineEntity.Id = facility.AssociatePipelines.Id;
-                associatedPipelineEntity.Name = facility.AssociatePipelines.Name;
-
-                facilityEntity.AssociatePipelineId = associatedPipelineEntity.Id;
-                facilityEntity.AssociatePipeline = associatedPipelineEntity;
+                if(facility.AssociatePipelines.Id == 0 && facility.AssociatePipelines.Name != null) 
+                {
+                    var associatedPipelineEntity = new AssociatePipelineEntity();
+                    associatedPipelineEntity.Id = facility.AssociatePipelines.Id;
+                    associatedPipelineEntity.Name = facility.AssociatePipelines.Name;
+                }
+                else
+                facilityEntity.AssociatePipelineId = facility.AssociatePipelines.Id;
             }
            facilityEntity.ReportingTypeId = facility.ReportingTypes.Id;
            facilityEntity.SupplyChainStageId = facility.SupplyChainStages.Id;
@@ -106,7 +108,7 @@ namespace Services.Mappers.SupplierMappers
 
             foreach (var contact in supplierEntity.ContactEntities)
             {
-                supplier.AddSupplierContact(contact.Id ,supplier, contact.User.Id, contact.User.Name, contact.User.Email, contact.User.ContactNo, contact.User.IsActive);
+                supplier.AddSupplierContact(contact.Id , contact.User.Id, contact.User.Name, contact.User.Email, contact.User.ContactNo, contact.User.IsActive);
             }
 
             foreach(var facility in supplierEntity.FacilityEntities)
@@ -115,7 +117,7 @@ namespace Services.Mappers.SupplierMappers
                 var supplyChainStage = supplyChainStages.Where(x => x.Id == facility.SupplyChainStageId).FirstOrDefault();
                 var associatePipeline = associatePipelines.Where(x => x.Id == facility.AssociatePipelineId).FirstOrDefault();
 
-                supplier.AddSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, supplier.Id, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);
+                supplier.AddSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);
             }
 
             return supplier;
