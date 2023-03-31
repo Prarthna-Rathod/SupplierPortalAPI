@@ -17,7 +17,7 @@ namespace BusinessLogic.SupplierRoot.Interfaces
         IEnumerable<Contact> Contacts { get; }
 
         Facility AddSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive);
-        Facility UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage);
+        Facility UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary,string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive);
 
         Contact AddSupplierContact(int contactId, int userId, string userName, string email, string contactNo, bool isActive);
         Contact UpdateSupplierContact(int contactId, int userId, string userName, string email, string contactNo, bool isActive);

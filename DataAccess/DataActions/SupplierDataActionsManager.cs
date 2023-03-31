@@ -9,6 +9,7 @@ namespace DataAccess.DataActions
     {
         private readonly SupplierPortalDBContext _context;
         private readonly string REPORTING_TYPE_GHGRP = "GHGRP";
+        private readonly string REPORTING_TYPE_NONGHGRP = "NonGHGRP";
 
         public SupplierDataActionsManager(SupplierPortalDBContext context)
         {
@@ -42,7 +43,7 @@ namespace DataAccess.DataActions
         public UserEntity AddUser(UserEntity userEntity)
         {
             IsUniqueEmail(userEntity.Email, "User");
-            
+
             var roles = _context.RoleEntities.Where(x => x.Name == "External").FirstOrDefault();
             userEntity.RoleId = roles.Id;
             userEntity.CreatedOn = DateTime.UtcNow;
@@ -57,17 +58,18 @@ namespace DataAccess.DataActions
         public bool AddSupplier(SupplierEntity supplier)
         {
             IsUniqueEmail(supplier.Email, "Supplier");
-                supplier.CreatedOn = DateTime.UtcNow;
-                supplier.CreatedBy = "System";
-                _context.SupplierEntities.Add(supplier);
-                _context.SaveChanges();
-                return true;
+            supplier.CreatedOn = DateTime.UtcNow;
+            supplier.CreatedBy = "System";
+            _context.SupplierEntities.Add(supplier);
+            _context.SaveChanges();
+            return true;
         }
 
         //Contact
         public bool AddContact(ContactEntity contact)
         {
-            var user = AddUser(new UserEntity { 
+            var user = AddUser(new UserEntity
+            {
                 Id = contact.UserId,
                 Name = contact.User.Name,
                 Email = contact.User.Email,
@@ -90,7 +92,7 @@ namespace DataAccess.DataActions
         {
             if (facility.AssociatePipelineId != null)
             {
-                if(facility.AssociatePipelineId == 0 && facility.AssociatePipeline.Name != null)
+                if (facility.AssociatePipelineId == 0 && facility.AssociatePipeline.Name != null)
                 {
                     var associatePipeline = AddAssociatePipeline(facility.AssociatePipeline.Name);
                     facility.AssociatePipeline = associatePipeline;
@@ -255,7 +257,7 @@ namespace DataAccess.DataActions
         {
             var entity = _context.UserEntities.FirstOrDefault(x => x.Id == userEntity.Id);
 
-            if(entity == null)
+            if (entity == null)
             {
                 throw new Exception("User not found !!");
             }
@@ -360,19 +362,147 @@ namespace DataAccess.DataActions
         }
         public bool UpdateFacility(FacilityEntity facility)
         {
-            var facilityEntity = _context.FacilityEntities.Where(x => x.Id == facility.Id).FirstOrDefault();
-            facilityEntity.Name = facility.Name;
-            facilityEntity.Description = facility.Description;
-            facilityEntity.IsPrimary = facility.IsPrimary;
-            facilityEntity.AssociatePipelineId = facility.AssociatePipelineId;
-            facilityEntity.ReportingTypeId = facility.ReportingTypeId;
-            facilityEntity.SupplyChainStageId = facility.SupplyChainStageId;
-            facilityEntity.UpdatedOn = DateTime.UtcNow;
-            facilityEntity.UpdatedBy = "System";
+            var facilityEntity = _context.FacilityEntities
+                                .Where(x => x.Id == facility.Id)
+                                .Include(x => x.ReportingType)
+                                .Include(x => x.AssociatePipeline)
+                                .Include(x => x.SupplyChainStage)
+                                .FirstOrDefault();
 
-            _context.FacilityEntities.Update(facilityEntity);
-            _context.SaveChanges();
-            return true;
+            if (facilityEntity == null)
+            {
+                throw new Exception("Facility not found !!");
+            }
+
+            if (facilityEntity.SupplierId != facility.SupplierId)
+            {
+                throw new Exception("Supplier cannot be changed !!");
+            }
+
+            var reportingType = _context.ReportingTypeEntities.FirstOrDefault(x => x.Id == facility.ReportingTypeId);
+
+
+            if (reportingType?.Name == REPORTING_TYPE_GHGRP && facilityEntity.ReportingType.Name == REPORTING_TYPE_GHGRP)
+            {
+                if ( (facility.IsPrimary == true && facilityEntity.IsPrimary == true) || facility.IsActive == true)
+                {
+                    goto updateFacilityCase;
+                }
+                else if (facility.IsPrimary == false || facility.IsActive == false)
+                {
+                    goto existingFacilityCase;
+                }
+                else if (facility.IsPrimary == true && facilityEntity.IsPrimary == false)
+                {
+                    goto caseGHGRP;
+                }
+            }
+            else if (reportingType.Name == REPORTING_TYPE_NONGHGRP && facilityEntity.ReportingType.Name != REPORTING_TYPE_NONGHGRP)
+            {
+                goto nonGHGRPCase;
+            }
+            // change reporting period NONGHGRP to GHGRP
+            else if (reportingType.Name == REPORTING_TYPE_GHGRP &&
+                facility.ReportingType.Name != REPORTING_TYPE_GHGRP)
+            {
+                goto caseGHGRP;
+            }
+
+        existingFacilityCase:
+            {
+                var existingPrimaryFacility = _context.FacilityEntities.Where(x =>
+                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
+                        x.GhgrpfacilityId == facility.GhgrpfacilityId &&
+                        x.IsPrimary == false && x.IsActive).FirstOrDefault();
+
+                if (existingPrimaryFacility != null)
+                {
+                    existingPrimaryFacility.IsPrimary = true;
+                    facilityEntity.IsActive = facility.IsActive;
+
+                    _context.FacilityEntities.Update(existingPrimaryFacility);
+                    _context.SaveChanges();
+                }
+                else
+                    throw new Exception("No record found for other Primary Facility !! You can't change IsActive status false");
+
+                goto updateFacilityCase;
+            }
+
+        nonGHGRPCase:
+            {
+                if (facilityEntity.IsPrimary == true || facilityEntity.IsActive == true)
+                {
+                    var existingPrimaryFacility = _context.FacilityEntities.Where(x =>
+                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
+                        x.GhgrpfacilityId == facility.GhgrpfacilityId &&
+                        x.IsPrimary == false && x.IsActive).FirstOrDefault();
+
+                    if (existingPrimaryFacility != null)
+                    {
+                        existingPrimaryFacility.IsPrimary = true;
+                        facility.IsPrimary = true;
+                        facilityEntity.IsPrimary = facility.IsPrimary;
+                        facilityEntity.ReportingTypeId = reportingType.Id;
+                        facilityEntity.IsActive = facility.IsActive;
+                        _context.FacilityEntities.Update(existingPrimaryFacility);
+                        _context.SaveChanges();
+                    }
+                    else
+                        throw new Exception("No record found for other Primary Facility !! You can't change IsActive status false");
+
+                    goto updateFacilityCase;
+                }
+                else
+                    goto updateFacilityCase;
+
+            }
+
+        caseGHGRP:
+            {
+                //NONGHGRP TO GHGRP then check IsPrimary according to Payload
+
+                //if (facility.IsPrimary == true || facility.IsActive == true)
+                if (facility.IsPrimary == true)
+                {
+                    var existingPrimaryFacility = _context.FacilityEntities.Where(x =>
+                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
+                        x.GhgrpfacilityId == facility.GhgrpfacilityId &&
+                        x.IsPrimary && x.IsActive).FirstOrDefault();
+
+                    if (existingPrimaryFacility != null)
+                    {
+                        existingPrimaryFacility.IsPrimary = false;
+                        facilityEntity.IsPrimary = facility.IsPrimary;
+                        facilityEntity.IsActive = facility.IsActive;
+                        _context.FacilityEntities.Update(existingPrimaryFacility);
+                        _context.SaveChanges();
+                    }
+                    else
+                        throw new Exception("No record found for primary Facility !! You can't change IsPrimary status");
+
+                    goto updateFacilityCase;
+                }
+                else
+                    goto updateFacilityCase;
+
+            }
+
+        updateFacilityCase:
+            {
+                facilityEntity.Name = facility.Name;
+                facilityEntity.Description = facility.Description;
+                facilityEntity.IsPrimary = facility.IsPrimary;
+                facilityEntity.AssociatePipelineId = facility.AssociatePipelineId;
+                facilityEntity.ReportingTypeId = facility.ReportingTypeId;
+                facilityEntity.SupplyChainStageId = facility.SupplyChainStageId;
+                facilityEntity.UpdatedOn = DateTime.UtcNow;
+                facilityEntity.UpdatedBy = "System";
+
+                _context.FacilityEntities.Update(facilityEntity);
+                _context.SaveChanges();
+                return true;
+            } 
         }
         public bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId)
         {
@@ -389,6 +519,7 @@ namespace DataAccess.DataActions
 
         #endregion
 
+        #region Private Method
         private bool IsUniqueEmail(string email, string entity)
         {
             if (entity == "User")
@@ -412,5 +543,10 @@ namespace DataAccess.DataActions
             return false;
         }
 
+        #endregion
     }
 }
+/*
+ * GHGRP TO NON THEN ISPRIMARY IS BY DEAFULT = TRUE
+ * NON TO GHGRP THEN CHECK ISPRIMARY ACCORDING TO PAYLOAD
+ */

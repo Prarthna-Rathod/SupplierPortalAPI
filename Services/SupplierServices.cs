@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using Microsoft.Extensions.Logging;
@@ -74,6 +75,18 @@ namespace Services
             return ConfigureSupplier(supplierEntity);
         }
 
+        private List<FacilityDto> RetrieveFacilityDtosForSupplier(Supplier supplier)
+        {
+            var facilityDtos = _supplierDomainDtoMapper.ConvertFacilitiesToDto(supplier.Name, supplier.Facilities);
+            return facilityDtos;
+        }
+
+        private List<ContactDto> RetrieveContactDtosForSupplier(Supplier supplier)
+        {
+            var contactDtos = _supplierDomainDtoMapper.ConvertContactsToDto(supplier.Name, supplier.Contacts);
+            return contactDtos;
+        }
+
         private Supplier ConfigureSupplier(SupplierEntity supplierEntity)
         {
             var reportingTypes = GetAndConvertReportingType();
@@ -84,6 +97,7 @@ namespace Services
             var supplier = _supplierEntityDomainMapper.ConvertSupplierEntityToDomain(supplierEntity, reportingTypes, supplyChainStages, associatePipelines);
             return supplier;
         }
+
         /// <summary>
         /// AddUpdateContact
         /// Supplier should be active for add contacts
@@ -161,7 +175,14 @@ namespace Services
         /// <returns></returns>
         public string UpdateFacility(FacilityDto facilityDto)
         {
-            var associatePipeline = new AssociatePipeline();
+            AssociatePipeline? associatePipeline = null;
+            if (facilityDto.AssociatePipelineId != null)
+            {
+                associatePipeline = GetAndConvertAssociatePipelines().FirstOrDefault(x => x.Id == facilityDto.AssociatePipelineId);
+                if (associatePipeline is null)
+                    throw new Exception("Can't found AssociatePipeline !!");
+            }
+
 
             var reportingType = GetAndConvertReportingType()
                .Where(x => x.Id == facilityDto.ReportingTypeId).FirstOrDefault();
@@ -169,7 +190,8 @@ namespace Services
                .Where(x => x.Id == facilityDto.SupplyChainStageId).FirstOrDefault();
 
             var supplier = RetrieveAndConvertSupplier(facilityDto.SupplierId);
-            var facility = supplier.UpdateSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary, associatePipeline, reportingType, supplyChainStage);
+
+            var facility = supplier.UpdateSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary,facilityDto.GHGRPFacilityId, associatePipeline, reportingType, supplyChainStage, facilityDto.IsActive);
 
             var facilityEntity = _supplierEntityDomainMapper.ConvertFacilityDomainToEntity(facility);
 
@@ -199,8 +221,9 @@ namespace Services
         public SupplierDto GetSupplierById(int supplierId)
         {
             var supplier = RetrieveAndConvertSupplier(supplierId);
-
-            var supplierDto = _supplierDomainDtoMapper.ConvertSupplierDomainToDto(supplier);
+            var contactDtos = RetrieveContactDtosForSupplier(supplier);
+            var facilityDtos = RetrieveFacilityDtosForSupplier(supplier);
+            var supplierDto = new SupplierDto(supplierId, supplier.Name, supplier.Alias, supplier.Email, supplier.ContactNo, supplier.IsActive, facilityDtos, contactDtos);
             return supplierDto;
         }
         #endregion

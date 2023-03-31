@@ -7,6 +7,36 @@ namespace Services.Mappers.SupplierMappers
 {
     public class SupplierDomainDtoMapper : ISupplierDomainDtoMapper
     {
+        public ContactDto ConvertContactDomainToDto(string supplierName, Contact contact)
+        {
+            return new ContactDto(contact.Id, contact.SupplierId, supplierName, contact.UserVO.Id, contact.UserVO.Name, contact.UserVO.Email, contact.UserVO.ContactNo, contact.UserVO.IsActive);
+        }
+
+        public List<ContactDto> ConvertContactsToDto(string supplierName, IEnumerable<Contact> contacts)
+        {
+            var contactDtos = new List<ContactDto>();
+            foreach (var contact in contacts)
+            {
+                contactDtos.Add(ConvertContactDomainToDto(supplierName, contact));
+            }
+            return contactDtos;
+        }
+
+        public List<FacilityDto> ConvertFacilitiesToDto(string supplierName, IEnumerable<Facility> facilities)
+        {
+            var facilityDtos = new List<FacilityDto>();
+            foreach (var facility in facilities)
+            {
+                facilityDtos.Add(ConvertFacilityDomainToDto(supplierName, facility));
+            }
+            return facilityDtos;
+        }
+
+        public FacilityDto ConvertFacilityDomainToDto(string supplierName, Facility facility)
+        {
+            return new FacilityDto(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.SupplierId, supplierName, facility.GHGHRPFacilityId, facility.AssociatePipelines?.Id, facility.AssociatePipelines?.Name, facility.ReportingTypes.Id, facility.ReportingTypes.Name, facility.SupplyChainStages.Id, facility.SupplyChainStages.Name, facility.IsActive);
+        }
+
         public SupplierDto ConvertSupplierDomainToDto(Supplier supplier)
         {
             var contactDtos = new List<ContactDto>();
