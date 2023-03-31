@@ -59,7 +59,7 @@ namespace SupplierPortalAPI.Controllers
         [HttpPut("UpdateFacility")]
         public string UpdateFacility(FacilityDto facilityDto) 
         {
-            return "";
+            return _service.UpdateFacility(facilityDto);
         }
 
         #endregion

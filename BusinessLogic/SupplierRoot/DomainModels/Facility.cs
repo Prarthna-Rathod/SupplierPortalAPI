@@ -1,6 +1,5 @@
 ﻿
 using BusinessLogic.ReferenceLookups;
-using BusinessLogic.SupplierRoot.ValueObjects;
 
 namespace BusinessLogic.SupplierRoot.DomainModels;
 
@@ -37,6 +36,55 @@ public class Facility
         : this(name, description, isPrimary, supplierId,ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive)
     {
         Id = id;
+    }
+
+    internal void UpdateFacility(string name, string description, bool isPrimary, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
+    {
+        UpdateName(name);
+        UpdateDescription(description);
+        UpdateIsPrimary(isPrimary);
+        UpdateAssociatePipeline(associatePipeline);
+        UpdateReportingType(reportingType);
+        UpdateSupplyChainStage(supplyChainStage);
+        UpdateIsActive(isActive);
+    }
+
+    internal void UpdateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new Exception("FacilityName is required");
+        }
+        else
+            Name = name;
+    }
+
+    internal void UpdateDescription(string description)
+    {
+        Description = description;
+    }
+
+    internal void UpdateIsPrimary(bool isPrimary)
+    { IsPrimary = isPrimary; }
+
+    internal void UpdateAssociatePipeline(AssociatePipeline associatePipeline)
+    {
+        AssociatePipelines = associatePipeline;
+    }
+
+    internal void UpdateReportingType(ReportingType reportingType)
+    {
+        ReportingTypes = reportingType;
+    }
+
+    internal void UpdateSupplyChainStage(SupplyChainStage supplyChainStage)
+    {
+        SupplyChainStages = supplyChainStage;
+    }
+
+    internal void UpdateIsActive(bool isActive)
+    {
+        IsActive = isActive;
     }
 
 }

@@ -39,7 +39,7 @@ namespace Services.Mappers.SupplierMappers
 
             if (facility.AssociatePipelines != null)
             {
-                if(facility.AssociatePipelines.Id == 0 && facility.AssociatePipelines.Name != null) 
+                if(facility.AssociatePipelines.Id == 0 && facility.AssociatePipelines.Name != null)
                 {
                     var associatedPipelineEntity = new AssociatePipelineEntity();
                     associatedPipelineEntity.Id = facility.AssociatePipelines.Id;
@@ -117,11 +117,11 @@ namespace Services.Mappers.SupplierMappers
                 var supplyChainStage = supplyChainStages.Where(x => x.Id == facility.SupplyChainStageId).FirstOrDefault();
                 var associatePipeline = associatePipelines.Where(x => x.Id == facility.AssociatePipelineId).FirstOrDefault();
 
-                supplier.AddSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);
+                /*supplier.AddSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);*/
+
+                supplier.LoadSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);
             }
-
             return supplier;
-
         }
 
         public IEnumerable<Supplier> ConvertSuppliersListEntityToDomain(IEnumerable<SupplierEntity> supplierEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<AssociatePipeline> associatePipelines)
