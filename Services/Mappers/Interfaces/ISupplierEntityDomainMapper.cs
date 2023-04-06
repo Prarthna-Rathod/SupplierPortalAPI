@@ -13,6 +13,7 @@ namespace Services.Mappers.Interfaces
         ContactEntity ConvertContactDomainToEntity(Contact contact);
         IEnumerable<Supplier> ConvertSuppliersListEntityToDomain(IEnumerable<SupplierEntity> supplierEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<AssociatePipeline> associatePipelines);
 
+        IEnumerable<FacilityEntity> ConvertFacilitiesDomainToEntity(IEnumerable<Facility> facilities);
         FacilityEntity ConvertFacilityDomainToEntity(Facility facility);
 
     }

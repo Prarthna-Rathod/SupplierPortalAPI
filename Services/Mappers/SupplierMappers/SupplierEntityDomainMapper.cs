@@ -1,8 +1,6 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.SupplierRoot.DomainModels;
-using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
-using Services.DTOs;
 using Services.Mappers.Interfaces;
 
 namespace Services.Mappers.SupplierMappers
@@ -11,8 +9,8 @@ namespace Services.Mappers.SupplierMappers
     {
         public ContactEntity ConvertContactDomainToEntity(Contact contact)
         {
-            var user = new UserEntity 
-            { 
+            var user = new UserEntity
+            {
                 Id = contact.UserVO.Id,
                 Name = contact.UserVO.Name,
                 Email = contact.UserVO.Email,
@@ -27,6 +25,16 @@ namespace Services.Mappers.SupplierMappers
             };
         }
 
+        public IEnumerable<FacilityEntity> ConvertFacilitiesDomainToEntity(IEnumerable<Facility> facilities)
+        {
+            var facilityEntities = new List<FacilityEntity>();
+
+            foreach (var facility in facilities)
+            {
+                facilityEntities.Add(ConvertFacilityDomainToEntity(facility));
+            }
+            return facilityEntities;
+        }
         public FacilityEntity ConvertFacilityDomainToEntity(Facility facility)
         {
             var facilityEntity = new FacilityEntity();
@@ -39,18 +47,25 @@ namespace Services.Mappers.SupplierMappers
 
             if (facility.AssociatePipelines != null)
             {
-                if(facility.AssociatePipelines.Id == 0 && facility.AssociatePipelines.Name != null)
+                if (facility.AssociatePipelines.Id == 0 && facility.AssociatePipelines.Name != null)
                 {
                     var associatedPipelineEntity = new AssociatePipelineEntity();
                     associatedPipelineEntity.Id = facility.AssociatePipelines.Id;
                     associatedPipelineEntity.Name = facility.AssociatePipelines.Name;
+
+                    facilityEntity.AssociatePipeline = associatedPipelineEntity;
+                    facilityEntity.AssociatePipelineId = associatedPipelineEntity.Id;
                 }
                 else
-                facilityEntity.AssociatePipelineId = facility.AssociatePipelines.Id;
+                {
+                    facilityEntity.AssociatePipelineId = facility.AssociatePipelines.Id;
+                   // facilityEntity.AssociatePipeline = facility.AssociatePipelines;
+                }
+                    
             }
-           facilityEntity.ReportingTypeId = facility.ReportingTypes.Id;
-           facilityEntity.SupplyChainStageId = facility.SupplyChainStages.Id;
-           facilityEntity.IsActive = facility.IsActive;
+            facilityEntity.ReportingTypeId = facility.ReportingTypes.Id;
+            facilityEntity.SupplyChainStageId = facility.SupplyChainStages.Id;
+            facilityEntity.IsActive = facility.IsActive;
 
             return facilityEntity;
         }
@@ -85,14 +100,14 @@ namespace Services.Mappers.SupplierMappers
                 facilityEntity.Id = facility.Id;
                 facilityEntity.Name = facility.Name;
                 facilityEntity.Description = facility.Description;
-                facilityEntity.IsPrimary = facility.IsPrimary;                
+                facilityEntity.IsPrimary = facility.IsPrimary;
                 facilityEntity.GhgrpfacilityId = facility.GHGHRPFacilityId;
                 facilityEntity.SupplierId = facility.SupplierId;
                 facilityEntity.AssociatePipelineId = facility.AssociatePipelines.Id;
                 facilityEntity.ReportingTypeId = facility.ReportingTypes.Id;
                 facilityEntity.SupplyChainStageId = facility.SupplyChainStages.Id;
                 facilityEntity.IsActive = facility.IsActive;
-                
+
                 supplierFacilities.Add(facilityEntity);
             }
 
@@ -108,10 +123,10 @@ namespace Services.Mappers.SupplierMappers
 
             foreach (var contact in supplierEntity.ContactEntities)
             {
-                supplier.AddSupplierContact(contact.Id , contact.User.Id, contact.User.Name, contact.User.Email, contact.User.ContactNo, contact.User.IsActive);
+                supplier.AddSupplierContact(contact.Id, contact.User.Id, contact.User.Name, contact.User.Email, contact.User.ContactNo, contact.User.IsActive);
             }
 
-            foreach(var facility in supplierEntity.FacilityEntities)
+            foreach (var facility in supplierEntity.FacilityEntities)
             {
                 var reportingType = reportingTypes.Where(x => x.Id == facility.ReportingTypeId).FirstOrDefault();
                 var supplyChainStage = supplyChainStages.Where(x => x.Id == facility.SupplyChainStageId).FirstOrDefault();
@@ -127,7 +142,7 @@ namespace Services.Mappers.SupplierMappers
         public IEnumerable<Supplier> ConvertSuppliersListEntityToDomain(IEnumerable<SupplierEntity> supplierEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<AssociatePipeline> associatePipelines)
         {
             var list = new List<Supplier>();
-            
+
             foreach (var entity in supplierEntities)
             {
                 list.Add(ConvertSupplierEntityToDomain(entity, reportingTypes, supplyChainStages, associatePipelines));

@@ -178,11 +178,17 @@ namespace Services
             AssociatePipeline? associatePipeline = null;
             if (facilityDto.AssociatePipelineId != null)
             {
-                associatePipeline = GetAndConvertAssociatePipelines().FirstOrDefault(x => x.Id == facilityDto.AssociatePipelineId);
-                if (associatePipeline is null)
-                    throw new Exception("Can't found AssociatePipeline !!");
+                if (facilityDto.AssociatePipelineId == 0 && facilityDto.AssociatePipelineName is not null)
+                {
+                    associatePipeline = new AssociatePipeline(0, facilityDto.AssociatePipelineName);
+                }
+                else
+                {
+                    associatePipeline = GetAndConvertAssociatePipelines().FirstOrDefault(x => x.Id == facilityDto.AssociatePipelineId);
+                    if (associatePipeline is null)
+                        throw new Exception("Can't found AssociatePipeline !!");
+                }
             }
-
 
             var reportingType = GetAndConvertReportingType()
                .Where(x => x.Id == facilityDto.ReportingTypeId).FirstOrDefault();
@@ -191,12 +197,18 @@ namespace Services
 
             var supplier = RetrieveAndConvertSupplier(facilityDto.SupplierId);
 
-            var facility = supplier.UpdateSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary,facilityDto.GHGRPFacilityId, associatePipeline, reportingType, supplyChainStage, facilityDto.IsActive);
+            /*var facility = supplier.UpdateSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary,facilityDto.GHGRPFacilityId, associatePipeline, reportingType, supplyChainStage, facilityDto.IsActive);
 
             var facilityEntity = _supplierEntityDomainMapper.ConvertFacilityDomainToEntity(facility);
 
-            _persister.UpdateFacility(facilityEntity);
+             _persister.UpdateFacility(facilityEntity);*/
 
+            var facility = supplier.UpdateSupplierFacility(facilityDto.Id, facilityDto.Name, facilityDto.Description, facilityDto.IsPrimary, facilityDto.GHGRPFacilityId, associatePipeline, reportingType, supplyChainStage, facilityDto.IsActive);
+
+            var facilities = supplier.Facilities;
+            var facilityEntities = _supplierEntityDomainMapper.ConvertFacilitiesDomainToEntity(facilities);
+            
+            _persister.UpdateAllFacilities(facilityEntities);
             return "Facility updated successfully";
         }
         #endregion
