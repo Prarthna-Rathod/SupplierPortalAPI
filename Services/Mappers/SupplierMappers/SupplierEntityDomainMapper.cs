@@ -81,8 +81,8 @@ namespace Services.Mappers.SupplierMappers
                 ContactNo = supplier.ContactNo,
                 IsActive = supplier.IsActive
             };
-
-            var supplierContacts = new List<ContactEntity>();
+            return entity;
+            /*var supplierContacts = new List<ContactEntity>();
             foreach (var contact in supplier.Contacts)
             {
                 var contactEntity = new ContactEntity();
@@ -113,8 +113,8 @@ namespace Services.Mappers.SupplierMappers
 
             entity.ContactEntities = supplierContacts;
             entity.FacilityEntities = supplierFacilities;
+*/
 
-            return entity;
         }
 
         public Supplier ConvertSupplierEntityToDomain(SupplierEntity supplierEntity, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<AssociatePipeline> associatePipelines)
