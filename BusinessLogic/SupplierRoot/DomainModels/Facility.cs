@@ -1,5 +1,5 @@
-﻿
-using BusinessLogic.ReferenceLookups;
+﻿using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ValueConstants;
 
 namespace BusinessLogic.SupplierRoot.DomainModels;
 
@@ -11,7 +11,7 @@ public class Facility
     public bool IsPrimary { get; set; }
     public int SupplierId { get; private set; }
     public string? GHGHRPFacilityId { get; private set; }
-    public AssociatePipeline AssociatePipelines { get; private set; }
+    public AssociatePipeline? AssociatePipelines { get; private set; }
     public ReportingType ReportingTypes { get; private set; }
     public SupplyChainStage SupplyChainStages { get; private set; }
     public bool IsActive { get; set; }
@@ -19,7 +19,7 @@ public class Facility
     internal Facility()
     { }
 
-    internal Facility(string name, string description, bool isPrimary, int supplierId, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
+    internal Facility(string name, string description, bool isPrimary, int supplierId, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
     {
         Name = name;
         Description = description;
@@ -32,21 +32,10 @@ public class Facility
         IsActive = isActive;
     }
 
-    internal Facility(int id, string name, string description, bool isPrimary, int supplierId, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive) 
-        : this(name, description, isPrimary, supplierId,ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive)
+    internal Facility(int id, string name, string description, bool isPrimary, int supplierId, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
+        : this(name, description, isPrimary, supplierId, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive)
     {
         Id = id;
-    }
-
-    internal void UpdateFacility(string name, string description, bool isPrimary, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
-    {
-        UpdateName(name);
-        UpdateDescription(description);
-        UpdateIsPrimary(isPrimary);
-        UpdateAssociatePipeline(associatePipeline);
-        UpdateReportingType(reportingType);
-        UpdateSupplyChainStage(supplyChainStage);
-        UpdateIsActive(isActive);
     }
 
     internal void UpdateName(string name)
@@ -65,7 +54,14 @@ public class Facility
     }
 
     internal void UpdateIsPrimary(bool isPrimary)
-    { IsPrimary = isPrimary; }
+    {
+        IsPrimary = ReportingTypes.Name == ReportingTypeValues.GHGRP ? isPrimary : true;
+    }
+
+    internal void UpdateGhgrpFacilityId(string? ghgrpFacilityId)
+    {       
+        GHGHRPFacilityId = ghgrpFacilityId;
+    }
 
     internal void UpdateAssociatePipeline(AssociatePipeline associatePipeline)
     {

@@ -117,7 +117,7 @@ namespace DataAccess.DataActions
                     {
                         primaryFacility.IsPrimary = false;
                         _context.FacilityEntities.Update(primaryFacility);
-                        _context.SaveChanges();
+                        //_context.SaveChanges();
                     }
                 }
                 else
@@ -360,7 +360,8 @@ namespace DataAccess.DataActions
             _context.SaveChanges();
             return true;
         }
-        public bool UpdateFacility(FacilityEntity facility)
+
+        /*public bool UpdateFacility(FacilityEntity facility)
         {
             var facilityEntity = _context.FacilityEntities
                                 .Where(x => x.Id == facility.Id)
@@ -379,131 +380,115 @@ namespace DataAccess.DataActions
                 throw new Exception("Supplier cannot be changed !!");
             }
 
+            if (facility.AssociatePipelineId != null)
+            {
+                if (facility.AssociatePipelineId == 0 && facility.AssociatePipeline.Name != null)
+                {
+                    var associatePipeline = AddAssociatePipeline(facility.AssociatePipeline.Name);
+                    facility.AssociatePipeline = associatePipeline;
+                    facility.AssociatePipelineId = associatePipeline.Id;
+                }
+                else
+                {
+                    facilityEntity.AssociatePipeline = facility.AssociatePipeline;
+                    facilityEntity.AssociatePipelineId = facilityEntity.AssociatePipelineId;
+                }
+            }
+
             var reportingType = _context.ReportingTypeEntities.FirstOrDefault(x => x.Id == facility.ReportingTypeId);
 
-
-            if (reportingType?.Name == REPORTING_TYPE_GHGRP && facilityEntity.ReportingType.Name == REPORTING_TYPE_GHGRP)
+            if (!facility.IsActive && facilityEntity.IsPrimary && facilityEntity.ReportingType.Name == REPORTING_TYPE_GHGRP)
             {
-                if ( (facility.IsPrimary == true && facilityEntity.IsPrimary == true) || facility.IsActive == true)
-                {
-                    goto updateFacilityCase;
-                }
-                else if (facility.IsPrimary == false || facility.IsActive == false)
-                {
-                    goto existingFacilityCase;
-                }
-                else if (facility.IsPrimary == true && facilityEntity.IsPrimary == false)
-                {
-                    goto caseGHGRP;
-                }
-            }
-            else if (reportingType.Name == REPORTING_TYPE_NONGHGRP && facilityEntity.ReportingType.Name != REPORTING_TYPE_NONGHGRP)
-            {
-                goto nonGHGRPCase;
-            }
-            // change reporting period NONGHGRP to GHGRP
-            else if (reportingType.Name == REPORTING_TYPE_GHGRP &&
-                facility.ReportingType.Name != REPORTING_TYPE_GHGRP)
-            {
-                goto caseGHGRP;
+                throw new Exception("Cannot update GHGRP primary facility to InActive !!");
             }
 
-        existingFacilityCase:
+            if (reportingType.Name == REPORTING_TYPE_GHGRP && facility.GhgrpfacilityId != null)
             {
-                var existingPrimaryFacility = _context.FacilityEntities.Where(x =>
-                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
-                        x.GhgrpfacilityId == facility.GhgrpfacilityId &&
-                        x.IsPrimary == false && x.IsActive).FirstOrDefault();
+                var existingFacility = FindExistingFacility(facility.GhgrpfacilityId);
 
-                if (existingPrimaryFacility != null)
+                if (existingFacility != null)
                 {
-                    existingPrimaryFacility.IsPrimary = true;
-                    facilityEntity.IsActive = facility.IsActive;
+                    if (facility.IsPrimary)
+                        existingFacility.IsPrimary = false;
 
-                    _context.FacilityEntities.Update(existingPrimaryFacility);
-                    _context.SaveChanges();
+                    _context.FacilityEntities.Update(existingFacility);
                 }
                 else
-                    throw new Exception("No record found for other Primary Facility !! You can't change IsActive status false");
-
-                goto updateFacilityCase;
+                    facility.IsPrimary = true;
             }
 
-        nonGHGRPCase:
+            if(reportingType.Name == REPORTING_TYPE_GHGRP && facilityEntity.GhgrpfacilityId == null && facility.GhgrpfacilityId != null)
             {
-                if (facilityEntity.IsPrimary == true || facilityEntity.IsActive == true)
+                facilityEntity.GhgrpfacilityId = facility.GhgrpfacilityId;
+            }
+
+            facilityEntity.Name = facility.Name;
+            facilityEntity.Description = facility.Description;
+            facilityEntity.IsPrimary = facility.IsPrimary;
+            facilityEntity.AssociatePipelineId = facility.AssociatePipelineId;
+            facilityEntity.ReportingTypeId = facility.ReportingTypeId;
+            facilityEntity.SupplyChainStageId = facility.SupplyChainStageId;
+            facilityEntity.IsActive = facility.IsActive;
+            facilityEntity.UpdatedOn = DateTime.UtcNow;
+            facilityEntity.UpdatedBy = "System";
+
+            _context.FacilityEntities.Update(facilityEntity);
+            _context.SaveChanges();
+            return true;
+
+        }
+*/
+        public bool UpdateAllFacilities(IEnumerable<FacilityEntity> facilityEntities)
+        {
+            var supplierId = facilityEntities.First().SupplierId;
+            var facilities = _context.FacilityEntities.Where(x => x.SupplierId == supplierId).ToList();
+            foreach (var updateFacility in facilityEntities)
+            {
+                var facilityEntity = facilities
+                                .Where(x => x.Id == updateFacility.Id)
+                                .FirstOrDefault();
+
+                if (facilityEntity == null)
                 {
-                    var existingPrimaryFacility = _context.FacilityEntities.Where(x =>
-                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
-                        x.GhgrpfacilityId == facility.GhgrpfacilityId &&
-                        x.IsPrimary == false && x.IsActive).FirstOrDefault();
-
-                    if (existingPrimaryFacility != null)
-                    {
-                        existingPrimaryFacility.IsPrimary = true;
-                        facility.IsPrimary = true;
-                        facilityEntity.IsPrimary = facility.IsPrimary;
-                        facilityEntity.ReportingTypeId = reportingType.Id;
-                        facilityEntity.IsActive = facility.IsActive;
-                        _context.FacilityEntities.Update(existingPrimaryFacility);
-                        _context.SaveChanges();
-                    }
-                    else
-                        throw new Exception("No record found for other Primary Facility !! You can't change IsActive status false");
-
-                    goto updateFacilityCase;
+                    throw new Exception("Facility not found !!");
                 }
-                else
-                    goto updateFacilityCase;
 
-            }
-
-        caseGHGRP:
-            {
-                //NONGHGRP TO GHGRP then check IsPrimary according to Payload
-
-                //if (facility.IsPrimary == true || facility.IsActive == true)
-                if (facility.IsPrimary == true)
+                if (updateFacility.AssociatePipeline != null)
                 {
-                    var existingPrimaryFacility = _context.FacilityEntities.Where(x =>
-                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
-                        x.GhgrpfacilityId == facility.GhgrpfacilityId &&
-                        x.IsPrimary && x.IsActive).FirstOrDefault();
-
-                    if (existingPrimaryFacility != null)
-                    {
-                        existingPrimaryFacility.IsPrimary = false;
-                        facilityEntity.IsPrimary = facility.IsPrimary;
-                        facilityEntity.IsActive = facility.IsActive;
-                        _context.FacilityEntities.Update(existingPrimaryFacility);
-                        _context.SaveChanges();
-                    }
-                    else
-                        throw new Exception("No record found for primary Facility !! You can't change IsPrimary status");
-
-                    goto updateFacilityCase;
+                    var associatePipeline = AddAssociatePipeline(updateFacility.AssociatePipeline.Name);
+                    updateFacility.AssociatePipeline = associatePipeline;
+                    updateFacility.AssociatePipelineId = associatePipeline.Id;
                 }
-                else
-                    goto updateFacilityCase;
 
-            }
-
-        updateFacilityCase:
-            {
-                facilityEntity.Name = facility.Name;
-                facilityEntity.Description = facility.Description;
-                facilityEntity.IsPrimary = facility.IsPrimary;
-                facilityEntity.AssociatePipelineId = facility.AssociatePipelineId;
-                facilityEntity.ReportingTypeId = facility.ReportingTypeId;
-                facilityEntity.SupplyChainStageId = facility.SupplyChainStageId;
+                facilityEntity.AssociatePipeline = updateFacility.AssociatePipeline;
+                facilityEntity.AssociatePipelineId = updateFacility.AssociatePipelineId;
+                facilityEntity.Name = updateFacility.Name;
+                facilityEntity.Description = updateFacility.Description;
+                facilityEntity.IsPrimary = updateFacility.IsPrimary;
+                facilityEntity.GhgrpfacilityId = updateFacility.GhgrpfacilityId;
+                facilityEntity.AssociatePipelineId = updateFacility.AssociatePipelineId;
+                facilityEntity.ReportingTypeId = updateFacility.ReportingTypeId;
+                facilityEntity.SupplyChainStageId = updateFacility.SupplyChainStageId;
+                facilityEntity.IsActive = updateFacility.IsActive;
                 facilityEntity.UpdatedOn = DateTime.UtcNow;
                 facilityEntity.UpdatedBy = "System";
+            }
 
-                _context.FacilityEntities.Update(facilityEntity);
-                _context.SaveChanges();
-                return true;
-            } 
+            _context.SaveChanges();
+            return true;
         }
+
+        private FacilityEntity FindExistingFacility(string? ghgrpFacilityId)
+        {
+            var existingFacility = _context.FacilityEntities.Where(x =>
+                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
+                        x.GhgrpfacilityId == ghgrpFacilityId &&
+                        x.IsPrimary && x.IsActive)
+                        .FirstOrDefault();
+
+            return existingFacility;
+        }
+
         public bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId)
         {
             var associatePipelineEntity = _context.AssociatePipelineEntities.Where(x => x.Id == associatePipelineId).FirstOrDefault();

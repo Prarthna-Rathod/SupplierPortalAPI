@@ -34,12 +34,12 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 
         private Supplier() { }
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Alias { get; set; }
-        public string Email { get; set; }
-        public string ContactNo { get; set; }
-        public bool IsActive { get; set; }
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Alias { get; private set; }
+        public string Email { get; private set; }
+        public string ContactNo { get; private set; }
+        public bool IsActive { get; private set; }
 
         public IEnumerable<Facility> Facilities
         {
@@ -152,40 +152,36 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 
         public Facility AddSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
         {
-            if (IsActive == true)
+            if (!IsActive) throw new Exception("Supplier is not active for add facility !!");
+
+            if (isActive == false)
+                throw new Exception("Can't add InActive facility !!");
+
+            CheckFacilityValidations(ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage);
+
+            if (reportingType.Name == ReportingTypeValues.GHGRP)
             {
-                CheckFacilityValidations(ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage);
+                //Check IsPrimaryFacility
+                var primaryFacility = _facilities.Where(x =>
+                    x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
+                    x.GHGHRPFacilityId == ghgrpFacilityId &&
+                    x.IsPrimary &&
+                    x.IsActive).FirstOrDefault();
 
-                if (isActive == false)
-                {
-                    throw new Exception("Can't add InActive facility !!");
-                }
-
-                if (reportingType.Name == ReportingTypeValues.GHGRP)
-                {
-                    //Check IsPrimaryFacility
-                    var primaryFacility = _facilities.Where(x =>
-                        x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
-                        x.GHGHRPFacilityId == ghgrpFacilityId &&
-                        x.IsPrimary &&
-                        x.IsActive).FirstOrDefault();
-
-                    if (primaryFacility != null && isPrimary == true)
-                        primaryFacility.IsPrimary = false;
-                    else
-                        isPrimary = true;
-                }
+                if (primaryFacility != null && isPrimary == true)
+                    primaryFacility.IsPrimary = false;
                 else
                     isPrimary = true;
-
-
-                var facility = new Facility(facilityId, name, description, isPrimary, Id, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive);
-
-                _facilities.Add(facility);
-                return facility;
             }
             else
-                throw new Exception("Supplier is not active for add facility !!");
+                isPrimary = true;
+
+
+            var facility = new Facility(facilityId, name, description, isPrimary, Id, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage, isActive);
+
+            _facilities.Add(facility);
+            return facility;
+
         }
 
         private void CheckFacilityValidations(string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage)
@@ -209,15 +205,12 @@ namespace BusinessLogic.SupplierRoot.DomainModels
         }
 
         private void CheckUpdateFacilityValidations(string? facilityGHGRPId, string? payLoadGHGRPFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage)
-        {           
-            if(reportingType.Name == ReportingTypeValues.GHGRP)
+        {
+            if (reportingType.Name == ReportingTypeValues.GHGRP && facilityGHGRPId != null)
             {
-                if (payLoadGHGRPFacilityId == null)
-                    throw new Exception("GHGRPFacilityId is required !!");
-
                 if (facilityGHGRPId != payLoadGHGRPFacilityId)
                     throw new Exception("GHGRPFacilityId cannot be change !!");
-            }            
+            }
 
             if (supplyChainStage.Name != SupplyChainStagesValues.TransmissionCompression)
             {
@@ -229,6 +222,19 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 
         }
 
+        private Facility FindExistingFacility(string? ghgrpFacilityId)
+        {
+            var existingFacility = _facilities.Where(x =>
+                        x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
+                        x.GHGHRPFacilityId == ghgrpFacilityId &&
+                        x.IsPrimary && x.IsActive)
+                        .FirstOrDefault();
+
+            return existingFacility;
+        }
+
+
+        /*public IEnumerable<Facility> UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)*/
         public Facility UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
         {
             var facility = _facilities.FirstOrDefault(x => x.Id == facilityId);
@@ -236,117 +242,59 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 
             CheckUpdateFacilityValidations(facility.GHGHRPFacilityId, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage);
 
-            if (reportingType.Name == ReportingTypeValues.GHGRP && facility.ReportingTypes.Name == ReportingTypeValues.GHGRP)
+            if (!isActive && facility.IsPrimary && facility.ReportingTypes.Name == ReportingTypeValues.GHGRP)
             {
-
-                if( (isPrimary == true && facility.IsPrimary == true) || isActive == true)
-                {
-                    goto updateFacilityCase;
-                }
-                else if(isPrimary == false || isActive == false)
-                {
-                    goto existingFacilityCase;
-                }
-                else if(isPrimary == true && facility.IsPrimary == false)
-                {
-                    goto caseGHGRP;
-                }
-            }
-                // change reporting period GHGRP to NONGHGRP
-            else if(reportingType.Name == ReportingTypeValues.NonGHGRP && facility.ReportingTypes.Name != ReportingTypeValues.NonGHGRP) 
-            {
-                goto nonGHGRPCase;
-            }
-                // change reporting period NONGHGRP to GHGRP
-            else if (reportingType.Name == ReportingTypeValues.GHGRP && 
-                facility.ReportingTypes.Name != ReportingTypeValues.GHGRP)
-            {
-                goto caseGHGRP;
+                throw new Exception("Cannot update GHGRP primary facility to InActive !!");
             }
 
-            existingFacilityCase:
+            if (reportingType.Name == ReportingTypeValues.GHGRP && ghgrpFacilityId != null && isPrimary)
             {
-                var existingPrimaryFacility = _facilities.Where(x =>
-                        x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
-                        x.GHGHRPFacilityId == ghgrpFacilityId &&
-                        x.IsPrimary == false && x.IsActive).FirstOrDefault();
+                var existingFacility = FindExistingFacility(ghgrpFacilityId);
 
-                if (existingPrimaryFacility != null)
+                if (existingFacility != null)
                 {
-                    existingPrimaryFacility.IsPrimary = true;
-                    facility.IsActive = isActive;
+                    if (isPrimary)
+                        existingFacility.UpdateIsPrimary(false);
                 }
                 else
-                    throw new Exception("No record found for other Primary Facility !! You can't change IsActive status false");
-
-                goto updateFacilityCase;
+                    isPrimary = true;
             }
-
-            nonGHGRPCase:
+            else
             {
-                //GHGRP TO NONGHGRP then by default IsPrimary = true
-                // if by default ghgrpfacilityId is null then existingPrimaryFacility = null
-                if(facility.IsPrimary == true || facility.IsActive == true)
-                {
-                    var existingPrimaryFacility = _facilities.Where(x =>
-                        x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
-                        x.GHGHRPFacilityId == ghgrpFacilityId &&
-                        x.IsPrimary == false && x.IsActive).FirstOrDefault();
+                var existingNonPrimaryFacility = _facilities.Where(x =>
+                    x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
+                    x.GHGHRPFacilityId == ghgrpFacilityId &&
+                     x.IsActive && x.Id != facilityId)
+                    .FirstOrDefault();
 
-                    if (existingPrimaryFacility != null)
+                if (ghgrpFacilityId is not null && reportingType.Name == ReportingTypeValues.NonGHGRP)
+                {
+                    if (existingNonPrimaryFacility != null)
                     {
-                        existingPrimaryFacility.IsPrimary = true;
-                        isPrimary = true;
-                        facility.IsPrimary = isPrimary;
-                        facility.ReportingTypes.Id = reportingType.Id;
-                        facility.IsActive = isActive;
+                        existingNonPrimaryFacility.UpdateIsPrimary(true);
                     }
-                    else
-                        throw new Exception("No record found for other Primary Facility !! You can't change IsActive status false");
-
-                    goto updateFacilityCase;
                 }
-                else
-                    goto updateFacilityCase;
 
+                if (reportingType.Name == ReportingTypeValues.GHGRP && ghgrpFacilityId != null && !isPrimary && isActive)
+                    existingNonPrimaryFacility.UpdateIsPrimary(true);
             }
 
-        caseGHGRP:
+            if (reportingType.Name == ReportingTypeValues.GHGRP && facility.GHGHRPFacilityId == null && ghgrpFacilityId != null)
             {
-                //NONGHGRP TO GHGRP then check IsPrimary according to Payload
-
-                //if (facility.IsPrimary == true || facility.IsActive == true)
-                if (isPrimary == true)
-                {
-                    var existingPrimaryFacility = _facilities.Where(x =>
-                        x.ReportingTypes.Name == ReportingTypeValues.GHGRP &&
-                        x.GHGHRPFacilityId == ghgrpFacilityId &&
-                        x.IsPrimary && x.IsActive).FirstOrDefault();
-
-                    if (existingPrimaryFacility != null)
-                    {
-                        existingPrimaryFacility.IsPrimary = false;
-                        facility.IsPrimary = isPrimary;
-                        facility.IsActive = isActive;
-                    }
-                    else
-                        throw new Exception("No record found for primary Facility !! You can't change IsPrimary status");
-
-                    goto updateFacilityCase;
-                }
-                else
-                    goto updateFacilityCase;
-                
+                facility.UpdateGhgrpFacilityId(ghgrpFacilityId);
             }
 
-            updateFacilityCase:
-            {
-                facility.UpdateFacility(name, description, isPrimary, associatePipeline, reportingType, supplyChainStage, isActive);
+            facility.UpdateName(name);
+            facility.UpdateDescription(description);
+            facility.UpdateReportingType(reportingType);
+            facility.UpdateIsPrimary(isPrimary);
+            facility.UpdateAssociatePipeline(associatePipeline);
+            facility.UpdateSupplyChainStage(supplyChainStage);
+            facility.UpdateIsActive(isActive);
 
-                return facility;
-            }
+            return facility;
+           
 
-            
         }
     }
 }
