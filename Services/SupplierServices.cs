@@ -113,7 +113,6 @@ namespace Services
             if (contactDto.Id == 0)
             {
                 var contact = supplier.AddSupplierContact(contactDto.Id, contactDto.UserId, contactDto.UserName, contactDto.UserEmail, contactDto.UserContactNo, contactDto.IsActive);
-
                 var contactEntity = _supplierEntityDomainMapper.ConvertContactDomainToEntity(contact);
                 _persister.AddContact(contactEntity);
             }
@@ -214,6 +213,11 @@ namespace Services
         #endregion
 
         #region GetAllMethods
+
+        /// <summary>
+        /// GetAllSuppliers List in Dto
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<SupplierDto> GetAllSuppliers()
         {
             var supplierList = _persister.GetAllSuppliers().Where(x => x.IsActive == true);
@@ -230,6 +234,12 @@ namespace Services
         #endregion
 
         #region GetById Methods
+
+        /// <summary>
+        /// GetSupplierById
+        /// </summary>
+        /// <param name="supplierId"></param>
+        /// <returns></returns>
         public SupplierDto GetSupplierById(int supplierId)
         {
             var supplier = RetrieveAndConvertSupplier(supplierId);
@@ -242,6 +252,10 @@ namespace Services
 
         #region Private Methods
 
+        /// <summary>
+        /// Get and Convert ReportingType reference lookup
+        /// </summary>
+        /// <returns></returns>
         private IEnumerable<ReportingType> GetAndConvertReportingType()
         {
             var reportingTypeEntity = _reportingPeriodDataActions.GetReportingTypes();
@@ -249,12 +263,20 @@ namespace Services
             return _referenceLookUpMapper.GetReportingTypeLookUp(reportingTypeEntity);
         }
 
+        /// <summary>
+        /// Get and Convert SupplyChainStage reference lookup
+        /// </summary>
+        /// <returns></returns>
         private IEnumerable<SupplyChainStage> GetAndConvertSupplyChainStages()
         {
             var supplyChainStageEntity = _persister.GetSupplyChainStages();
             return _referenceLookUpMapper.GetSupplyChainStagesLookUp(supplyChainStageEntity);
         }
 
+        /// <summary>
+        /// Get and Convert AssociatePipeline reference lookup
+        /// </summary>
+        /// <returns></returns>
         private IEnumerable<AssociatePipeline> GetAndConvertAssociatePipelines()
         {
             var associatePipelineEntity = _persister.GetAllAssociatePipeline();

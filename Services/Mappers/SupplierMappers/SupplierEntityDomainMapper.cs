@@ -7,6 +7,11 @@ namespace Services.Mappers.SupplierMappers
 {
     public class SupplierEntityDomainMapper : ISupplierEntityDomainMapper
     {
+        /// <summary>
+        /// Convert ContactDomain to ContactEntity mapper
+        /// </summary>
+        /// <param name="contact"></param>
+        /// <returns></returns>
         public ContactEntity ConvertContactDomainToEntity(Contact contact)
         {
             var user = new UserEntity
@@ -25,6 +30,11 @@ namespace Services.Mappers.SupplierMappers
             };
         }
 
+        /// <summary>
+        /// Convert FacilityDomainList to FacilityEntityList mapper
+        /// </summary>
+        /// <param name="facilities"></param>
+        /// <returns></returns>
         public IEnumerable<FacilityEntity> ConvertFacilitiesDomainToEntity(IEnumerable<Facility> facilities)
         {
             var facilityEntities = new List<FacilityEntity>();
@@ -35,6 +45,12 @@ namespace Services.Mappers.SupplierMappers
             }
             return facilityEntities;
         }
+
+        /// <summary>
+        /// Convert FacilityDomain to FacilityEntity mapper
+        /// </summary>
+        /// <param name="facility"></param>
+        /// <returns></returns>
         public FacilityEntity ConvertFacilityDomainToEntity(Facility facility)
         {
             var facilityEntity = new FacilityEntity();
@@ -70,6 +86,11 @@ namespace Services.Mappers.SupplierMappers
             return facilityEntity;
         }
 
+        /// <summary>
+        /// Convert SupplierDomain to SupplierEntity
+        /// </summary>
+        /// <param name="supplier"></param>
+        /// <returns></returns>
         public SupplierEntity ConvertSupplierDomainToEntity(Supplier supplier)
         {
             var entity = new SupplierEntity()
@@ -112,11 +133,18 @@ namespace Services.Mappers.SupplierMappers
             }
 
             entity.ContactEntities = supplierContacts;
-            entity.FacilityEntities = supplierFacilities;
-*/
+            entity.FacilityEntities = supplierFacilities;   */
 
         }
 
+        /// <summary>
+        /// Convert SupplierEntity to SupplierDomain mapper
+        /// </summary>
+        /// <param name="supplierEntity"></param>
+        /// <param name="reportingTypes"></param>
+        /// <param name="supplyChainStages"></param>
+        /// <param name="associatePipelines"></param>
+        /// <returns></returns>
         public Supplier ConvertSupplierEntityToDomain(SupplierEntity supplierEntity, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<AssociatePipeline> associatePipelines)
         {
             var supplier = new Supplier(supplierEntity.Id, supplierEntity.Name, supplierEntity.Alias, supplierEntity.Email, supplierEntity.ContactNo, supplierEntity.IsActive);
@@ -132,13 +160,19 @@ namespace Services.Mappers.SupplierMappers
                 var supplyChainStage = supplyChainStages.Where(x => x.Id == facility.SupplyChainStageId).FirstOrDefault();
                 var associatePipeline = associatePipelines.Where(x => x.Id == facility.AssociatePipelineId).FirstOrDefault();
 
-                /*supplier.AddSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);*/
-
                 supplier.LoadSupplierFacility(facility.Id, facility.Name, facility.Description, facility.IsPrimary, facility.GhgrpfacilityId, associatePipeline, reportingType, supplyChainStage, facility.IsActive);
             }
             return supplier;
         }
 
+        /// <summary>
+        /// Convert SupplierEntityList to SupplierDomainList
+        /// </summary>
+        /// <param name="supplierEntities"></param>
+        /// <param name="reportingTypes"></param>
+        /// <param name="supplyChainStages"></param>
+        /// <param name="associatePipelines"></param>
+        /// <returns></returns>
         public IEnumerable<Supplier> ConvertSuppliersListEntityToDomain(IEnumerable<SupplierEntity> supplierEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<AssociatePipeline> associatePipelines)
         {
             var list = new List<Supplier>();

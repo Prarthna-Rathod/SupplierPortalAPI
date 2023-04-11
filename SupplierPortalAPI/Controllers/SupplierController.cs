@@ -1,18 +1,21 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.Interfaces;
 
 namespace SupplierPortalAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SupplierController : ControllerBase
     {
         private ISupplierServices _service;
+        private readonly ILogger _logger;
 
-        public SupplierController(ISupplierServices supplierServices)
+        public SupplierController(ILoggerFactory loggerFactory, ISupplierServices supplierServices)
         {
+            _logger = loggerFactory.CreateLogger<SupplierController>();
             _service = supplierServices;
         }
 
