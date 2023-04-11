@@ -8,7 +8,6 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 {
     public class Supplier : ISupplier
     {
-        //
         private HashSet<Contact> _contacts;
         private HashSet<Facility> _facilities;
 
@@ -123,6 +122,10 @@ namespace BusinessLogic.SupplierRoot.DomainModels
                 ValidateUserContactNo(contactNo);
                 var userVO = new UserVO(userId, userName, email, contactNo, isActive);
                 var contact = new Contact(contactId, Id, userVO);
+                var x = _contacts.Where(x => x.UserVO.Email == email).FirstOrDefault();
+                if (x != null)
+                    throw new Exception("Email is already exists !!");
+
                 _contacts.Add(contact);
 
                 return contact;
@@ -151,7 +154,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
         }
 
         public Facility AddSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
-        {
+         {
             if (!IsActive) throw new Exception("Supplier is not active for add facility !!");
 
             if (isActive == false)
@@ -212,6 +215,9 @@ namespace BusinessLogic.SupplierRoot.DomainModels
                     throw new Exception("GHGRPFacilityId cannot be change !!");
             }
 
+            if (facilityGHGRPId != null && payLoadGHGRPFacilityId == null)
+                throw new Exception("GHGRPFacilityId cannot changed to be null !!");
+
             if (supplyChainStage.Name != SupplyChainStagesValues.TransmissionCompression)
             {
                 if (associatePipeline != null)
@@ -233,8 +239,6 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             return existingFacility;
         }
 
-
-        /*public IEnumerable<Facility> UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)*/
         public Facility UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
         {
             var facility = _facilities.FirstOrDefault(x => x.Id == facilityId);

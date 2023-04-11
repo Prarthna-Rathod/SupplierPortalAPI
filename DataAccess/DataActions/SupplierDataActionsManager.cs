@@ -9,7 +9,6 @@ namespace DataAccess.DataActions
     {
         private readonly SupplierPortalDBContext _context;
         private readonly string REPORTING_TYPE_GHGRP = "GHGRP";
-        private readonly string REPORTING_TYPE_NONGHGRP = "NonGHGRP";
 
         public SupplierDataActionsManager(SupplierPortalDBContext context)
         {
@@ -117,7 +116,6 @@ namespace DataAccess.DataActions
                     {
                         primaryFacility.IsPrimary = false;
                         _context.FacilityEntities.Update(primaryFacility);
-                        //_context.SaveChanges();
                     }
                 }
                 else
@@ -531,7 +529,3 @@ namespace DataAccess.DataActions
         #endregion
     }
 }
-/*
- * GHGRP TO NON THEN ISPRIMARY IS BY DEAFULT = TRUE
- * NON TO GHGRP THEN CHECK ISPRIMARY ACCORDING TO PAYLOAD
- */
