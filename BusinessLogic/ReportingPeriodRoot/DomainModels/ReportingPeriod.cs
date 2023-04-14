@@ -1,8 +1,8 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
-using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
-using DataAccess.Entities;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
@@ -11,13 +11,13 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         private HashSet<PeriodSupplier> _periodSupplier;
 
         private readonly string REPORTING_PERIOD_NAME_PREFIX = "Reporting Period Data";
-        public ReportingPeriod(ReportingPeriodType types, string collectionTimePeriod, ReportingPeriodStatus status, DateTime startDate, DateTime? endDate, bool isActive)
+        public ReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive)
         {
-            ValidateReportingPeriod(collectionTimePeriod, startDate, endDate, types);
-            DisplayName = GeneratedReportingPeriodName(types);
+            CheckCollectionTimePeriodData(reportingPeriodType.Name, collectionTimePeriod);
+            DisplayName = GeneratedReportingPeriodName(reportingPeriodType, collectionTimePeriod);
             CollectionTimePeriod = collectionTimePeriod;
-            ReportingPeriodType = types;
-            ReportingPeriodStatus = status;
+            ReportingPeriodType = reportingPeriodType;
+            ReportingPeriodStatus = reportingPeriodStatus;
             StartDate = startDate;
             EndDate = endDate;
             IsActive = isActive;
@@ -39,10 +39,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         public DateTime StartDate { get; private set; }
         public DateTime? EndDate { get; private set; }
         public bool IsActive { get; private set; }
-        public DateTime CreatedOn { get; private set; }
-        public DateTime? UpdatedOn { get; private set; }
-        public string CreatedBy { get; private set; }
-        public string? UpdatedBy { get; private set; }
 
         public ReportingPeriodType ReportingPeriodType { get; private set; }
 
@@ -54,20 +50,19 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return CollectionTimePeriod.Split(" ");
         }
 
-        private string GeneratedReportingPeriodName(ReportingPeriodType reportingPeriodType)
+        private string GeneratedReportingPeriodName(ReportingPeriodType reportingPeriodType, string collectionTimePeriod)
         {
             var reportingPeriodName = REPORTING_PERIOD_NAME_PREFIX;
             switch (reportingPeriodType.Name)
-
             {
                 case ReportingPeriodTypeValues.Annual:
-                    reportingPeriodName = $"{reportingPeriodName} Yearly";
+                    reportingPeriodName = $"{reportingPeriodName} Year {collectionTimePeriod}";
                     break;
                 case ReportingPeriodTypeValues.Quartly:
-                    reportingPeriodName = $"{reportingPeriodName} Quarterly";
+                    reportingPeriodName = $"{reportingPeriodName} {collectionTimePeriod}";
                     break;
                 case ReportingPeriodTypeValues.Monthly:
-                    reportingPeriodName = $"{reportingPeriodName} Monthly";
+                    reportingPeriodName = $"{reportingPeriodName} {collectionTimePeriod}";
                     break;
                 default:
                     reportingPeriodName = $"{reportingPeriodName} {SplitCollectionTimePeriod().FirstOrDefault()}";
@@ -76,46 +71,42 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return $"{reportingPeriodName}";
         }
 
-        private void ValidateReportingPeriod(string collectionTimePeriod, DateTime startDate, DateTime? endDate, ReportingPeriodType reportingPeriodType)
+        private void CheckCollectionTimePeriodData(string reportingPeriodTypeName, string collectionTimePeriod)
         {
-            if (string.IsNullOrWhiteSpace(collectionTimePeriod))
-                throw new ArgumentNullException("CollectionTimePeriod can not be null");
-
-            if (startDate == null)
-                throw new ArgumentNullException("StartDate can not be null");
-
-            if (reportingPeriodType != null && reportingPeriodType.Name == ReportingPeriodTypeValues.Annual)
+            switch (reportingPeriodTypeName)
             {
-                int convertedCollectionTimePeriod = Convert.ToInt32(collectionTimePeriod);
-                if (convertedCollectionTimePeriod.ToString().Length != 4)
-                {
-                    throw new ArgumentException("Collection time period should be in Year(ex: YYYY) only");
-                }
+                case ReportingPeriodTypeValues.Annual:
+                    {
+                        Regex format = new Regex("^[0-9]{4}$");
+                        if (!format.IsMatch(collectionTimePeriod))
+                        {
+                            throw new NoContentException("Collection time period should be in Year(ex: 2023)");
+                        }
+                    }
+                    break;
 
-            }
+                case ReportingPeriodTypeValues.Quartly:
+                    {
+                        Regex format = new Regex("^[Q]{1}[1-4]{1}[ ][0-9]{4}$");
+                        if (!format.IsMatch(collectionTimePeriod))
+                        {
+                            throw new NoContentException("Collection time period should be in Quarter(ex: 'Q1 2023')");
+                        }
+                    }
+                    break;
 
-            if (reportingPeriodType != null && reportingPeriodType.Name == ReportingPeriodTypeValues.Quartly)
-            {
-                string convertedCollectionTimePeriod = Convert.ToString(collectionTimePeriod);
-                var format = "(^[0-9]{4}-[Q]{1}[0-9]{1}$)";
-                var validateformat = format.Equals(convertedCollectionTimePeriod.ToString());
-                if (convertedCollectionTimePeriod.ToString().Length != 7 && validateformat == false)
-                {
-                    throw new ArgumentException("Collection time period should be in Quater(ex: YYYY-Q1) only");
-                }
+                case ReportingPeriodTypeValues.Monthly:
+                    {
+                        Regex format = new Regex("^[A-Z]{3}[ ][0-9]{4}$");
 
-            }
-
-            if (reportingPeriodType != null && reportingPeriodType.Name == ReportingPeriodTypeValues.Monthly)
-            {
-                string convertedCollectionTimePeriod = Convert.ToString(collectionTimePeriod);
-                var format = "(^[A-Z]{3}-[0-9]{4}$)";
-                var x = format.Equals(convertedCollectionTimePeriod.ToString());
-
-                if (convertedCollectionTimePeriod.ToString().Length != 8 && x == false)
-                {
-                    throw new ArgumentException("Collection time period should be in Month(ex: Jan-YYYY) only");
-                }
+                        if (!format.IsMatch(collectionTimePeriod))
+                        {
+                            throw new NoContentException("Collection time period should be in Month(ex: 'Jan 2023')");
+                        }
+                    }
+                    break;
+                default:
+                    throw new NoContentException("Please enter valid CollectionTimePeriod for ReportingPeriodType !!");
 
             }
 
@@ -133,18 +124,100 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             }
         }
 
-        public void UpdateReportingPeriod(int reportingPeriodTypeId, string collectionTimePeriod, int reportingPeriodStatusId, DateTime startDate, DateTime? endDate, bool isActive)
+        public void UpdateReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
         {
-            ReportingPeriodType.Id = reportingPeriodTypeId;
-            CollectionTimePeriod = collectionTimePeriod;
-            ReportingPeriodStatus.Id = reportingPeriodStatusId;
-            StartDate = startDate;
-            EndDate = endDate;
-            IsActive = isActive;
-            UpdatedOn = DateTime.UtcNow;
-            UpdatedBy = "System";
+            switch (ReportingPeriodStatus.Name)
+            {
+                case ReportingPeriodStatusValues.InActive:
+                    {
+                        CheckCollectionTimePeriodData(reportingPeriodType.Name, collectionTimePeriod);
+                        DisplayName = GeneratedReportingPeriodName(reportingPeriodType, collectionTimePeriod);
+
+                        if (StartDate.Date != startDate.Date && startDate.Date < DateTime.UtcNow.Date)
+                        {
+                                throw new Exception("StartDate should be in future !!");
+                        }
+
+                        if (endDate != null && endDate < startDate)
+                        {
+                            
+                                throw new BadRequestException("EndDate should be greater than startDate !!");
+                        }
+
+
+                        if (reportingPeriodStatus.Name == ReportingPeriodStatusValues.Open || reportingPeriodStatus.Name == ReportingPeriodStatusValues.Close)
+                        {
+                            if (reportingPeriodStatus.Name == ReportingPeriodStatusValues.Close)
+                            {
+                                //ReportingPeriodStatus = reportingPeriodStatus;
+                                isActive = false;
+                            }
+                        }
+                        else if (reportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+                            throw new BadRequestException("You cannot set ReportingPeriodStatus to Complete !!");
+
+                        CollectionTimePeriod = collectionTimePeriod;
+                        ReportingPeriodStatus = reportingPeriodStatus;
+                        StartDate = startDate;
+                        EndDate = endDate;
+                        IsActive = isActive;
+
+                    }
+                    break;
+                case ReportingPeriodStatusValues.Open:
+                    {
+                        if (ReportingPeriodType.Id != reportingPeriodType.Id || CollectionTimePeriod != collectionTimePeriod ||
+                            StartDate.Date != startDate.Date || IsActive != isActive)
+                        {
+                            throw new BadRequestException("You can't update any other data except ReportingPeriodStatus and EndDate !!");
+                        }
+
+                        if (ReportingPeriodStatus.Name != reportingPeriodStatus.Name && reportingPeriodStatus.Name == ReportingPeriodStatusValues.Close)
+                        {
+                            ReportingPeriodStatus = reportingPeriodStatus;
+
+                            var periodSuppliersList = _periodSupplier.Where(x => x.IsActive && x.SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked).ToList();
+
+                            var supplierReportingPeriodLockedStatus = supplierReportingPeriodStatuses.First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+                            foreach (var periodSupplier in periodSuppliersList)
+                            {
+                                periodSupplier.UpdateSupplierReportingPeriodStatus(supplierReportingPeriodLockedStatus);
+                            }
+                        }
+                        else
+                            throw new BadRequestException("ReportingPeriodStatus can be Open as it is or else you can set it to Close only !!");
+
+
+                        if (endDate != null)
+                        {
+                            if (endDate < startDate)
+                                throw new BadRequestException("EndDate should be greater than startDate !!");
+                        }
+                        EndDate = endDate;
+
+                    }
+                    break;
+                case ReportingPeriodStatusValues.Close:
+                    {
+                        if (ReportingPeriodType.Id != reportingPeriodType.Id || CollectionTimePeriod != collectionTimePeriod ||
+                            StartDate.Date != startDate.Date || IsActive != isActive || EndDate != endDate)
+                            throw new BadRequestException("You can't update any other data except ReportingPeriodStatus !!");
+
+                        if (ReportingPeriodStatus.Name != reportingPeriodStatus.Name && reportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+                        {
+                            ReportingPeriodStatus = reportingPeriodStatus;
+                        }
+                        else
+                            throw new BadRequestException("ReportingPeriodStatus can be Close as it is or else you can set it to Complete only !!");
+                    }
+                    break;
+                default:
+                    throw new BadRequestException("You cannot update any data because ReportingPeriod is Completed !!");
+            }
+
         }
 
+        /*
         public PeriodSupplier LoadPeriodSupplier(int id, SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
             var reportingPeriodSupplier = new PeriodSupplier(id, supplier, reportingPeriodId, supplierReportingPeriodStatus);
@@ -211,11 +284,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier;
         }
 
-        //public PeriodSupplier RemovePeriodSupplier(int periodSupplierId)
-        //{
-        //   //var periodSupplierRelevantFacility = 
-        //}
-
         public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
         {
             throw new NotImplementedException();
@@ -252,6 +320,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             throw new NotImplementedException();
         }
 
-
+        */
     }
 }

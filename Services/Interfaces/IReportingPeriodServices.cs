@@ -17,21 +17,21 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="reportingPeriodSupplierDto"></param>
     /// <returns></returns>
-    Task<string> SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
+    //string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
 
     /// <summary>
     /// Add Reporting Period
     /// </summary>
     /// <param name="reportingPeriodDto"></param>
     /// <returns></returns>
-    Task<string> AddUpdateReportingPeriod(ReportingPeriodDto reportingPeriodDto);
+    string AddUpdateReportingPeriod(ReportingPeriodDto reportingPeriodDto);
 
     /// <summary>
     /// Add PeriodFacility
     /// </summary>
     /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
-    Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
+  //  Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
 
     /// <summary>
     /// Get Active ReportingPeriods

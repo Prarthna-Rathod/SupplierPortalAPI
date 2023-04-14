@@ -19,6 +19,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     //    return periodSupplier;
     //}
 
+    /* Commented by Prarthna
     public void ConvertPeriodSupplierEntityToDomain(ReportingPeriod periodDomain, ICollection<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntities, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
     {
         foreach (var item in reportingPeriodSupplierEntities)
@@ -32,6 +33,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         }
 
     }
+    */
 
     //private FacilityVO GenerateFacilityVO(FacilityEntity facility)
     //{
@@ -46,21 +48,29 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     public ReportingPeriodEntity ConvertReportingPeriodDomainToEntity(ReportingPeriod reportingPeriod)
     {
+        var reportingPeriodSuppliers = ConvertReportingPeriodSuppliersDomainToEntity(reportingPeriod.PeriodSuppliers ?? new List<PeriodSupplier>());
 
-        var reportingPeriodSupplier = ConvertReportingPeriodSuppliersDomainToEntity(reportingPeriod.PeriodSuppliers ?? new List<PeriodSupplier>());
+        var reportingPeriodType = new ReportingPeriodTypeEntity();
+        reportingPeriodType.Id = reportingPeriod.ReportingPeriodType.Id;
+        reportingPeriodType.Name = reportingPeriod.ReportingPeriodType.Name;
+
+        var reportingPeriodStatus = new ReportingPeriodStatusEntity();
+        reportingPeriodStatus.Id = reportingPeriod.ReportingPeriodStatus.Id;
+        reportingPeriodStatus.Name = reportingPeriod.ReportingPeriodStatus.Name;
 
         return new ReportingPeriodEntity()
         {
-
             Id = reportingPeriod.Id,
             DisplayName = reportingPeriod.DisplayName,
-            ReportingPeriodTypeId = reportingPeriod.ReportingPeriodType.Id,
+            ReportingPeriodTypeId = reportingPeriodType.Id,
+            ReportingPeriodType = reportingPeriodType,
             CollectionTimePeriod = reportingPeriod.CollectionTimePeriod,
-            ReportingPeriodStatusId = reportingPeriod.ReportingPeriodStatus.Id,
+            ReportingPeriodStatusId = reportingPeriodStatus.Id,
+            ReportingPeriodStatus = reportingPeriodStatus,
             StartDate = reportingPeriod.StartDate,
             EndDate = reportingPeriod.EndDate,
             IsActive = reportingPeriod.IsActive,
-            ReportingPeriodSupplierEntities = reportingPeriodSupplier.ToList(),
+            ReportingPeriodSupplierEntities = reportingPeriodSuppliers.ToList(),
         };
     }
 

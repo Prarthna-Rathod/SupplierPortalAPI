@@ -17,7 +17,7 @@ namespace BusinessLogic.ValueConstants
         };
         public const string InActive = "InActive";
         public const string Open = "Open";
-        public const string Close = "Close";
+        public const string Close = "Closed";
         public const string Complete = "Complete";
 
     }

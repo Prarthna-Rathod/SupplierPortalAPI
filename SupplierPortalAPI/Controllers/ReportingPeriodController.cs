@@ -20,29 +20,29 @@ namespace SupplierPortalAPI.Controllers
 
         #region Add-Update Methods
 
-        [HttpPost("AddReportingPeriod")]
-        public async Task<string> AddUpdateReportingPeriod(ReportingPeriodDto reportingPeriodDto)
+        [HttpPost("AddUpdateReportingPeriod")]
+        public string AddUpdateReportingPeriod(ReportingPeriodDto reportingPeriodDto)
         {
-            return await _services.AddUpdateReportingPeriod(reportingPeriodDto);
+            return _services.AddUpdateReportingPeriod(reportingPeriodDto);
         }
 
-        [HttpPost("AddPeriodSupplier")]
-        public async Task<string> SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
+      /*  [HttpPost("AddPeriodSupplier")]
+        public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
         {
-            return await _services.SetPeriodSupplier(reportingPeriodSupplierDto);
-        }
+            return _services.SetPeriodSupplier(reportingPeriodSupplierDto);
+        }*/
 
-        [HttpPost("AddPeriodFacility")]
+        /*[HttpPost("AddPeriodFacility")]
         public async Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
         {
             return await _services.SetPeriodFacility(reportingPeriodFacilityDto);
         }
-
-       /* [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
-        public bool PeriodSupplierLockUnlock(int periodSupplierId)
-        {
-            return _services.UpdateLockUnlockPeriodSupplier(periodSupplierId);
-        }*/
+*/
+        /* [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
+         public bool PeriodSupplierLockUnlock(int periodSupplierId)
+         {
+             return _services.UpdateLockUnlockPeriodSupplier(periodSupplierId);
+         }*/
 
         #endregion
 

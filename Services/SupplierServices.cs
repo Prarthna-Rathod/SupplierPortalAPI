@@ -8,6 +8,7 @@ using Services.DTOs;
 using Services.Factories.Interfaces;
 using Services.Interfaces;
 using Services.Mappers.Interfaces;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace Services
 {
@@ -70,7 +71,7 @@ namespace Services
             var supplierEntity = _persister.GetSupplierById(supplierId);
             if (supplierEntity == null)
             {
-                throw new Exception("Supplier not found !!");
+                throw new NotFoundException("Supplier not found !!");
             }
             return ConfigureSupplier(supplierEntity);
         }
@@ -147,7 +148,7 @@ namespace Services
                 {
                     associatePipeline = GetAndConvertAssociatePipelines().FirstOrDefault(x => x.Id == facilityDto.AssociatePipelineId);
                     if (associatePipeline is null) 
-                        throw new Exception("Can't found AssociatePipeline !!");
+                        throw new NotFoundException("Can't found AssociatePipeline !!");
                 }
             }
 
@@ -185,7 +186,7 @@ namespace Services
                 {
                     associatePipeline = GetAndConvertAssociatePipelines().FirstOrDefault(x => x.Id == facilityDto.AssociatePipelineId);
                     if (associatePipeline is null)
-                        throw new Exception("Can't found AssociatePipeline !!");
+                        throw new NotFoundException("Can't found AssociatePipeline !!");
                 }
             }
 
