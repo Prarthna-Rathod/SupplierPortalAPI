@@ -1,5 +1,4 @@
-﻿
-using BusinessLogic.ReferenceLookups;
+﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.ValueConstants;
 using Microsoft.Extensions.Logging;
@@ -21,33 +20,40 @@ public class ReportingPeriodFactory : IReportingPeriodFactory
     {
         _logger = loggerFactory.CreateLogger<ReportingPeriodFactory>();
     }
-    public ReportingPeriod CreateNewReportingPeriod(ReportingPeriodType reportingPeriodType,string CollectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool active)
+
+    public ReportingPeriod CreateNewReportingPeriod(ReportingPeriodType reportingPeriodType,string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive)
     {
-        var type = reportingPeriodType;
-        var status= reportingPeriodStatus;
+        if (!isActive)
+            throw new Exception("InActive ReportingPeriod cannot be added !!");
 
-        if(reportingPeriodStatus.Name!= ReportingPeriodStatusValues.InActive)
-        {
-            throw new Exception("Reporting Period Is InActive");
-        }
+        if (string.IsNullOrWhiteSpace(collectionTimePeriod))
+            throw new ArgumentNullException("CollectionTimePeriod can't be null !!");
 
-        if(startDate< DateTime.Now.Date)
+        if (startDate == null)
+            throw new ArgumentNullException("StartDate can't be null !!");
+
+        //Check StartDate and EndDate
+        if (startDate < DateTime.UtcNow.Date)
         {
-            throw new Exception("Date Should be in Future");
+            throw new Exception("StartDate should be in future");
         }
-        if(endDate != null) 
+        if (endDate != null)
         {
-            if(endDate <= DateTime.Now.Date) 
+            if (endDate < startDate)
             {
-                throw new Exception("EndDate Should be in Future");
-            }          
-            if(endDate < startDate) 
-            {
-                throw new Exception("EndDate should be Greaterthan StartDate");
+                // 21-4-23 <  22-4-23
+                throw new Exception("EndDate should be greater than StartDate");
             }
         }
 
-        var ReportingPeriod = new ReportingPeriod(type,CollectionTimePeriod, status, startDate, endDate, active);
-        return ReportingPeriod;
+        //Check ReportingPeriodStatus
+        if (reportingPeriodStatus.Name != ReportingPeriodStatusValues.InActive && reportingPeriodStatus.Name != ReportingPeriodStatusValues.Open)
+        {
+            throw new Exception("ReportingPeriodStatus should be InActive or Open !!");
+        }
+
+
+        var reportingPeriod = new ReportingPeriod(reportingPeriodType, collectionTimePeriod, reportingPeriodStatus, startDate, endDate, isActive);
+        return reportingPeriod;
     }
 }

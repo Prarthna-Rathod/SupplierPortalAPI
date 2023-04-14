@@ -12,7 +12,7 @@ namespace DataAccess.DataActions.Interfaces
 
         #region Add Methods
 
-        Task<bool> AddReportingPeriod(ReportingPeriodEntity reportingPeriodEntity);
+        bool AddReportingPeriod(ReportingPeriodEntity reportingPeriodEntity);
 
         Task<bool> AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
 
@@ -26,13 +26,13 @@ namespace DataAccess.DataActions.Interfaces
 
         #region Update Methods
 
-        Task<bool> UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
+        bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
 
         Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 
         Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
 
-        bool UpdatePeriodSupplierStatus(ReportingPeriodSupplierEntity periodSupplierEntity);
+        IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
 
         #endregion
 

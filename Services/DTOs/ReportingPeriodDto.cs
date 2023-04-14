@@ -19,14 +19,13 @@ public class ReportingPeriodDto
 
     public int ReportingPeriodTypeId { get; set; }
 
-    public string ReportingPeriodType { get; set; }
+    public string ReportingPeriodTypeName { get; set; }
 
     public string CollectionTimePeriod { get;set; }
 
-
     public int ReportingPeriodStatusId { get; set; }
 
-    public string ReportingPeriodStatus { get;set; }
+    public string ReportingPeriodStatusName { get;set; }
 
     public DateTime StartDate { get; set; }
 
@@ -36,15 +35,15 @@ public class ReportingPeriodDto
 
     public List<ReportingPeriodSupplierDto> reportingPeriodSupplierDtos { get; set; }
 
-    public ReportingPeriodDto(int? id, string displayName, int reportingPeriodTypeId, string reportingPeriodType, string collectionTimePeriod, int reportingPeriodStatusId, string reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive, List<ReportingPeriodSupplierDto> reportingPeriodSupplierDtos)
+    public ReportingPeriodDto(int? id, string displayName, int reportingPeriodTypeId, string reportingPeriodTypeName, string collectionTimePeriod, int reportingPeriodStatusId, string reportingPeriodStatusName, DateTime startDate, DateTime? endDate, bool isActive, List<ReportingPeriodSupplierDto> reportingPeriodSupplierDtos)
     {
         Id = id;
         DisplayName = displayName;
         ReportingPeriodTypeId = reportingPeriodTypeId;
-        ReportingPeriodType = reportingPeriodType;
+        ReportingPeriodTypeName = reportingPeriodTypeName;
         CollectionTimePeriod = collectionTimePeriod;
         ReportingPeriodStatusId = reportingPeriodStatusId;
-        ReportingPeriodStatus = reportingPeriodStatus;
+        ReportingPeriodStatusName = reportingPeriodStatusName;
         StartDate = startDate;
         EndDate = endDate;
         IsActive = isActive;

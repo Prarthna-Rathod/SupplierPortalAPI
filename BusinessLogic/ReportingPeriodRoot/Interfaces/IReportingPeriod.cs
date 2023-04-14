@@ -18,16 +18,13 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         DateTime StartDate { get; }
         DateTime? EndDate { get; }
         bool IsActive { get; }
-        DateTime CreatedOn { get; }
-        DateTime? UpdatedOn { get; }
-        string CreatedBy { get; }
-        string? UpdatedBy { get; }
 
         ReportingPeriodType ReportingPeriodType { get; }
         ReportingPeriodStatus ReportingPeriodStatus { get;}
         
         IEnumerable<PeriodSupplier> PeriodSuppliers { get; }
 
+        /*
         PeriodSupplier LoadPeriodSupplier(int reportingPriodSupplierId,SupplierVO supplier, int reportingPeriodId,SupplierReportingPeriodStatus supplierReportingPeriodStatus);
 
         PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus);
@@ -48,6 +45,6 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId,int documentId);
 
         IEnumerable<PeriodFacility> UpdateDataStatusToSubmittedForCompletePeriodFacility(int supplierId,FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
-
+        */
     }
 }

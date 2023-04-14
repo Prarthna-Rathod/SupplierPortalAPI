@@ -2,6 +2,7 @@
 using BusinessLogic.SupplierRoot.Interfaces;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 using System.Text.RegularExpressions;
 
 namespace BusinessLogic.SupplierRoot.DomainModels
@@ -77,7 +78,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new Exception("Name is required");
+                throw new NoContentException("Name is required");
             }
             else
                 Name = name;
@@ -111,7 +112,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 
             if (isValidate == false)
             {
-                throw new Exception("Please enter valid ContactNumber !!");
+                throw new NoContentException("Please enter valid ContactNumber !!");
             }
         }
 
@@ -124,14 +125,14 @@ namespace BusinessLogic.SupplierRoot.DomainModels
                 var contact = new Contact(contactId, Id, userVO);
                 var x = _contacts.Where(x => x.UserVO.Email == email).FirstOrDefault();
                 if (x != null)
-                    throw new Exception("Email is already exists !!");
+                    throw new AlreadyExistException("Email is already exists !!");
 
                 _contacts.Add(contact);
 
                 return contact;
             }
             else
-                throw new Exception("Supplier is not active for add contacts !!");
+                throw new NoContentException("Supplier is not active for add contacts !!");
 
         }
 
@@ -139,7 +140,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
         {
             var contact = _contacts.FirstOrDefault(x => x.Id == contactId);
             if (contact == null)
-                throw new Exception("Contact not found !!");
+                throw new NotFoundException("Contact not found !!");
 
             contact.UpdateUser(userName, email, contactNo, isActive);
 
@@ -155,10 +156,10 @@ namespace BusinessLogic.SupplierRoot.DomainModels
 
         public Facility AddSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline? associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
          {
-            if (!IsActive) throw new Exception("Supplier is not active for add facility !!");
+            if (!IsActive) throw new NoContentException("Supplier is not active for add facility !!");
 
             if (isActive == false)
-                throw new Exception("Can't add InActive facility !!");
+                throw new NoContentException("Can't add InActive facility !!");
 
             CheckFacilityValidations(ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage);
 
@@ -193,7 +194,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             {
                 if (ghgrpFacilityId != null)
                 {
-                    throw new Exception("GHGRP-FacilityId is not allowed !!");
+                    throw new BadRequestException("GHGRP-FacilityId is not allowed !!");
                 }
             }
 
@@ -201,7 +202,7 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             {
                 if (associatePipeline != null)
                 {
-                    throw new Exception("Associate Pipeline is not allowed !!");
+                    throw new BadRequestException("Associate Pipeline is not allowed !!");
                 }
             }
 
@@ -212,17 +213,17 @@ namespace BusinessLogic.SupplierRoot.DomainModels
             if (reportingType.Name == ReportingTypeValues.GHGRP && facilityGHGRPId != null)
             {
                 if (facilityGHGRPId != payLoadGHGRPFacilityId)
-                    throw new Exception("GHGRPFacilityId cannot be change !!");
+                    throw new BadRequestException("GHGRPFacilityId cannot be change !!");
             }
 
             if (facilityGHGRPId != null && payLoadGHGRPFacilityId == null)
-                throw new Exception("GHGRPFacilityId cannot changed to be null !!");
+                throw new BadRequestException("GHGRPFacilityId cannot changed to be null !!");
 
             if (supplyChainStage.Name != SupplyChainStagesValues.TransmissionCompression)
             {
                 if (associatePipeline != null)
                 {
-                    throw new Exception("Associate Pipeline is not allowed !!");
+                    throw new BadRequestException("Associate Pipeline is not allowed !!");
                 }
             }
 
@@ -242,13 +243,13 @@ namespace BusinessLogic.SupplierRoot.DomainModels
         public Facility UpdateSupplierFacility(int facilityId, string name, string description, bool isPrimary, string? ghgrpFacilityId, AssociatePipeline associatePipeline, ReportingType reportingType, SupplyChainStage supplyChainStage, bool isActive)
         {
             var facility = _facilities.FirstOrDefault(x => x.Id == facilityId);
-            if (facility == null) throw new Exception("Can't found Facility !!");
+            if (facility == null) throw new NotFoundException("Can't found Facility !!");
 
             CheckUpdateFacilityValidations(facility.GHGHRPFacilityId, ghgrpFacilityId, associatePipeline, reportingType, supplyChainStage);
 
             if (!isActive && facility.IsPrimary && facility.ReportingTypes.Name == ReportingTypeValues.GHGRP)
             {
-                throw new Exception("Cannot update GHGRP primary facility to InActive !!");
+                throw new BadRequestException("Cannot update GHGRP primary facility to InActive !!");
             }
 
             if (reportingType.Name == ReportingTypeValues.GHGRP && ghgrpFacilityId != null && isPrimary)
@@ -280,7 +281,13 @@ namespace BusinessLogic.SupplierRoot.DomainModels
                 }
 
                 if (reportingType.Name == ReportingTypeValues.GHGRP && ghgrpFacilityId != null && !isPrimary && isActive)
-                    existingNonPrimaryFacility.UpdateIsPrimary(true);
+                {
+                    if (existingNonPrimaryFacility != null)
+                        existingNonPrimaryFacility.UpdateIsPrimary(true);
+                    else
+                        throw new BadRequestException("You cannot change IsPrimary false because no other facility is available for set it true !!");
+                }
+                    
             }
 
             if (reportingType.Name == ReportingTypeValues.GHGRP && facility.GHGHRPFacilityId == null && ghgrpFacilityId != null)
