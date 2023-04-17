@@ -5,7 +5,7 @@ using DataAccess.Entities;
 using System.Xml.Linq;
 using Xunit;
 
-namespace UnitTest
+namespace UnitTest.SupplierBusinessLogic
 {
     public class SupplierUnitTesting : BasicTestClass
     {
@@ -101,7 +101,7 @@ namespace UnitTest
                 var supplyChainStage = GenerateSupplyChainStage().Where(x => x.Id == 1).FirstOrDefault();
                 facility = supplier.AddSupplierFacility(0, "TestFacility1", "TestFacilityDescription", true, "123", null, reportingType, supplyChainStage, true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
@@ -110,7 +110,7 @@ namespace UnitTest
             Assert.NotNull(facility);
             Assert.Equal(0, exceptionCounter);
             Assert.Null(exceptionMessage);
-            
+
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace UnitTest
             {
                 facility = supplier.AddSupplierFacility(0, "TestFailedFacility", "Test case failure", false, "123", null, reportingType, supplyChainStage, true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 //GHGRPFacilityId not allowed in NONGHGRP
@@ -227,7 +227,7 @@ namespace UnitTest
             {
                 facility = supplier.AddSupplierFacility(0, "TestFailFacility3", "facility3", false, "123", null, reportingType, supplyChainStage, false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //InActive facility cannot be add
                 exceptionCounter++;
@@ -298,7 +298,7 @@ namespace UnitTest
             var supplier = GetSupplierDomain();
             var reportingType = GenerateReportingType().Where(x => x.Id == 1).FirstOrDefault();
             var supplyChainStage = GenerateSupplyChainStage().Where(x => x.Id == 1).FirstOrDefault();
-            
+
             Facility facility = null;
 
             try
@@ -306,7 +306,7 @@ namespace UnitTest
                 //IsActive = false (Default IsPrimary = false)
                 facility = supplier.UpdateSupplierFacility(2, "Update Facility case2", "Testing Facility 2", false, "123", null, reportingType, supplyChainStage, false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
@@ -339,12 +339,12 @@ namespace UnitTest
                 //IsActive = false (IsPrimary = true)
                 facility = supplier.UpdateSupplierFacility(1, "Update test facility 1", "Test facility 1", true, "123", associatePipeline, reportingType, supplyChainStage, false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
             }
-            
+
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
@@ -370,7 +370,7 @@ namespace UnitTest
                 //GHGRPFacility = 456   (Default = 123)
                 facility = supplier.UpdateSupplierFacility(1, "Update test facility 1", "Test facility 1", true, "456", associatePipeline, reportingType, supplyChainStage, true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
@@ -402,7 +402,7 @@ namespace UnitTest
                 //AssociatePipeline is not null
                 facility = supplier.UpdateSupplierFacility(1, "Update Facility 1", "Updated facility", false, "123", associatePipeline, reportingType, supplyChainStage, true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
@@ -433,7 +433,7 @@ namespace UnitTest
                 //GHGRPFacilityId = null (Default is 123)
                 facility = supplier.UpdateSupplierFacility(2, "Update Facility case2", "Testing Facility 2", false, null, null, reportingType, supplyChainStage, true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;

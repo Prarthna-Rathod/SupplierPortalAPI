@@ -92,6 +92,16 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     }
 
+    public IEnumerable<ReportingPeriod> ConvertReportingPeriodEntitiesToDomain(IEnumerable<ReportingPeriodEntity> reportingPeriodEntities, IEnumerable<ReportingPeriodType> reportingPeriodTypes, IEnumerable<ReportingPeriodStatus> reportingPeriodStatuses)
+    {
+        var list = new List<ReportingPeriod>();
+        foreach(var reportingPeriod in reportingPeriodEntities)
+        {
+            list.Add(ConvertReportingPeriodEntityToDomain(reportingPeriod, reportingPeriodTypes, reportingPeriodStatuses));
+        }
+        return list;
+    }
+
     public ReportingPeriodSupplierEntity ConvertReportingPeriodSupplierDomainToEntity(PeriodSupplier periodSupplier)
     {
         return new ReportingPeriodSupplierEntity()

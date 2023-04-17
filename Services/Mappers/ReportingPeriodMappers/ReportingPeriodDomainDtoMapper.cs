@@ -12,11 +12,21 @@ namespace Services.Mappers.ReportingPeriodMappers
 {
     public class ReportingPeriodDomainDtoMapper : IReportingPeriodDomainDtoMapper
     {
-        public ReportingPeriodDto ConvertReportingDTO(ReportingPeriod reportingPeriod)
+        public ReportingPeriodDto ConvertReportingPeriodDomainToDto(ReportingPeriod reportingPeriod)
         {
-            var reportingPeriodSupplier = new List<ReportingPeriodSupplierDto>();
+            var reportingPeriodSuppliers = new List<ReportingPeriodSupplierDto>();
             
-            return new ReportingPeriodDto(reportingPeriod.Id,reportingPeriod.DisplayName,reportingPeriod.ReportingPeriodType.Id,reportingPeriod.ReportingPeriodType.Name,reportingPeriod.CollectionTimePeriod,reportingPeriod.ReportingPeriodStatus.Id,reportingPeriod.ReportingPeriodStatus.Name,reportingPeriod.StartDate,reportingPeriod.EndDate,reportingPeriod.IsActive,reportingPeriodSupplier);
+            return new ReportingPeriodDto(reportingPeriod.Id,reportingPeriod.DisplayName,reportingPeriod.ReportingPeriodType.Id,reportingPeriod.ReportingPeriodType.Name,reportingPeriod.CollectionTimePeriod,reportingPeriod.ReportingPeriodStatus.Id,reportingPeriod.ReportingPeriodStatus.Name,reportingPeriod.StartDate,reportingPeriod.EndDate,reportingPeriod.IsActive,reportingPeriodSuppliers);
+        }
+
+        public IEnumerable<ReportingPeriodDto> ConvertReportingPeriodDomainListToDtos(IEnumerable<ReportingPeriod> reportingPeriods)
+        {
+            var list = new List<ReportingPeriodDto>();
+            foreach(var reportingPeriod in reportingPeriods)
+            {
+                list.Add(ConvertReportingPeriodDomainToDto(reportingPeriod));
+            }
+            return list;
         }
     }
 }

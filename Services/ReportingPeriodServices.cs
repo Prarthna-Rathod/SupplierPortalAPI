@@ -25,12 +25,10 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private ISupplierDataActions _supplierDataActions;
     private IReferenceLookUpMapper _referenceLookUpMapper;
     private IReportingPeriod _reportingPeriod;
-
-
+    private IReportingPeriodDomainDtoMapper _reportingPeriodDomainDtoMapper;
 
     public ReportingPeriodServices(IReportingPeriodFactory reportingPeriodFactory, ILoggerFactory loggerFactory,
-        IReportingPeriodDomainDtoMapper reportingPeriodDomainMapper, IReportingPeriodEntityDomainMapper reportingPeriodEntityDomainMapper, IReadOnlyEntityToDtoMapper readOnlyEntityToDtoMapper, IReportingPeriodDataActions reportingPeriodDataActions, ISupplierDataActions supplierDataActions, IReferenceLookUpMapper referenceLookUpMapper, IReportingPeriod reportingPeriod)
-
+        IReportingPeriodDomainDtoMapper reportingPeriodDomainMapper, IReportingPeriodEntityDomainMapper reportingPeriodEntityDomainMapper, IReadOnlyEntityToDtoMapper readOnlyEntityToDtoMapper, IReportingPeriodDataActions reportingPeriodDataActions, ISupplierDataActions supplierDataActions, IReferenceLookUpMapper referenceLookUpMapper, IReportingPeriod reportingPeriod, IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper)
     {
         _reportingPeriodFactory = reportingPeriodFactory;
         _logger = loggerFactory.CreateLogger<SupplierServices>();
@@ -40,6 +38,8 @@ public class ReportingPeriodServices : IReportingPeriodServices
         _supplierDataActions = supplierDataActions;
         _referenceLookUpMapper = referenceLookUpMapper;
         _reportingPeriod = reportingPeriod;
+        _reportingPeriodDomainDtoMapper = reportingPeriodDomainDtoMapper;
+
     }
 
     #region Private Methods
@@ -188,7 +188,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     #region Add-Update-Remove Methods
 
     /// <summary>
-    /// SetReportingPeriod
+    /// Add ReportingPeriod
     /// </summary>
     /// <param name="reportingPeriodDto"></param>
     /// <returns></returns>
@@ -240,7 +240,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     }
 
     /// <summary>
-    /// Add PeriodSupplier (Where Supplier should be Active & ReportingPeriod Should Be InActive)
+    /// Add PeriodSupplier (Where Supplier should be active & ReportingPeriod should be InActive)
     /// </summary>
     /// <param name="reportingPeriodSupplierDto"></param>
     /// <returns></returns>
@@ -401,15 +401,17 @@ public class ReportingPeriodServices : IReportingPeriodServices
     #endregion
 
     #region GetMethods
-    public IEnumerable<InternalReportingPeriodDTO> GetActiveReportingPeriods()
+    public IEnumerable<ReportingPeriodDto> GetActiveReportingPeriods()
     {
-        var activeReportingPeriods = _reportingPeriodDataActions.GetReportingPeriods().Where(x => x.IsActive == true);
-        var reportingPeriodDto = new List<InternalReportingPeriodDTO>();
-        foreach (var reportingPeriodEntity in activeReportingPeriods)
-        {
-            reportingPeriodDto.Add(_readOnlyEntityToDtoMapper.ConvertReportingPeriodEntityToInternalPeriodDTO(reportingPeriodEntity));
-        }
-        return reportingPeriodDto;
+        var activeReportingPeriods = _reportingPeriodDataActions.GetReportingPeriods().Where(x => x.IsActive);
+        var reportingPeriodTypes = GetAndConvertReportingPeriodType();
+        var reportingPeriodStatuses = GetAndConvertReportingPeriodStatus();
+
+        var reportingPeriodDomainList = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodEntitiesToDomain(activeReportingPeriods, reportingPeriodTypes, reportingPeriodStatuses);
+
+        var reportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodDomainListToDtos(reportingPeriodDomainList);
+
+        return reportingPeriodDtos;
     }
 
     /// <summary>

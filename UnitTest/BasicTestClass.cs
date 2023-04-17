@@ -1,18 +1,33 @@
 using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.SupplierRoot.DomainModels;
 using DataAccess.Entities;
+using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
 
 namespace UnitTest
 {
     public class BasicTestClass
     {
+        //Supplier
         private int supplierId = 1;
         private string supplierName = "Reliance";
         private string supplierAlias = "rel";
         private string supplierEmail = "reliance@gmail.com";
         private string supplierContactNo = "+0934734353";
 
+        //ReportingPeriod
+        private int reportingPeriodId = 1;
+        private string displayName = "Reporting Period Data Year 2022";
+        private int reportingPeriodTypeId = 1;
+        private string collectionTimePeriod = "2022";
+        private int reportingPeriodStatusId = 2;
+        private DateTime startDate = new DateTime(2023,04,12);
+        private DateTime? endDate = null;
+        private bool isActive = true;
+
+
+        #region Supplier
         protected IEnumerable<ReportingType> GenerateReportingType()
         {
             var reportingTypes = new List<ReportingType>();
@@ -38,6 +53,7 @@ namespace UnitTest
             associatePipelines.Add(new AssociatePipeline(2, "Pipeline 2"));
             return associatePipelines;
         }
+
 
         protected Supplier GetSupplierDomain()
         {
@@ -148,34 +164,7 @@ namespace UnitTest
             return facilityEntities;
         }
 
-        /*protected IEnumerable<SupplierEntity> CreateSupplierEntities()
-        {
-            List<SupplierEntity> supplierList = new List<SupplierEntity>
-            {
-                new SupplierEntity()
-                {
-                    Id = 1,
-                    Name = "Supplier1",
-                    Alias = "supplier1",
-                    Email = "supplier1@gmail.com",
-                    ContactNo = "+34738473",
-                    IsActive = true
-                },
-
-                new SupplierEntity()
-                {
-                    Id = 2,
-                    Name = "Supplier2",
-                    Alias = "supplier2",
-                    Email = "supplier2@gmaiil.com",
-                    ContactNo = "+78657676",
-                    IsActive = true
-                }
-            };
-
-            return supplierList;
-        }*/
-
+       
         protected SupplierEntityDomainMapper CreateInstanceOfSupplierEntityToDomain()
         {
             return new SupplierEntityDomainMapper();
@@ -185,6 +174,77 @@ namespace UnitTest
         {
             return new SupplierDomainDtoMapper();
         }
+
+        #endregion
+
+        #region ReportingPeriod
+
+        protected IEnumerable<ReportingPeriodType> GetAndConvertReportingPeriodTypes()
+        {
+            var reportingPeriodTypes = new List<ReportingPeriodType>();
+            reportingPeriodTypes.Add(new ReportingPeriodType(1, "Annual"));
+            reportingPeriodTypes.Add(new ReportingPeriodType(2, "Quartly"));
+            reportingPeriodTypes.Add(new ReportingPeriodType(3, "Monthly"));
+
+            return reportingPeriodTypes;
+        }
+
+        protected IEnumerable<ReportingPeriodStatus> GetAndConvertReportingPeriodStatus()
+        {
+            var reportingPeriodStatuses = new List<ReportingPeriodStatus>();
+            reportingPeriodStatuses.Add(new ReportingPeriodStatus(1, "InActive"));
+            reportingPeriodStatuses.Add(new ReportingPeriodStatus(2, "Open"));
+            reportingPeriodStatuses.Add(new ReportingPeriodStatus(3, "Closed"));
+            reportingPeriodStatuses.Add(new ReportingPeriodStatus(4, "Complete"));
+
+            return reportingPeriodStatuses;
+        }
+
+        protected IEnumerable<SupplierReportingPeriodStatus> GetSupplierReportingPeriodStatuses()
+        {
+            var supplierReportingPeriodStatuses = new List<SupplierReportingPeriodStatus>();
+            supplierReportingPeriodStatuses.Add(new SupplierReportingPeriodStatus(1, "Locked"));
+            supplierReportingPeriodStatuses.Add(new SupplierReportingPeriodStatus(2, "Unlocked"));
+
+            return supplierReportingPeriodStatuses;
+        }
+
+        protected ReportingPeriod GetReportingPeriodDomain()
+        {
+            var reportingPeriodEntity = CreateReportingPeriodEntity();
+            var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
+            var reportingPeriodStatuses = GetAndConvertReportingPeriodStatus();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            return mapper.ConvertReportingPeriodEntityToDomain(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatuses);
+        }
+
+        protected ReportingPeriodEntity CreateReportingPeriodEntity()
+        {
+            var reportingPeriodEntity = new ReportingPeriodEntity();
+            reportingPeriodEntity.Id = reportingPeriodId;
+            reportingPeriodEntity.DisplayName = displayName;
+            reportingPeriodEntity.ReportingPeriodTypeId = reportingPeriodTypeId;
+            reportingPeriodEntity.ReportingPeriodStatusId = reportingPeriodStatusId;
+            reportingPeriodEntity.CollectionTimePeriod = collectionTimePeriod;
+            reportingPeriodEntity.StartDate = startDate;
+            reportingPeriodEntity.EndDate = endDate;
+            reportingPeriodEntity.IsActive = isActive;
+
+            return reportingPeriodEntity;
+
+        }
+
+        protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
+        {
+            return new ReportingPeriodEntityDomainMapper();
+        }
+
+        protected ReportingPeriodDomainDtoMapper CreateInstanceOfReportingPeriodDomainDtoMapper()
+        {
+            return new ReportingPeriodDomainDtoMapper();
+        }
+
+        #endregion
 
     }
 }

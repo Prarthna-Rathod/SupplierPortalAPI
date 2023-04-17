@@ -220,7 +220,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #endregion
 
-    #region Get Methods
+    #region GetAll Methods
 
 
     public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypes()
@@ -390,6 +390,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #endregion
 
+    #region Dispose Methods
     protected void Dispose(bool disposing)
     {
         if (disposing)
@@ -407,5 +408,5 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         GC.SuppressFinalize(this);
     }
 
-    
+    #endregion
 }

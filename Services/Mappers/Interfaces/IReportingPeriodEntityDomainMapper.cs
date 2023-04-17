@@ -18,6 +18,8 @@ public interface IReportingPeriodEntityDomainMapper
 
     ReportingPeriod ConvertReportingPeriodEntityToDomain(ReportingPeriodEntity reportingPeriodEntity,IEnumerable<ReportingPeriodType> reportingPeriodTypes, IEnumerable<ReportingPeriodStatus> reportingPeriodStatuses);
 
+    IEnumerable<ReportingPeriod> ConvertReportingPeriodEntitiesToDomain(IEnumerable<ReportingPeriodEntity> reportingPeriodEntities, IEnumerable<ReportingPeriodType> reportingPeriodTypes, IEnumerable<ReportingPeriodStatus> reportingPeriodStatuses);
+
     IEnumerable<ReportingPeriodSupplierEntity> ConvertReportingPeriodSuppliersDomainToEntity(IEnumerable<PeriodSupplier> periodSuppliers);
     ReportingPeriodSupplierEntity ConvertReportingPeriodSupplierDomainToEntity(PeriodSupplier periodSupplier);
    /* void ConvertPeriodSupplierEntityToDomain(ReportingPeriod periodDomain, ICollection<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntities, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses);*/
