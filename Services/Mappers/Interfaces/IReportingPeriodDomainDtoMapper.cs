@@ -10,5 +10,6 @@ namespace Services.Mappers.Interfaces;
 
 public interface IReportingPeriodDomainDtoMapper
 {
-    ReportingPeriodDto ConvertReportingDTO(ReportingPeriod reportingPeriod);
+    ReportingPeriodDto ConvertReportingPeriodDomainToDto(ReportingPeriod reportingPeriod);
+    IEnumerable<ReportingPeriodDto> ConvertReportingPeriodDomainListToDtos(IEnumerable<ReportingPeriod> reportingPeriods);
 }

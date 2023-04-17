@@ -37,7 +37,7 @@ public interface IReportingPeriodServices
     /// Get Active ReportingPeriods
     /// </summary>
     /// <returns></returns>
-    IEnumerable<InternalReportingPeriodDTO> GetActiveReportingPeriods();
+    IEnumerable<ReportingPeriodDto> GetActiveReportingPeriods();
 
     /// <summary>
     /// Get Active ReportingPeriodSuppliers

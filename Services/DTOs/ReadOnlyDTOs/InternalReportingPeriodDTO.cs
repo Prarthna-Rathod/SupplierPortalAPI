@@ -8,15 +8,15 @@ namespace Services.DTOs.ReadOnlyDTOs;
 
 public class InternalReportingPeriodDTO
 {
-    public InternalReportingPeriodDTO(int reportingPeriodId,string reportingPeriodName,int reportingPeriodTypeId,string reportingPeriodType,string collectionTimePeriod,int reportingPeriodStatusId,string reportingPeriodStatus,DateTime startDate,DateTime? endDate)
+    public InternalReportingPeriodDTO(int reportingPeriodId,string reportingPeriodName,int reportingPeriodTypeId,string reportingPeriodTypeName,string collectionTimePeriod,int reportingPeriodStatusId,string reportingPeriodStatusName,DateTime startDate,DateTime? endDate)
     {
         ReportingPeriodId = reportingPeriodId;
         ReportingPeriodName = reportingPeriodName;
         ReportingPeriodTypeId = reportingPeriodTypeId;
-        ReportingPeriodType = reportingPeriodType;
+        ReportingPeriodTypeName = reportingPeriodTypeName;
         CollectionTimePeriod = collectionTimePeriod;
         ReportingPeriodStatusId = reportingPeriodStatusId;
-        ReportingPeriodStatus = reportingPeriodStatus;
+        ReportingPeriodStatusName = reportingPeriodStatusName;
         StartDate = startDate;
         EndDate = endDate;
     }
@@ -24,10 +24,10 @@ public class InternalReportingPeriodDTO
     public int ReportingPeriodId { get; set; }
     public string ReportingPeriodName { get; set; }
     public int ReportingPeriodTypeId { get; set; }
-    public string ReportingPeriodType { get; set; }
+    public string ReportingPeriodTypeName { get; set; }
     public string CollectionTimePeriod { get; set; }
     public int ReportingPeriodStatusId { get; set; }
-    public string ReportingPeriodStatus { get; set; }
+    public string ReportingPeriodStatusName { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
 

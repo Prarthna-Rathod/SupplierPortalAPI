@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+/*using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SupplierPortalAPI.Controllers
@@ -32,4 +32,4 @@ namespace SupplierPortalAPI.Controllers
             .ToArray();
         }
     }
-}
+}*/
