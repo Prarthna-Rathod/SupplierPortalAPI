@@ -31,11 +31,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public async Task<bool> AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity)
+    public bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity)
     {
-        await _context.ReportingPeriodSupplierEntities.AddAsync(reportingPeriodSupplierEntity);
+        _context.ReportingPeriodSupplierEntities.Add(reportingPeriodSupplierEntity);
         reportingPeriodSupplierEntity.IsActive = true;
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return true;
     }
 

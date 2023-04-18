@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
+using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 using System.Text.RegularExpressions;
@@ -217,42 +218,37 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         }
 
-        /*
-        public PeriodSupplier LoadPeriodSupplier(int id, SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+
+        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(id, supplier, reportingPeriodId, supplierReportingPeriodStatus);
+            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, reportingPeriodId, supplierReportingPeriodStatus);
 
-            if (_periodSupplier.Contains(reportingPeriodSupplier))
-            {
-                throw new Exception("Supplier Already Exist!");
-            }
-            _periodSupplier.Add(reportingPeriodSupplier);
-
-            return reportingPeriodSupplier;
-
-
-        }
+            return _periodSupplier.Add(reportingPeriodSupplier);
+        }   
 
         public PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
             var reportingPeriodSupplier = new PeriodSupplier(supplier, reportingPeriodId, supplierReportingPeriodStatus);
 
+
+/*
             if (_periodSupplier.Contains(reportingPeriodSupplier))
             {
                 throw new Exception("Supplier Already Exist!");
             }
             else
-            {
-                if(supplier.IsActive == true && ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive)
+            {*/
+                if(supplier.IsActive && ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive)
                 {
                     _periodSupplier.Add(reportingPeriodSupplier);
                 }
                
-            }
+           // }
 
             return reportingPeriodSupplier;
         }
 
+        /*
         public PeriodSupplier UpdatePeriodSupplierStatus(int periodSupplierId, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
         {
             var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();

@@ -4,15 +4,15 @@ namespace BusinessLogic.SupplierRoot.ValueObjects;
 
 public class FacilityVO
 {
-    public FacilityVO(int id, string facilityName, int supplierId, string? GHGRPfacilityId, bool isActive, SupplyChainStage supplyChainStage = null, ReportingType reportingType = null)
+    public FacilityVO(int id, string facilityName, int supplierId, string? GHGRPfacilityId, bool isActive, SupplyChainStage supplyChainStage, ReportingType reportingType)
     {
         Id = id;
         FacilityName = facilityName;
         SupplierId = supplierId;
         GHGRPFacilityId = GHGRPfacilityId;
         IsActive = isActive;
-        SupplyChainStage = supplyChainStage ?? null;
-        ReportingType = reportingType ?? null;
+        SupplyChainStage = supplyChainStage;
+        ReportingType = reportingType;
 
     }
 
@@ -21,6 +21,6 @@ public class FacilityVO
     public string FacilityName { get; private set; }
     public string? GHGRPFacilityId { get; private set; }
     public bool IsActive { get; private set; }
-    public SupplyChainStage? SupplyChainStage { get; private set; }
-    public ReportingType? ReportingType { get; private set; }
+    public SupplyChainStage SupplyChainStage { get; private set; }
+    public ReportingType ReportingType { get; private set; }
 }
