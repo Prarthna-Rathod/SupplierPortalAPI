@@ -476,7 +476,7 @@ namespace DataAccess.DataActions
             return true;
         }
 
-        private FacilityEntity FindExistingFacility(string? ghgrpFacilityId)
+      /*  private FacilityEntity FindExistingFacility(string? ghgrpFacilityId)
         {
             var existingFacility = _context.FacilityEntities.Where(x =>
                         x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
@@ -486,7 +486,7 @@ namespace DataAccess.DataActions
 
             return existingFacility;
         }
-
+*/
         public bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId)
         {
             var associatePipelineEntity = _context.AssociatePipelineEntities.Where(x => x.Id == associatePipelineId).FirstOrDefault();

@@ -14,7 +14,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddReportingPeriod(ReportingPeriodEntity reportingPeriodEntity);
 
-        Task<bool> AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
+        bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
 
         Task<bool> AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity);
 

@@ -26,11 +26,11 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriod(reportingPeriodDto);
         }
 
-      /*  [HttpPost("AddPeriodSupplier")]
+        [HttpPost("AddPeriodSupplier")]
         public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
         {
             return _services.SetPeriodSupplier(reportingPeriodSupplierDto);
-        }*/
+        }
 
         /*[HttpPost("AddPeriodFacility")]
         public async Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto)

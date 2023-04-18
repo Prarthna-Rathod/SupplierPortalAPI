@@ -17,7 +17,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="reportingPeriodSupplierDto"></param>
     /// <returns></returns>
-    //string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
+    string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
 
     /// <summary>
     /// Add Reporting Period

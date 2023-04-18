@@ -35,17 +35,25 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     }
     */
 
-    //private FacilityVO GenerateFacilityVO(FacilityEntity facility)
-    //{
-    //    return new FacilityVO;
-    //}
+   /* private FacilityVO GenerateFacilityVO(FacilityEntity facility)
+    {
+       *//* var supplyChainStage = 
 
-    private SupplierVO GenerateSupplierVO(SupplierEntity supplier)
+        return new FacilityVO(facility.Id, facility.Name, facility.SupplierId, facility.GhgrpfacilityId, facility.IsActive, facility.SupplyChainStage, facility.ReportingType);*//*
+    }
+*/
+   /* private SupplierVO GenerateSupplierVO(SupplierEntity supplier)
     {
         var facilityVOs = new List<FacilityVO>();
+
+        foreach(var facility in supplier.FacilityEntities)
+        {
+            facilityVOs.Add(GenerateFacilityVO(facility));
+        }
+
         return new SupplierVO(supplier.Id, supplier.Name, supplier.IsActive, facilityVOs);
     }
-
+*/
     public ReportingPeriodEntity ConvertReportingPeriodDomainToEntity(ReportingPeriod reportingPeriod)
     {
         var reportingPeriodSuppliers = ConvertReportingPeriodSuppliersDomainToEntity(reportingPeriod.PeriodSuppliers ?? new List<PeriodSupplier>());
@@ -124,16 +132,19 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         return suppliers;
     }
 
-    public SupplierVO ConvertSupplierToSupplierValueObject(SupplierEntity supplierEntity, IEnumerable<SupplyChainStage>? supplyChainStages = null, IEnumerable<ReportingType>? reportingTypes = null)
+    public SupplierVO ConvertSupplierToSupplierValueObject(SupplierEntity supplierEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
     {
-        var facilityVO = new List<FacilityVO>();
+        var facilityVOs = new List<FacilityVO>();
 
         foreach (var facilityEntity in supplierEntity.FacilityEntities)
         {
-            var selectedSupplyChainStage = supplyChainStages != null ? supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId) : null;
-            var selectedReprtingType = reportingTypes != null ? reportingTypes.FirstOrDefault(x => x.Id ==facilityEntity.ReportingTypeId) : null;
+            var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
+            var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
+
+            facilityVOs.Add(new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType));
+
         }
-        var supplierVO = new SupplierVO(supplierEntity.Id,supplierEntity.Name,supplierEntity.IsActive,facilityVO);
+        var supplierVO = new SupplierVO(supplierEntity.Id,supplierEntity.Name,supplierEntity.IsActive,facilityVOs);
         return supplierVO;
     }
 
@@ -143,7 +154,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         foreach(var supplierEntity in supplierEntities)
         {
-            supplierVOs.Add(ConvertSupplierToSupplierValueObject(supplierEntity));
+            supplierVOs.Add(ConvertSupplierToSupplierValueObject(supplierEntity, null, null));
         }
         return supplierVOs;
     }

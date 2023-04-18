@@ -23,7 +23,7 @@ public interface IReportingPeriodEntityDomainMapper
     IEnumerable<ReportingPeriodSupplierEntity> ConvertReportingPeriodSuppliersDomainToEntity(IEnumerable<PeriodSupplier> periodSuppliers);
     ReportingPeriodSupplierEntity ConvertReportingPeriodSupplierDomainToEntity(PeriodSupplier periodSupplier);
    /* void ConvertPeriodSupplierEntityToDomain(ReportingPeriod periodDomain, ICollection<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntities, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses);*/
-    SupplierVO ConvertSupplierToSupplierValueObject(SupplierEntity supplierEntity,IEnumerable<SupplyChainStage>? supplyChainStages = null,IEnumerable<ReportingType>? reportingTypes = null);
+    SupplierVO ConvertSupplierToSupplierValueObject(SupplierEntity supplierEntity,IEnumerable<SupplyChainStage> supplyChainStages ,IEnumerable<ReportingType> reportingTypes);
 
     IEnumerable<SupplierVO> ConvertSupplierEntityToSupplierValueObject(IEnumerable<SupplierEntity> supplierEntities);
 
