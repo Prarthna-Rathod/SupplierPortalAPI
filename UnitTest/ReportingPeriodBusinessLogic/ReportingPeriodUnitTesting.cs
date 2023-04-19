@@ -9,7 +9,7 @@ using Xunit;
 
 namespace UnitTest.ReportingPeriodBusinessLogic
 {
-    public class ReportingPeriodUnitTesting: BasicTestClass
+    public class ReportingPeriodUnitTesting : BasicTestClass
     {
         /// <summary>
         /// Update ReportingPeriod Success Case1
@@ -27,11 +27,11 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-               reportingPeriod.UpdateReportingPeriod(reportingPeriodType, "2022", reportingPeriodStatus, new DateTime(2023, 4,12), null, true, supplierReportingPeriodStatuses);
+                reportingPeriod.UpdateReportingPeriod(reportingPeriodType, "2022", reportingPeriodStatus, new DateTime(2023, 4, 12), null, true, supplierReportingPeriodStatuses);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                exceptionCounter ++;
+                exceptionCounter++;
                 exceptionMessage = ex.Message;
             }
 
@@ -45,8 +45,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         /// For this UnitTest set ReportingPeriodStatus Open in BasicTestClass -> CreateReportingPeriodEntity
         /// </summary>
         [Fact]
-        public void UpdateReportingPeriodSucceedCase2() 
-        { 
+        public void UpdateReportingPeriodSucceedCase2()
+        {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
@@ -54,18 +54,55 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Close);
             var supplierReportingPeriodStatuses = GetSupplierReportingPeriodStatuses();
 
+
             try
             {
                 reportingPeriod.UpdateReportingPeriod(reportingPeriodType, "2022", reportingPeriodStatus, new DateTime(2023, 4, 12), null, true, supplierReportingPeriodStatuses);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                exceptionCounter ++;
+                exceptionCounter++;
                 exceptionMessage = ex.Message;
             }
 
             Assert.Null(exceptionMessage);
             Assert.Equal(0, exceptionCounter);
+
+        }
+        /// <summary>
+        /// Add ReportingPeriodSupplier Success case
+        /// In this case supplier should be active & reportingPeriodStatus should be InActive
+        /// </summary>
+        [Fact]
+        public void AddReportingPeriodSupplierSucceed()
+        {
+
+            //Arrange
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = GetReportingPeriodDomain();
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Id == 2);
+
+            PeriodSupplier periodSupplier = null;
+
+            //Act
+            try
+            {
+                periodSupplier = reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
+
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            //Assert
+            Assert.NotNull(periodSupplier);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
 
         }
 
@@ -87,9 +124,9 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             {
                 reportingPeriod.UpdateReportingPeriod(reportingPeriodType, "2022", reportingPeriodStatus, new DateTime(2023, 4, 12), new DateTime(2024, 4, 12), true, supplierReportingPeriodStatuses);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                exceptionCounter ++;
+                exceptionCounter++;
                 exceptionMessage = ex.Message;
             }
 
@@ -117,9 +154,9 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             {
                 reportingPeriod.UpdateReportingPeriod(reportingPeriodType, "2023", reportingPeriodStatus, new DateTime(2024, 4, 12), new DateTime(2024, 4, 12), true, supplierReportingPeriodStatuses);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                exceptionCounter ++;
+                exceptionCounter++;
                 exceptionMessage = ex.Message;
             }
 
@@ -147,7 +184,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             {
                 reportingPeriod.UpdateReportingPeriod(reportingPeriodType, "2022", reportingPeriodStatus, new DateTime(2022, 4, 12), new DateTime(2022, 4, 12), true, supplierReportingPeriodStatuses);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;

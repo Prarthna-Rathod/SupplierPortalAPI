@@ -2,9 +2,13 @@ using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.ValueConstants;
+using BusinessLogic.SupplierRoot.ValueObjects;
+using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
+using Services.Mappers.Interfaces;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace UnitTest
 {
@@ -23,6 +27,7 @@ namespace UnitTest
         //private int reportingPeriodTypeId = 1;
         private string collectionTimePeriod = "2022";
         //private int reportingPeriodStatusId = 1;
+        private int reportingPeriodStatusId = 1;
         private DateTime startDate = new DateTime(2023,04,12);
         private DateTime? endDate = null;
         private bool isActive = true;
@@ -233,6 +238,17 @@ namespace UnitTest
             return reportingPeriodEntity;
 
         }
+
+        protected SupplierVO GetAndConvertSupplierValueObject()
+        {
+            var supplierEntity = CreateSupplierEntity();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var supplierVO = mapper.ConvertSupplierToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
+            return supplierVO;
+        }
+
 
         protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
         {
