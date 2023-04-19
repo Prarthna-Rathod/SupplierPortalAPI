@@ -230,20 +230,20 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         {
             var reportingPeriodSupplier = new PeriodSupplier(supplier, reportingPeriodId, supplierReportingPeriodStatus);
 
-
-/*
-            if (_periodSupplier.Contains(reportingPeriodSupplier))
+            //Check existing PeriodSupplier
+            foreach(var periodSupplier in _periodSupplier)
             {
-                throw new Exception("Supplier Already Exist!");
+                if (periodSupplier.Supplier.Id == supplier.Id && periodSupplier.ReportingPeriodId == reportingPeriodId)
+                    throw new BadRequestException("ReportingPeriodSupplier is already exists !!");
+            }
+
+            //Add new PeriodSupplier
+            if (supplier.IsActive && ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive)
+            {
+                _periodSupplier.Add(reportingPeriodSupplier);
             }
             else
-            {*/
-                if(supplier.IsActive && ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive)
-                {
-                    _periodSupplier.Add(reportingPeriodSupplier);
-                }
-               
-           // }
+                throw new BadRequestException("Supplier is not Active or ReportingPeriodStatus is not InActive !!");
 
             return reportingPeriodSupplier;
         }
