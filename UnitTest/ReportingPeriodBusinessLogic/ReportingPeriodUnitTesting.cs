@@ -1,14 +1,11 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.ValueConstants;
-<<<<<<< HEAD
-=======
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
->>>>>>> 55b54c21e24239b52afb4a6fece7aa0e8c6e82aa
 
 namespace UnitTest.ReportingPeriodBusinessLogic
 {
