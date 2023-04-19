@@ -9,6 +9,7 @@ namespace DataAccess.DataActions;
 public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 {
     private readonly SupplierPortalDBContext _context;
+    private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
     public ReportingPeriodDataActionsManager(SupplierPortalDBContext context)
     {
         _context = context;
@@ -23,10 +24,18 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         if (existingReportingPeriod != null)
             throw new Exception($"ReportingPeriod with the same CollectionTimePeriod {reportingPeriod.CollectionTimePeriod} and same ReportingPeriodType {reportingPeriod.ReportingPeriodType.Name} is already exists !!");
 
-        reportingPeriod.CreatedBy = "System";
-        reportingPeriod.CreatedOn = DateTime.UtcNow;
+        var entity = new ReportingPeriodEntity();
+        entity.DisplayName = reportingPeriod.DisplayName;
+        entity.ReportingPeriodTypeId = reportingPeriod.ReportingPeriodTypeId;
+        entity.CollectionTimePeriod = reportingPeriod.CollectionTimePeriod;
+        entity.ReportingPeriodStatusId = reportingPeriod.ReportingPeriodStatusId;
+        entity.StartDate = reportingPeriod.StartDate.Date;
+        entity.EndDate = reportingPeriod.EndDate;
+        entity.IsActive = reportingPeriod.IsActive;
+        entity.CreatedBy = "System";
+        entity.CreatedOn = DateTime.UtcNow;
 
-        _context.ReportingPeriodEntities.Add(reportingPeriod);
+        _context.ReportingPeriodEntities.Add(entity);
         _context.SaveChanges();
         return true;
     }
@@ -88,7 +97,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         reportingPeriodEntity.EndDate = reportingPeriod.EndDate;
         reportingPeriodEntity.IsActive = reportingPeriod.IsActive;
 
-        reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSuppliers(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
+        if(reportingPeriod.ReportingPeriodStatus.Name == REPORTING_PERIOD_STATUS_CLOSE)
+        {
+            reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSuppliers(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
+        }
 
         reportingPeriodEntity.UpdatedOn = DateTime.UtcNow;
         reportingPeriodEntity.UpdatedBy = "System";
