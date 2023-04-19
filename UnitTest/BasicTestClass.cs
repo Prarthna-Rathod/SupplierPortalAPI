@@ -1,6 +1,7 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.ValueConstants;
 using DataAccess.Entities;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
@@ -19,13 +20,12 @@ namespace UnitTest
         //ReportingPeriod
         private int reportingPeriodId = 1;
         private string displayName = "Reporting Period Data Year 2022";
-        private int reportingPeriodTypeId = 1;
+        //private int reportingPeriodTypeId = 1;
         private string collectionTimePeriod = "2022";
-        private int reportingPeriodStatusId = 2;
+        //private int reportingPeriodStatusId = 1;
         private DateTime startDate = new DateTime(2023,04,12);
         private DateTime? endDate = null;
         private bool isActive = true;
-
 
         #region Supplier
         protected IEnumerable<ReportingType> GenerateReportingType()
@@ -223,8 +223,8 @@ namespace UnitTest
             var reportingPeriodEntity = new ReportingPeriodEntity();
             reportingPeriodEntity.Id = reportingPeriodId;
             reportingPeriodEntity.DisplayName = displayName;
-            reportingPeriodEntity.ReportingPeriodTypeId = reportingPeriodTypeId;
-            reportingPeriodEntity.ReportingPeriodStatusId = reportingPeriodStatusId;
+            reportingPeriodEntity.ReportingPeriodTypeId = GetAndConvertReportingPeriodTypes().FirstOrDefault(x => x.Name == ReportingPeriodTypeValues.Annual).Id;
+            reportingPeriodEntity.ReportingPeriodStatusId = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.InActive).Id;
             reportingPeriodEntity.CollectionTimePeriod = collectionTimePeriod;
             reportingPeriodEntity.StartDate = startDate;
             reportingPeriodEntity.EndDate = endDate;

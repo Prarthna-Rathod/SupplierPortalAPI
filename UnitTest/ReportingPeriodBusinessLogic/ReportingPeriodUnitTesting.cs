@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ValueConstants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
-            var reportingPeriodType = GetAndConvertReportingPeriodTypes().First(x => x.Id == reportingPeriod.ReportingPeriodType.Id);
-            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Id == 2);
+            var reportingPeriodType = GetAndConvertReportingPeriodTypes().First(x => x.Name == ReportingPeriodTypeValues.Annual);
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Open);
             var supplierReportingPeriodStatuses = GetSupplierReportingPeriodStatuses();
 
             try
@@ -41,7 +42,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         /// <summary>
         /// Update ReportingPeriod Success Case2
         /// If ReportingPeriodStatus is changed from Open to Closed then set SupplierReportingPeriodStatus 'Locked' for all related ReportingPeriodSuppliers.
-        /// For this UnitTest set ReportingPeriodStatus Open in BasicTestClass
+        /// For this UnitTest set ReportingPeriodStatus Open in BasicTestClass -> CreateReportingPeriodEntity
         /// </summary>
         [Fact]
         public void UpdateReportingPeriodSucceedCase2() 
@@ -49,8 +50,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
-            var reportingPeriodType = GetAndConvertReportingPeriodTypes().First(x => x.Id == reportingPeriod.ReportingPeriodType.Id);
-            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Id == 3);
+            var reportingPeriodType = GetAndConvertReportingPeriodTypes().First(x => x.Name == ReportingPeriodTypeValues.Annual);
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Close);
             var supplierReportingPeriodStatuses = GetSupplierReportingPeriodStatuses();
 
             try
@@ -78,8 +79,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
-            var reportingPeriodType = GetAndConvertReportingPeriodTypes().First(x => x.Id == reportingPeriod.ReportingPeriodType.Id);
-            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Id == 4);
+            var reportingPeriodType = GetAndConvertReportingPeriodTypes().First(x => x.Name == ReportingPeriodTypeValues.Annual);
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Complete);
             var supplierReportingPeriodStatuses = GetSupplierReportingPeriodStatuses();
 
             try
@@ -100,7 +101,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         /// <summary>
         /// Update ReportingPeriod Failed Case2
         /// If reportingPeriodStatus is Closed and try to update any data then throw exception
-        /// For this UnitTest set ReportingPeriodStatus Closed in BasicTestClass
+        /// For this UnitTest set ReportingPeriodStatus Closed in BasicTestClass -> CreateReportingPeriodEntity
         /// </summary>
         [Fact]
         public void UpdateReportingPeriodFailsCase2()
