@@ -73,6 +73,43 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         }
 
         /// <summary>
+        /// Add ReportingPeriodSupplier Success case
+        /// In this case supplier should be active & reportingPeriodStatus should be InActive
+        /// </summary>
+        [Fact]
+        public void AddReportingPeriodSupplierSucceed()
+        {
+
+            //Arrange
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = GetReportingPeriodDomain();
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+
+            PeriodSupplier? periodSupplier = null;
+
+            //Act
+            try
+            {
+                periodSupplier = reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
+
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            //Assert
+            Assert.NotNull(periodSupplier);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+
+        }
+
+        /// <summary>
         /// Update ReportingPeriod Failed Case1
         /// If ReportingPeriodStatus changed from InActive to Complete then throw exception
         /// </summary>
@@ -160,7 +197,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.NotEqual(0, exceptionCounter);
         }
 
-
         #endregion
 
         #region Add PeriodSupplier
@@ -201,7 +237,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.Null(exceptionMessage);
 
         }
-
 
         /// <summary>
         /// Add ReportingPeriodSupplier failure case.
@@ -257,6 +292,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.NotNull(exceptionMessage);
         }
 
+
         #endregion
+
     }
 }
