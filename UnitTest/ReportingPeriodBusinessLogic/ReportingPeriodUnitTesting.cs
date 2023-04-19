@@ -1,19 +1,18 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.ValueConstants;
-<<<<<<< HEAD
-=======
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
->>>>>>> 55b54c21e24239b52afb4a6fece7aa0e8c6e82aa
 
 namespace UnitTest.ReportingPeriodBusinessLogic
 {
     public class ReportingPeriodUnitTesting : BasicTestClass
     {
+        #region Update ReportingPeriod
+
         /// <summary>
         /// Update ReportingPeriod Success Case1
         /// Updated ReportingPeriodStatus from InActive to Open
@@ -72,7 +71,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.Equal(0, exceptionCounter);
 
         }
-        
+
         /// <summary>
         /// Add ReportingPeriodSupplier Success case
         /// In this case supplier should be active & reportingPeriodStatus should be InActive
@@ -198,6 +197,47 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.NotEqual(0, exceptionCounter);
         }
 
+        #endregion
+
+        #region Add PeriodSupplier
+
+        /// <summary>
+        /// Add ReportingPeriodSupplier Success case
+        /// In this case supplier should be active & reportingPeriodStatus should be InActive
+        /// </summary>
+        [Fact]
+        public void AddReportingPeriodSupplierSucceed()
+        {
+
+            //Arrange
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = GetReportingPeriodDomain();
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+
+            PeriodSupplier periodSupplier = null;
+
+            //Act
+            try
+            {
+                periodSupplier = reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
+
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            //Assert
+            Assert.NotNull(periodSupplier);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+
+        }
+
         /// <summary>
         /// Add ReportingPeriodSupplier failure case.
         /// In this case duplicate ReportingPeriodSupplier can not be add.
@@ -251,5 +291,9 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
+
+
+        #endregion
+
     }
 }
