@@ -51,9 +51,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     public async Task<bool> AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity)
     {
         await _context.ReportingPeriodFacilityEntities.AddAsync(reportingPeriodFacilityEntity);
-        
+
         await _context.SaveChangesAsync();
-        
+
         return true;
     }
 
@@ -90,14 +90,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             throw new Exception("ReportingPeriodEntity not found !!");
 
         reportingPeriodEntity.DisplayName = reportingPeriod.DisplayName;
-            reportingPeriodEntity.ReportingPeriodTypeId =            reportingPeriod.ReportingPeriodTypeId;
+        reportingPeriodEntity.ReportingPeriodTypeId = reportingPeriod.ReportingPeriodTypeId;
         reportingPeriodEntity.CollectionTimePeriod = reportingPeriod.CollectionTimePeriod;
         reportingPeriodEntity.ReportingPeriodStatusId = reportingPeriod.ReportingPeriodStatusId;
         reportingPeriodEntity.StartDate = reportingPeriod.StartDate;
         reportingPeriodEntity.EndDate = reportingPeriod.EndDate;
         reportingPeriodEntity.IsActive = reportingPeriod.IsActive;
 
-        if(reportingPeriod.ReportingPeriodStatus.Name == REPORTING_PERIOD_STATUS_CLOSE)
+        if (reportingPeriod.ReportingPeriodStatus.Name == REPORTING_PERIOD_STATUS_CLOSE)
         {
             reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSuppliers(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
         }
@@ -166,21 +166,21 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-  /*  public ReportingPeriodSupplierEntity UpdatePeriodSupplier(ReportingPeriodSupplierEntity periodSupplierEntity)
-    {
-        var periodSupplier = _context.ReportingPeriodSupplierEntities
-            .Where(x => x.Id == periodSupplierEntity.Id).FirstOrDefault();
+    /*  public ReportingPeriodSupplierEntity UpdatePeriodSupplier(ReportingPeriodSupplierEntity periodSupplierEntity)
+      {
+          var periodSupplier = _context.ReportingPeriodSupplierEntities
+              .Where(x => x.Id == periodSupplierEntity.Id).FirstOrDefault();
 
-        if (periodSupplier == null)
-            throw new Exception("ReportingPeriodSupplierEntity not found for update !!");
+          if (periodSupplier == null)
+              throw new Exception("ReportingPeriodSupplierEntity not found for update !!");
 
-        periodSupplier.SupplierReportingPeriodStatusId = periodSupplierEntity.SupplierReportingPeriodStatusId;
+          periodSupplier.SupplierReportingPeriodStatusId = periodSupplierEntity.SupplierReportingPeriodStatusId;
 
-        _context.ReportingPeriodSupplierEntities.Update(periodSupplier);
-        _context.SaveChanges();
-        return periodSupplier;
-    }
-*/
+          _context.ReportingPeriodSupplierEntities.Update(periodSupplier);
+          _context.SaveChanges();
+          return periodSupplier;
+      }
+  */
     public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
@@ -188,7 +188,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         var reportingPeriodId = periodSuppliers.First().ReportingPeriodId;
         var allPeriodSuppliers = _context.ReportingPeriodSupplierEntities.Where(x => x.ReportingPeriodId == reportingPeriodId).ToList();
 
-        foreach(var periodSupplier in periodSuppliers)
+        foreach (var periodSupplier in periodSuppliers)
         {
             var updatePeriodSupplier = allPeriodSuppliers
             .Where(x => x.Id == periodSupplier.Id).FirstOrDefault();
@@ -212,10 +212,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     public bool RemovePeriodSupplier(int periodSupplierId)
     {
         var periodSupplier = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId)
-            .Include(x=>x.ReportingPeriodFacilityEntities).FirstOrDefault();
+            .Include(x => x.ReportingPeriodFacilityEntities).FirstOrDefault();
 
         //var periodSupplierRelevantFacility = _context.ReportingPeriodSupplierEntities.Where(x=>x.Id == periodSupplierId).Include(x=>x .ReportingPeriodFacilityEntities).ToList();
-        if(periodSupplier == null)
+        if (periodSupplier == null)
         {
             return false;
         }
@@ -250,6 +250,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         var reportingPeriods = _context.ReportingPeriodEntities
                                 .Include(x => x.ReportingPeriodType)
                                 .Include(x => x.ReportingPeriodStatus)
+                                .Include(x => x.ReportingPeriodSupplierEntities)
                                 .ToList();
 
         return reportingPeriods;
@@ -336,10 +337,12 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     public IEnumerable<ReportingPeriodSupplierEntity> GetReportingPeriodSuppliers(int reportingPeriodId)
     {
         var reportingPeriodSupplier =
-            _context.ReportingPeriodSupplierEntities.Include(x => x.Supplier)
-            .Include(x =>x .ReportingPeriod)
-            .Include(x=>x.SupplierReportingPeriodStatus)
-            .Where(x => x.ReportingPeriodId == reportingPeriodId).ToList();
+            _context.ReportingPeriodSupplierEntities
+                                    .Where(x => x.ReportingPeriodId == reportingPeriodId)
+                                    .Include(x => x.Supplier)
+                                    .Include(x => x.ReportingPeriod)
+                                    .Include(x => x.SupplierReportingPeriodStatus)
+                                    .ToList();
         return reportingPeriodSupplier;
 
     }

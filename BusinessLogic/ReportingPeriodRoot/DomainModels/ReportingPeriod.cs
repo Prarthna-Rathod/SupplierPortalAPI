@@ -46,6 +46,19 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         public ReportingPeriodStatus ReportingPeriodStatus { get; private set; }
 
 
+        public IEnumerable<PeriodSupplier> PeriodSuppliers
+        {
+            get
+            {
+                if (_periodSupplier == null)
+                {
+                    return new List<PeriodSupplier>();
+                }
+                return _periodSupplier.ToList();
+            }
+        }
+
+        #region Private Methods
         private string[] SplitCollectionTimePeriod()
         {
             return CollectionTimePeriod.Split(" ");
@@ -113,18 +126,9 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         }
 
-        public IEnumerable<PeriodSupplier> PeriodSuppliers
-        {
-            get
-            {
-                if (_periodSupplier == null)
-                {
-                    return new List<PeriodSupplier>();
-                }
-                return _periodSupplier.ToList();
-            }
-        }
+        #endregion
 
+        #region Update ReportingPerid
         public void UpdateReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
         {
             switch (ReportingPeriodStatus.Name)
@@ -136,13 +140,13 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                         if (StartDate.Date != startDate.Date && startDate.Date < DateTime.UtcNow.Date)
                         {
-                                throw new Exception("StartDate should be in future !!");
+                            throw new Exception("StartDate should be in future !!");
                         }
 
                         if (endDate != null && endDate < startDate)
                         {
-                            
-                                throw new BadRequestException("EndDate should be greater than startDate !!");
+
+                            throw new BadRequestException("EndDate should be greater than startDate !!");
                         }
 
 
@@ -218,20 +222,22 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         }
 
+        #endregion
 
+        #region Period Supplier
         public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
             var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, reportingPeriodId, supplierReportingPeriodStatus);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
-        }   
+        }
 
         public PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
             var reportingPeriodSupplier = new PeriodSupplier(supplier, reportingPeriodId, supplierReportingPeriodStatus);
 
             //Check existing PeriodSupplier
-            foreach(var periodSupplier in _periodSupplier)
+            foreach (var periodSupplier in _periodSupplier)
             {
                 if (periodSupplier.Supplier.Id == supplier.Id && periodSupplier.ReportingPeriodId == reportingPeriodId)
                     throw new BadRequestException("ReportingPeriodSupplier is already exists !!");
@@ -248,68 +254,16 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return reportingPeriodSupplier;
         }
 
+        #endregion
+
+        #region Period Facility
+
         /*
-        public PeriodSupplier UpdatePeriodSupplierStatus(int periodSupplierId, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
-        {
-            var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();
-
-            if (periodSupplier is null)
-            {
-                throw new ArgumentNullException("Unable to retrieve Period Supplier");
-            }
-
-            if (periodSupplier.Id == periodSupplierId)
-            {
-                if (periodSupplier.SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
-                {
-                    var unlockedStatus = supplierReportingPeriodStatuses.Where(x => x.Name == "Unlocked").FirstOrDefault();
-                    periodSupplier.UpdateSupplierReportingPeriodStatus(unlockedStatus);
-                }
-                else
-                {
-                    periodSupplier.SupplierReportingPeriodStatus.Name = "Locked";
-                }
-            }
-            else
-            {
-                throw new ArgumentNullException("Unable to retrieve Period Supplier");
-
-            }
-
-
-            return periodSupplier;
-        }
-
-        public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddDocumentToPeriodSupplierFacility(DocumentType documentType, DocumentStatus documentStatus)
-        {
-            throw new NotImplementedException();
-        }
-
         public void AddPeriodFacilityToPeriodSupplier(int supplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, ReportingType reportingType, int reportingPeriodSupplierId)
         {
             var reportingPeriodFacility = new PeriodFacility();
         }
 
-
-        public PeriodSupplierDocument AddSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, string documentName, DocumentType documentType, IEnumerable<DocumentStatus> documentStatus)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId, int periodFacilityId, int documentId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, int documentId)
-        {
-            throw new NotImplementedException();
-        }
 
         public IEnumerable<PeriodFacility> UpdateDataStatusToSubmittedForCompletePeriodFacility(int supplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
         {
@@ -317,5 +271,44 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         }
 
         */
+
+        #endregion
+
+        #region Period Document
+
+        /*
+         public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
+         {
+             throw new NotImplementedException();
+         }
+
+         public void AddDocumentToPeriodSupplierFacility(DocumentType documentType, DocumentStatus documentStatus)
+         {
+             throw new NotImplementedException();
+         }
+
+        
+         public PeriodSupplierDocument AddSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, string documentName, DocumentType documentType, IEnumerable<DocumentStatus> documentStatus)
+         {
+             throw new NotImplementedException();
+         }
+
+         public PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId, int periodFacilityId, int documentId)
+         {
+             throw new NotImplementedException();
+         }
+
+         public PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, int documentId)
+         {
+             throw new NotImplementedException();
+         }
+
+
+
+        */
+
+        #endregion
+
+
     }
 }
