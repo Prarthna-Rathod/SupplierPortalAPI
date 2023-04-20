@@ -1,3 +1,4 @@
+using BusinessLogic.SupplierRoot.DomainModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,7 +17,6 @@ namespace Services.DTOs
         public string ReportingPeriodName { get; set; }
         public int SupplierReportingPeriodStatusId { get; set; }
         public string SupplierReportingPeriodStatusName { get;set; }
-       // public bool IsActive { get; set; }
 
         public ReportingPeriodSupplierDto(int id, int supplierId, string supplierName, int reportingPeriodId, string reportingPeriodName, int supplierReportingPeriodStatusId, string supplierReportingPeriodStatusName)
         {
@@ -27,7 +27,6 @@ namespace Services.DTOs
             ReportingPeriodName = reportingPeriodName;
             SupplierReportingPeriodStatusId = supplierReportingPeriodStatusId;
             SupplierReportingPeriodStatusName = supplierReportingPeriodStatusName;
-          //  IsActive = isActive;
         }
 
 

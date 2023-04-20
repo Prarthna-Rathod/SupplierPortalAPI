@@ -54,17 +54,17 @@ namespace SupplierPortalAPI.Controllers
             return _services.GetActiveReportingPeriods();
         }
 
-       /* [HttpGet("GetActivePeriodSuppliers")]
-        public IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers()
-        {
-            return _services.GetActivePeriodSuppliers();
-        }
+        /* [HttpGet("GetActivePeriodSuppliers")]
+         public IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers()
+         {
+             return _services.GetActivePeriodSuppliers();
+         }*/
 
-        [HttpGet("GetPeriodSuppliers")]
-        public  IEnumerable<SupplierReportingPeriodDTO> GetReportingPeriodSuppliers(int ReportingPeriodId)
-        { 
-            return  _services.GetReportingPeriodSuppliers(ReportingPeriodId);
-        }*/
+        [HttpGet("GetReportingPeriodRelaventSuppliers")]
+        public IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId)
+        {
+            return _services.GetReportingPeriodSuppliers(reportingPeriodId);
+        }
         #endregion
 
         #region Remove_PeriodSupplier

@@ -34,9 +34,9 @@ public class PeriodSupplier
     public SupplierReportingPeriodStatus SupplierReportingPeriodStatus { get; private set; }
     public bool IsActive { get; private set; }
 
-    public void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus unlockedStatus)
+    public void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
     {
-        SupplierReportingPeriodStatus = unlockedStatus;
+        SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
     }
 
 }

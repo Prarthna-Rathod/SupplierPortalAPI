@@ -12,12 +12,8 @@ namespace Services.Interfaces;
 
 public interface IReportingPeriodServices
 {
-    /// <summary>
-    /// Add PeriodSupplier
-    /// </summary>
-    /// <param name="reportingPeriodSupplierDto"></param>
-    /// <returns></returns>
-    string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
+
+    #region ReportingPeriod
 
     /// <summary>
     /// Add Reporting Period
@@ -27,17 +23,22 @@ public interface IReportingPeriodServices
     string AddUpdateReportingPeriod(ReportingPeriodDto reportingPeriodDto);
 
     /// <summary>
-    /// Add PeriodFacility
-    /// </summary>
-    /// <param name="reportingPeriodFacilityDto"></param>
-    /// <returns></returns>
-  //  Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
-
-    /// <summary>
     /// Get Active ReportingPeriods
     /// </summary>
     /// <returns></returns>
     IEnumerable<ReportingPeriodDto> GetActiveReportingPeriods();
+
+    #endregion
+
+    #region PeriodSuppliers
+
+    /// <summary>
+    /// Add PeriodSupplier
+    /// </summary>
+    /// <param name="reportingPeriodSupplierDto"></param>
+    /// <returns></returns>
+    string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
+
 
     /// <summary>
     /// Get Active ReportingPeriodSuppliers
@@ -49,7 +50,8 @@ public interface IReportingPeriodServices
     /// Get Active Period Suppliers
     /// </summary>
     /// <returns></returns>
-    IEnumerable<SupplierReportingPeriodDTO> GetReportingPeriodSuppliers(int ReportingPeriodId);
+    IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
+
 
     /// <summary>
     /// Remove Period Supplier
@@ -58,14 +60,21 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     bool RemovePeriodSupplier(int PeriodSupplierId);
 
+    #endregion
+
+    #region PeriodFacilities
+
+
     /// <summary>
-    /// UpdateLockUnlockStatus
+    /// Add PeriodFacility
     /// </summary>
-    /// <param name="periodSupplierId"></param>
+    /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
-   // bool UpdateLockUnlockPeriodSupplier(int periodSupplierId);
+    //  Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
 
+    #endregion
 
-
+    #region ReportingPeriodDocuments
+    #endregion
 
 }
