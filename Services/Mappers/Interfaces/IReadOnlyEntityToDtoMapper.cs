@@ -17,6 +17,5 @@ namespace Services.Mappers.Interfaces
 
         ReportingPeriodActiveSupplierDTO ConvertReportingPeriodSupplierEntityToReportingPeriodActiveSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
 
-        //ReportingPeriodSupplierDto CovertPeriodSupplierEntityToPeriodSupplierDTO();
     }
 }
