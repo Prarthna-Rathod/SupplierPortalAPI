@@ -271,13 +271,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return periodSuppliers;
     }
 
-    public IEnumerable<ReportingPeriodSupplierEntity> GetRelaventPeriodSuppliers()
-    {
-        var periodSuppliers = _context.ReportingPeriodSupplierEntities.Include(x=>x.ReportingPeriod).Include(x => x.Supplier).ToList();
-
-        return periodSuppliers;
-    }
-
     public IEnumerable<DocumentRequiredStatusEntity> GetDocumentRequiredStatus()
     {
         return _context.DocumentRequiredStatusEntities.ToList();
