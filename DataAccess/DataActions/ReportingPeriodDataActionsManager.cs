@@ -423,5 +423,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         GC.SuppressFinalize(this);
     }
 
+  
+
     #endregion
 }
