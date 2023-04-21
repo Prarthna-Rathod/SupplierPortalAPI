@@ -53,10 +53,11 @@ public interface IReportingPeriodServices
     IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers();
 
     /// <summary>
-    /// Get Active Period Suppliers
+    /// Get InRelevant Suppliers
     /// </summary>
     /// <returns></returns>
-    IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
+    /// 
+    IEnumerable<SupplierDto> GetInRelevantSuppliers();
 
 
     /// <summary>
