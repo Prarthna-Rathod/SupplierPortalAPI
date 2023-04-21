@@ -32,12 +32,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.SetPeriodSupplier(reportingPeriodSupplierDto);
         }
 
-        /*[HttpPost("AddPeriodFacility")]
-        public async Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+        [HttpPost("AddPeriodFacilities")]
+        public string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
         {
-            return await _services.SetPeriodFacility(reportingPeriodFacilityDto);
+            return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
         }
-*/
+/*
         /* [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
          public bool PeriodSupplierLockUnlock(int periodSupplierId)
          {
@@ -82,6 +82,6 @@ namespace SupplierPortalAPI.Controllers
                 return "PeriodSupplier is not exists !!";
         }
 */
-        #endregion
+        #endregion                   
     }
 }

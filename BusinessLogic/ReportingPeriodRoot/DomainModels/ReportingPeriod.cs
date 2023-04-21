@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
+using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -10,6 +11,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
     public class ReportingPeriod : IReportingPeriod
     {
         private HashSet<PeriodSupplier> _periodSupplier;
+        private HashSet<PeriodFacility> _periodfacilities;
 
         private readonly string REPORTING_PERIOD_NAME_PREFIX = "Reporting Period Data";
         public ReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive)
@@ -23,6 +25,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             EndDate = endDate;
             IsActive = isActive;
             _periodSupplier = new HashSet<PeriodSupplier>();
+            _periodfacilities = new HashSet<PeriodFacility>();
         }
 
         public ReportingPeriod(int id, string displayName, ReportingPeriodType types, string collectionTimePeriod, ReportingPeriodStatus status, DateTime startDate, DateTime? endDate, bool isActive) : this(types, collectionTimePeriod, status, startDate, endDate, isActive)
@@ -55,6 +58,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                     return new List<PeriodSupplier>();
                 }
                 return _periodSupplier.ToList();
+            }
+        }
+
+        public IEnumerable<PeriodFacility> PeriodFacilities
+        {
+            get
+            {
+                if (_periodfacilities == null)
+                {
+                    return new List<PeriodFacility>();
+                }
+                return _periodfacilities.ToList();
             }
         }
 
@@ -258,19 +273,39 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region Period Facility
 
-        /*
-        public void AddPeriodFacilityToPeriodSupplier(int supplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, ReportingType reportingType, int reportingPeriodSupplierId)
+        public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod)
         {
-            var reportingPeriodFacility = new PeriodFacility();
+            var periodFacility = new PeriodFacility(periodFacilityId,facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+
+            //Check existing PeriodSupplier
+            foreach (var existingPeriodFacility in _periodfacilities)
+            {
+                if (existingPeriodFacility.FacilityVO.Id == facilityVO.Id && existingPeriodFacility.ReportingPeriodId == Id)
+                {
+                    if (facilityIsRelevantForPeriod)
+                        throw new BadRequestException("ReportingPeriodFacility is already exists !!");
+                    else
+                        _periodfacilities.Remove(existingPeriodFacility);                    
+                }       
+            }
+
+            if (facilityIsRelevantForPeriod)
+            {
+                if (facilityReportingPeriodDataStatus.Name != FacilityReportingPeriodDataStatusValues.InProgress)
+                    throw new BadRequestException("FacilityReportingPeriodStatus should be InProgress only !!");
+
+                _periodfacilities.Add(periodFacility);
+            }
+            return periodFacility;
         }
 
-
-        public IEnumerable<PeriodFacility> UpdateDataStatusToSubmittedForCompletePeriodFacility(int supplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        public bool LoadPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId)
         {
-            throw new NotImplementedException();
+            var periodFacility = new PeriodFacility(periodFacilityId,facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+
+            return _periodfacilities.Add(periodFacility);
         }
 
-        */
 
         #endregion
 

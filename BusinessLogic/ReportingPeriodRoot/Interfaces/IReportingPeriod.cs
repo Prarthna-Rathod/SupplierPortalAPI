@@ -12,21 +12,13 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 {
     public interface IReportingPeriod
     {
-        int Id { get; }
-        string DisplayName { get; }
-        string CollectionTimePeriod { get; }
-        DateTime StartDate { get; }
-        DateTime? EndDate { get; }
-        bool IsActive { get; }
-
-        ReportingPeriodType ReportingPeriodType { get; }
-        ReportingPeriodStatus ReportingPeriodStatus { get;}
-        
-        IEnumerable<PeriodSupplier> PeriodSuppliers { get; }
-
         PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus);
         
         bool LoadPeriodSupplier(int reportingPeriodSupplierId,SupplierVO supplierVO, int reportingPeriodId,SupplierReportingPeriodStatus supplierReportingPeriodStatus);
+
+        PeriodFacility AddPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus,int periodSupplierId, bool facilityIsRelevantForPeriod);
+
+        bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId);
 
         /*
 

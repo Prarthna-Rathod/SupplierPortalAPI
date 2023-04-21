@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.SupplierRoot.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,59 +11,32 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
     public class PeriodFacility
     {
-        private HashSet<Facility> _facilities;
+ /*       private HashSet<Facility> _facilities;
         private HashSet<FacilityReportingPeriodDataStatus> _facilityReportingPeriodDataStatuses;
         private HashSet<ReportingType> _reportingTypes;
         //private HashSet<ReportingPeriodSupplier> ReportingPeriodSuppliers;
 
-        public PeriodFacility()
+*/
+        public int Id { get; private set; }
+        public FacilityVO FacilityVO { get; private set; }
+        public FacilityReportingPeriodDataStatus FacilityReportingPeriodDataStatus { get; private set; }
+        public int ReportingPeriodId { get; private set; }
+        public int ReportingPeriodSupplierId { get; private set; }
+
+        internal PeriodFacility() { }
+
+        internal PeriodFacility(FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId)
         {
-            _facilities = new HashSet<Facility>();
-            _facilityReportingPeriodDataStatuses = new HashSet<FacilityReportingPeriodDataStatus>();
-            _reportingTypes = new HashSet<ReportingType>();
+            FacilityVO = facilityVO;
+            FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
+            ReportingPeriodId = reportingPeriodId;
+            ReportingPeriodSupplierId = reportingPeriodSupplierId;
         }
 
-        public PeriodFacility(int id) : this()
+        internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId)
         {
             Id = id;
         }
-
-        public int Id { get; set; }
-
-        public IEnumerable<Facility> Facilities
-        {
-            get
-            {
-                if (_facilities == null)
-                {
-                    return new List<Facility>();
-                }
-                return _facilities.ToList();
-            }
-        }
-
-        public IEnumerable<FacilityReportingPeriodDataStatus> FacilityReportingPeriodDataStatus
-        {
-            get
-            {
-                if (_facilityReportingPeriodDataStatuses == null)
-                {
-                    return new List<FacilityReportingPeriodDataStatus>();
-                }
-                return _facilityReportingPeriodDataStatuses.ToList();
-            }
-        }
-
-        public IEnumerable<ReportingType> ReportingType
-        {
-            get
-            {
-                if (_reportingTypes == null)
-                {
-                    return new List<ReportingType>();
-                }
-                return _reportingTypes.ToList();
-            }
-        }
+    
     }
 }

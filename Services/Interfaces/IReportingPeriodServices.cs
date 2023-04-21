@@ -70,7 +70,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
-    //  Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
+     string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
 
     #endregion
 

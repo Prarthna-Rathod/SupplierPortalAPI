@@ -7,6 +7,7 @@ namespace DataAccess.Entities
     {
         public ReportingPeriodEntity()
         {
+            ReportingPeriodFacilityEntities = new HashSet<ReportingPeriodFacilityEntity>();
             ReportingPeriodSupplierEntities = new HashSet<ReportingPeriodSupplierEntity>();
         }
 
@@ -25,6 +26,7 @@ namespace DataAccess.Entities
 
         public virtual ReportingPeriodStatusEntity ReportingPeriodStatus { get; set; } = null!;
         public virtual ReportingPeriodTypeEntity ReportingPeriodType { get; set; } = null!;
+        public virtual ICollection<ReportingPeriodFacilityEntity> ReportingPeriodFacilityEntities { get; set; }
         public virtual ICollection<ReportingPeriodSupplierEntity> ReportingPeriodSupplierEntities { get; set; }
     }
 }
