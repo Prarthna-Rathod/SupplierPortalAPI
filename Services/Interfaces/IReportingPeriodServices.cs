@@ -37,7 +37,20 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="reportingPeriodSupplierDto"></param>
     /// <returns></returns>
-    string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
+    /*string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);*/
+
+    /// <summary>
+    /// Add Multiple PeriodSuppliers
+    /// </summary>
+    /// <param name="multiplePeriodSuppliersDto"></param>
+    /// <returns></returns>
+    string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto);
+
+    /// <summary>
+    /// Get Active ReportingPeriodSuppliers
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers();
 
     /// <summary>
     /// Get InRelevant Suppliers

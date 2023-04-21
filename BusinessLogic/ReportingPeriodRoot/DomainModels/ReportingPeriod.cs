@@ -229,21 +229,21 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #endregion
 
         #region Period Supplier
-        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, reportingPeriodId, supplierReportingPeriodStatus);
+            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO,Id, supplierReportingPeriodStatus);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
-        public PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+        public PeriodSupplier AddPeriodSupplier(int periodSupplierId,SupplierVO supplier,SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(supplier, reportingPeriodId, supplierReportingPeriodStatus);
+            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId,supplier, Id, supplierReportingPeriodStatus);
 
             //Check existing PeriodSupplier
             foreach (var periodSupplier in _periodSupplier)
             {
-                if (periodSupplier.Supplier.Id == supplier.Id && periodSupplier.ReportingPeriodId == reportingPeriodId)
+                if (periodSupplier.Supplier.Id == supplier.Id && periodSupplier.ReportingPeriodId == Id)
                     throw new BadRequestException("ReportingPeriodSupplier is already exists !!");
             }
 

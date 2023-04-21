@@ -26,10 +26,16 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriod(reportingPeriodDto);
         }
 
-        [HttpPost("AddPeriodSupplier")]
+        /*[HttpPost("AddPeriodSupplier")]
         public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
         {
             return _services.SetPeriodSupplier(reportingPeriodSupplierDto);
+        }*/
+
+        [HttpPost("AddMultiplePeriodSuppliers")]
+        public string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto)
+        {
+            return _services.SetMultiplePeriodSuppliers(multiplePeriodSuppliersDto);
         }
 
         /*[HttpPost("AddPeriodFacility")]
@@ -38,11 +44,6 @@ namespace SupplierPortalAPI.Controllers
             return await _services.SetPeriodFacility(reportingPeriodFacilityDto);
         }
 */
-        /* [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
-         public bool PeriodSupplierLockUnlock(int periodSupplierId)
-         {
-             return _services.UpdateLockUnlockPeriodSupplier(periodSupplierId);
-         }*/
 
         #endregion
 
