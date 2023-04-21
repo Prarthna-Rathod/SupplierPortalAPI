@@ -284,17 +284,17 @@ public partial class SupplierPortalDBContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacility_FacilityReportingPeriodDataStatus");
 
+            entity.HasOne(d => d.ReportingPeriod)
+                .WithMany(p => p.ReportingPeriodFacilityEntities)
+                .HasForeignKey(d => d.ReportingPeriodId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacility_ReportingPeriod");
+
             entity.HasOne(d => d.ReportingPeriodSupplier)
                 .WithMany(p => p.ReportingPeriodFacilityEntities)
                 .HasForeignKey(d => d.ReportingPeriodSupplierId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacility_ReportingPeriodSupplier");
-
-            entity.HasOne(d => d.ReportingType)
-                .WithMany(p => p.ReportingPeriodFacilityEntities)
-                .HasForeignKey(d => d.ReportingTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ReportingPeriodFacility_ReportingType");
         });
 
         modelBuilder.Entity<ReportingPeriodStatusEntity>(entity =>

@@ -28,6 +28,10 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         
         bool LoadPeriodSupplier(int reportingPeriodSupplierId,SupplierVO supplierVO,SupplierReportingPeriodStatus supplierReportingPeriodStatus);
 
+        PeriodFacility AddPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus,int periodSupplierId, bool facilityIsRelevantForPeriod);
+
+        bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId);
+
         /*
 
         PeriodSupplier UpdatePeriodSupplierStatus(int periodSupplierId, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses);

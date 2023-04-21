@@ -116,6 +116,14 @@ public class ReportingPeriodServices : IReportingPeriodServices
             reportingPeriodDomain.LoadPeriodSupplier(periodSupplier.Id, supplierVO, supplierReportingPeriodStatus);
         }
 
+        foreach(var periodFacility in reportingPeriodEntity.ReportingPeriodFacilityEntities)
+        {
+            var facilityVO = GetAndConvertFacilityValueObject(periodFacility.FacilityId);
+            var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacility.FacilityReportingPeriodDataStatusId);
+
+            reportingPeriodDomain.LoadPeriodFacility(periodFacility.Id,facilityVO, facilityReportingPeriodStatus, periodFacility.ReportingPeriodSupplierId);
+        }
+
         return reportingPeriodDomain;
 
     }
@@ -137,6 +145,20 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         var supplierVO = _reportingPeriodEntityDomainMapper.ConvertSupplierToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
         return supplierVO;
+    }
+
+    private FacilityVO GetAndConvertFacilityValueObject(int facilityId)
+    {
+        var facilityEntity = _supplierDataActions.GetFacilityById(facilityId);
+        var reportingTypes = GetAndConvertReportingTypes();
+        var supplyChainStages = GetAndConvertSupplyChainStages();
+
+        if (facilityEntity == null)
+            throw new BadRequestException("Facility not found !!");
+
+        var facilityVO = _reportingPeriodEntityDomainMapper.ConvertFacilityToFacilityValueObject(facilityEntity,supplyChainStages,reportingTypes);
+
+        return facilityVO;
     }
 
     private ReportingPeriod ConfigureReportingPeriod(ReportingPeriodEntity reportingPeriodEntity, IEnumerable<ReportingPeriodType> reportingPeriodTypes, IEnumerable<ReportingPeriodStatus> reportingPeriodStatuses)
@@ -244,11 +266,25 @@ public class ReportingPeriodServices : IReportingPeriodServices
     }
 
     /// <summary>
-    /// Set PeriodFacility
+    /// Add PeriodFacility
     /// </summary>
     /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
+    public string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodFacilityDto.ReportingPeriodId);
+
+        var facilityReportingPeriodDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == reportingPeriodFacilityDto.FacilityReportingPeriodDataStatusId);
+
+        foreach(var facilityId in reportingPeriodFacilityDto.FacilityIds)
+        {
+            var facilityVO = GetAndConvertFacilityValueObject(facilityId);
+            var periodFacility = reportingPeriod.AddPeriodFacility(reportingPeriodFacilityDto.Id,facilityVO, facilityReportingPeriodDataStatus, reportingPeriodFacilityDto.ReportingPeriodSupplierId, reportingPeriodFacilityDto.FacilityIsRelevantForPeriod);
+
+            var periodFacilityEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodFacilityDomainToEntity(periodFacility);
+            _reportingPeriodDataActions.AddPeriodFacility(periodFacilityEntity, reportingPeriodFacilityDto.FacilityIsRelevantForPeriod);
+            
     /* public async Task<string> SetPeriodFacility(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
      {
          var reportingPeriodData = new SupplierReportingPeriodDTO();
@@ -347,10 +383,9 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
             }
         }
-        return "Success";
 
+        return "ReportingPeriodFacilities added or removed successfully";
     }
-*/
 
     /// <summary>
     /// Remove PeriodSupplier

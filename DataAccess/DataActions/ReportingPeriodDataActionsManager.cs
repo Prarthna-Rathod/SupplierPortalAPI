@@ -48,12 +48,19 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public async Task<bool> AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity)
+    public bool AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, bool facilityIsRelaventForPeriod)
     {
-        await _context.ReportingPeriodFacilityEntities.AddAsync(reportingPeriodFacilityEntity);
+        var allPeriodfacilities = _context.ReportingPeriodFacilityEntities;
 
-        await _context.SaveChangesAsync();
+        foreach (var existingPeriodFacility in allPeriodfacilities)
+        {
+            if (existingPeriodFacility.FacilityId == reportingPeriodFacilityEntity.FacilityId && existingPeriodFacility.ReportingPeriodId == reportingPeriodFacilityEntity.ReportingPeriodId && !facilityIsRelaventForPeriod)
+                _context.ReportingPeriodFacilityEntities.Remove(existingPeriodFacility);
+        }
+        if(facilityIsRelaventForPeriod)
+            _context.ReportingPeriodFacilityEntities.Add(reportingPeriodFacilityEntity);
 
+        _context.SaveChanges();
         return true;
     }
 
@@ -316,6 +323,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodType)
                                 .Include(x => x.ReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;
@@ -372,7 +380,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return await _context.ReportingPeriodFacilityEntities
                                     .Include(x => x.Facility)
                                     .Include(x => x.FacilityReportingPeriodDataStatus)
-                                    .Include(x => x.ReportingType)
+                                    .Include(x => x.ReportingPeriod)
                                     .Include(x => x.ReportingPeriodSupplier)
                                     .ToListAsync();
     }

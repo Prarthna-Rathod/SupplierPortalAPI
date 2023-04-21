@@ -17,8 +17,8 @@ public class FacilityVO
     }
 
     public int Id { get; private set; }
-    public int SupplierId { get; private set; }
     public string FacilityName { get; private set; }
+    public int SupplierId { get; private set; }
     public string? GHGRPFacilityId { get; private set; }
     public bool IsActive { get; private set; }
     public SupplyChainStage SupplyChainStage { get; private set; }

@@ -150,6 +150,29 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     #endregion
 
     #region PeriodFacility
+
+    public FacilityVO ConvertFacilityToFacilityValueObject(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
+    {
+        var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
+        var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
+
+        var facilityVOs = new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage,selectedReprtingType);
+
+        return facilityVOs;
+    }
+
+    public ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility)
+    {
+        var periodFacilityEntity = new ReportingPeriodFacilityEntity();
+        periodFacilityEntity.Id = periodFacility.Id;
+        periodFacilityEntity.FacilityId = periodFacility.FacilityVO.Id;
+        periodFacilityEntity.FacilityReportingPeriodDataStatusId = periodFacility.FacilityReportingPeriodDataStatus.Id;
+        periodFacilityEntity.ReportingPeriodId = periodFacility.ReportingPeriodId;
+        periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
+
+        return periodFacilityEntity;
+    }
+
     #endregion
 
     #region PeriodDocument

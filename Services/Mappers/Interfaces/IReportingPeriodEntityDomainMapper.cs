@@ -38,6 +38,11 @@ public interface IReportingPeriodEntityDomainMapper
     #endregion
 
     #region PeriodFacility
+
+    FacilityVO ConvertFacilityToFacilityValueObject(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes);
+
+    ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility);
+
     #endregion
 
     #region PeriodDocument

@@ -8,25 +8,30 @@ namespace Services.DTOs
 {
     public class ReportingPeriodFacilityDto
     {
-        public ReportingPeriodFacilityDto(int id,int facilityId,string facilityName,int facilityReportingPeriodDataStatusId,string facilityReportingPeriodDataStatus,int reportingTypeId,string reportingType,int reportingPeriodSupplierId)
+        public int Id { get; set; }
+        public IEnumerable<int> FacilityIds { get; set; }
+        //public string FacilityName { get; set; }
+        public int FacilityReportingPeriodDataStatusId { get; set; }
+        public string FacilityReportingPeriodDataStatusName { get; set; }
+        public int ReportingPeriodId { get; set; }
+        public int ReportingPeriodSupplierId { get; set; }
+
+        public bool FacilityIsRelevantForPeriod { get; set; }
+
+        public ReportingPeriodFacilityDto(int id, IEnumerable<int> facilityIds, 
+            //string facilityName, 
+            int facilityReportingPeriodDataStatusId, string facilityReportingPeriodDataStatusName, int reportingPeriodId, int reportingPeriodSupplierId, bool facilityIsRelevantForPeriod)
         {
             Id = id;
-            FacilityId = facilityId;
-            FacilityName = facilityName;
+            FacilityIds = facilityIds;
+            //FacilityName = facilityName;
             FacilityReportingPeriodDataStatusId = facilityReportingPeriodDataStatusId;
-            FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
-            ReportingTypeId = reportingTypeId;
-            ReportingType = reportingType;
+            FacilityReportingPeriodDataStatusName = facilityReportingPeriodDataStatusName;
+            ReportingPeriodId = reportingPeriodId;
             ReportingPeriodSupplierId = reportingPeriodSupplierId;
+            FacilityIsRelevantForPeriod = facilityIsRelevantForPeriod;
         }
 
-        public int Id { get; set; }
-        public int FacilityId { get; set; }
-        public string FacilityName { get; set; }
-        public int FacilityReportingPeriodDataStatusId { get; set; }
-        public string FacilityReportingPeriodDataStatus { get; set; }
-        public int ReportingTypeId { get; set; }
-        public string ReportingType { get; set; }
-        public int ReportingPeriodSupplierId { get; set; }
+
     }
 }
