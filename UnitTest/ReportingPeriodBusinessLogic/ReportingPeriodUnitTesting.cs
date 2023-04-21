@@ -180,12 +180,12 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
 
-            PeriodSupplier periodSupplier = null;
+            PeriodSupplier? periodSupplier = null;
 
             //Act
             try
             {
-                periodSupplier = reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
+                periodSupplier = reportingPeriod.AddPeriodSupplier(0,supplierVO, supplierReportingPerionStatus);
 
             }
             catch (Exception ex)
@@ -216,8 +216,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             {
                 var supplierVO = GetAndConvertSupplierValueObject();
                 var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-                reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
-                reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
+                reportingPeriod.AddPeriodSupplier(0,supplierVO, supplierReportingPerionStatus);
+                reportingPeriod.AddPeriodSupplier(0,supplierVO, supplierReportingPerionStatus);
             }
             catch (Exception ex)
             {
@@ -244,7 +244,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             {
                 var supplierVO = GetAndConvertSupplierValueObject();
                 var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-                reportingPeriod.AddPeriodSupplier(supplierVO, reportingPeriod.Id, supplierReportingPerionStatus);
+                reportingPeriod.AddPeriodSupplier(0,supplierVO, supplierReportingPerionStatus);
             }
             catch (Exception ex)
             {

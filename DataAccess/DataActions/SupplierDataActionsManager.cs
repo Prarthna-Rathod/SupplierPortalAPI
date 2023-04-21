@@ -163,9 +163,11 @@ namespace DataAccess.DataActions
             var allSuppliers = _context.SupplierEntities.Include(x => x.ContactEntities)
                                                             .ThenInclude(x => x.User)
                                                         .Include(x => x.FacilityEntities)
+                                                        .Include(x => x.ReportingPeriodSupplierEntities)
                                                         .ToList();
             return allSuppliers;
         }
+
         public IEnumerable<ContactEntity> GetAllContacts()
         {
             var allContacts = _context.ContactEntities.Include(x => x.User).ToList();

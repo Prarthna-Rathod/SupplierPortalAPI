@@ -26,10 +26,16 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriod(reportingPeriodDto);
         }
 
-        [HttpPost("AddPeriodSupplier")]
+        /*[HttpPost("AddPeriodSupplier")]
         public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
         {
             return _services.SetPeriodSupplier(reportingPeriodSupplierDto);
+        }*/
+
+        [HttpPost("AddMultiplePeriodSuppliers")]
+        public string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto)
+        {
+            return _services.SetMultiplePeriodSuppliers(multiplePeriodSuppliersDto);
         }
 
         [HttpPost("AddPeriodFacilities")]
@@ -37,12 +43,6 @@ namespace SupplierPortalAPI.Controllers
         {
             return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
         }
-/*
-        /* [HttpPut("UpdateLockUnlokckStatusOfPeriodSupplier")]
-         public bool PeriodSupplierLockUnlock(int periodSupplierId)
-         {
-             return _services.UpdateLockUnlockPeriodSupplier(periodSupplierId);
-         }*/
 
         #endregion
 
@@ -54,16 +54,9 @@ namespace SupplierPortalAPI.Controllers
             return _services.GetActiveReportingPeriods();
         }
 
-        /* [HttpGet("GetActivePeriodSuppliers")]
-         public IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers()
-         {
-             return _services.GetActivePeriodSuppliers();
-         }*/
-
-        [HttpGet("GetReportingPeriodRelaventSuppliers")]
-        public IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId)
-        {
-            return _services.GetReportingPeriodSuppliers(reportingPeriodId);
+        [HttpGet("GetInRelevantSuppliers")]
+        public IEnumerable<SupplierDto> GetInRelevantSuppliers() { 
+            return _services.GetInRelevantSuppliers();
         }
         #endregion
 
