@@ -39,18 +39,14 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);
 
-
     /// <summary>
-    /// Get Active ReportingPeriodSuppliers
+    /// Get Relevant Period Suppliers
     /// </summary>
+    /// <param name="reportingPeriodId"></param>
+    /// <param name="isActive"></param>
     /// <returns></returns>
-    IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers();
-
-    /// <summary>
-    /// Get Active Period Suppliers
-    /// </summary>
-    /// <returns></returns>
-    IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
+    /// 
+    IEnumerable<SupplierDto> GetInRelevantSuppliers();
 
 
     /// <summary>

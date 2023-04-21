@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.SupplierRoot.DomainModels;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Mappers.Interfaces;
@@ -53,6 +54,10 @@ namespace Services.Mappers.ReportingPeriodMappers
             return dto;
         }
 
+        //public IEnumerable<ReportingPeriodSupplierDto> ConvertRelevantSuppliersDomainToDtos(IEnumerable<Supplier> suppliersDomain)
+        //{
+          
+        //}
 
         #endregion
 

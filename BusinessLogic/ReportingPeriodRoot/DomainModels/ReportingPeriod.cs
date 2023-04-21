@@ -1,5 +1,7 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
+using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.SupplierRoot.Interfaces;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -10,6 +12,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
     public class ReportingPeriod : IReportingPeriod
     {
         private HashSet<PeriodSupplier> _periodSupplier;
+        private HashSet<PeriodSupplier> _activePeriodSupplier;
 
         private readonly string REPORTING_PERIOD_NAME_PREFIX = "Reporting Period Data";
         public ReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive)
@@ -23,6 +26,9 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             EndDate = endDate;
             IsActive = isActive;
             _periodSupplier = new HashSet<PeriodSupplier>();
+            _activePeriodSupplier= new HashSet<PeriodSupplier>();
+
+
         }
 
         public ReportingPeriod(int id, string displayName, ReportingPeriodType types, string collectionTimePeriod, ReportingPeriodStatus status, DateTime startDate, DateTime? endDate, bool isActive) : this(types, collectionTimePeriod, status, startDate, endDate, isActive)
@@ -128,7 +134,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #endregion
 
-        #region Update ReportingPerid
+        #region Update ReportingPeriod
         public void UpdateReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
         {
             switch (ReportingPeriodStatus.Name)
@@ -232,6 +238,21 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
+
+        public bool GetandAddPeriodSupplier(SupplierVO supplierVO,int reportingPeriodId,SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+        {
+
+            var reportingPeriodSupplier = new PeriodSupplier(supplierVO, reportingPeriodId, supplierReportingPeriodStatus);
+
+            foreach (var periodSupplier in _periodSupplier)
+            {
+                if(!periodSupplier.IsActive && ReportingPeriodStatus.Name ==ReportingPeriodStatusValues.Open)
+                {
+                    _activePeriodSupplier.Add(reportingPeriodSupplier);
+                }
+            }
+            return true;
+        }
         public PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
             var reportingPeriodSupplier = new PeriodSupplier(supplier, reportingPeriodId, supplierReportingPeriodStatus);

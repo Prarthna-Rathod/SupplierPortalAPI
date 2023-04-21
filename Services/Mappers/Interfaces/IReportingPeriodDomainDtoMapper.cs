@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.SupplierRoot.DomainModels;
 using Services.DTOs;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,10 @@ public interface IReportingPeriodDomainDtoMapper
 
     #endregion
 
+
     #region PeriodSupplier
+
+    //IEnumerable<ReportingPeriodSupplierDto> ConvertRelevantSuppliersDomainToDtos(IEnumerable<Supplier> suppliersDomain);
 
     IEnumerable<ReportingPeriodSupplierDto> ConvertPeriodSupplierDomainListToDtos(IEnumerable<PeriodSupplier> periodSuppliersDomain, ReportingPeriod reportingPeriod);
     ReportingPeriodSupplierDto ConvertPeriodSupplierDomainToDto(PeriodSupplier periodSuppliersDomain, string displayName);

@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,7 @@ namespace Services.Mappers.Interfaces
         InternalReportingPeriodDTO ConvertReportingPeriodEntityToInternalPeriodDTO(ReportingPeriodEntity reportingPeriodEntity);
 
         ReportingPeriodActiveSupplierDTO ConvertReportingPeriodSupplierEntityToReportingPeriodActiveSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
+
+        //ReportingPeriodSupplierDto CovertPeriodSupplierEntityToPeriodSupplierDTO();
     }
 }
