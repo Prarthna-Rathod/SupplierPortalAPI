@@ -12,7 +12,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
     public class ReportingPeriod : IReportingPeriod
     {
         private HashSet<PeriodSupplier> _periodSupplier;
-        private HashSet<PeriodSupplier> _activePeriodSupplier;
 
         private readonly string REPORTING_PERIOD_NAME_PREFIX = "Reporting Period Data";
         public ReportingPeriod(ReportingPeriodType reportingPeriodType, string collectionTimePeriod, ReportingPeriodStatus reportingPeriodStatus, DateTime startDate, DateTime? endDate, bool isActive)
@@ -26,7 +25,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             EndDate = endDate;
             IsActive = isActive;
             _periodSupplier = new HashSet<PeriodSupplier>();
-            _activePeriodSupplier= new HashSet<PeriodSupplier>();
 
 
         }
@@ -238,21 +236,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
-
-        public bool GetandAddPeriodSupplier(SupplierVO supplierVO,int reportingPeriodId,SupplierReportingPeriodStatus supplierReportingPeriodStatus)
-        {
-
-            var reportingPeriodSupplier = new PeriodSupplier(supplierVO, reportingPeriodId, supplierReportingPeriodStatus);
-
-            foreach (var periodSupplier in _periodSupplier)
-            {
-                if(!periodSupplier.IsActive && ReportingPeriodStatus.Name ==ReportingPeriodStatusValues.Open)
-                {
-                    _activePeriodSupplier.Add(reportingPeriodSupplier);
-                }
-            }
-            return true;
-        }
         public PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
             var reportingPeriodSupplier = new PeriodSupplier(supplier, reportingPeriodId, supplierReportingPeriodStatus);
