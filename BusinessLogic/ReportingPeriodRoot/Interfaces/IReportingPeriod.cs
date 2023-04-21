@@ -24,9 +24,9 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         
         IEnumerable<PeriodSupplier> PeriodSuppliers { get; }
 
-        PeriodSupplier AddPeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus);
+        PeriodSupplier AddPeriodSupplier(int periodSupplierId,SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus);
         
-        bool LoadPeriodSupplier(int reportingPeriodSupplierId,SupplierVO supplierVO, int reportingPeriodId,SupplierReportingPeriodStatus supplierReportingPeriodStatus);
+        bool LoadPeriodSupplier(int reportingPeriodSupplierId,SupplierVO supplierVO,SupplierReportingPeriodStatus supplierReportingPeriodStatus);
 
         /*
 
