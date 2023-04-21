@@ -54,11 +54,6 @@ namespace Services.Mappers.ReportingPeriodMappers
             return dto;
         }
 
-        //public IEnumerable<ReportingPeriodSupplierDto> ConvertRelevantSuppliersDomainToDtos(IEnumerable<Supplier> suppliersDomain)
-        //{
-          
-        //}
-
         #endregion
 
         #region PeriodFacility
