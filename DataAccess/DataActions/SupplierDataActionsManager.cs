@@ -168,12 +168,6 @@ namespace DataAccess.DataActions
             return allSuppliers;
         }
 
-        public IEnumerable<SupplierEntity> GetAllReportingPeriodSupplier()
-        {
-            var allSuppliers = _context.SupplierEntities.Include(x => x.ReportingPeriodSupplierEntities).ToList();
-
-            return allSuppliers;
-        }
         public IEnumerable<ContactEntity> GetAllContacts()
         {
             var allContacts = _context.ContactEntities.Include(x => x.User).ToList();
