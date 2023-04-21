@@ -20,8 +20,6 @@ public interface IReportingPeriodDomainDtoMapper
 
     #region PeriodSupplier
 
-    //IEnumerable<ReportingPeriodSupplierDto> ConvertRelevantSuppliersDomainToDtos(IEnumerable<Supplier> suppliersDomain);
-
     IEnumerable<ReportingPeriodSupplierDto> ConvertPeriodSupplierDomainListToDtos(IEnumerable<PeriodSupplier> periodSuppliersDomain, ReportingPeriod reportingPeriod);
     ReportingPeriodSupplierDto ConvertPeriodSupplierDomainToDto(PeriodSupplier periodSuppliersDomain, string displayName);
 
