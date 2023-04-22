@@ -47,10 +47,10 @@ public interface IReportingPeriodServices
     string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto);
 
     /// <summary>
-    /// Get Active ReportingPeriodSuppliers
+    /// Get ReportingPeriodSuppliers
     /// </summary>
     /// <returns></returns>
-    IEnumerable<ReportingPeriodActiveSupplierDTO> GetActivePeriodSuppliers();
+    IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
 
     /// <summary>
     /// Get InRelevant Suppliers
