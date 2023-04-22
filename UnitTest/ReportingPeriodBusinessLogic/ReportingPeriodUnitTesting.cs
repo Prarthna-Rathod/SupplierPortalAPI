@@ -251,12 +251,138 @@ namespace UnitTest.ReportingPeriodBusinessLogic
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
             }
-            Assert.NotEqual(0, exceptionCounter);
-            Assert.NotNull(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
         }
 
 
         #endregion
 
+        #region Add PeriodFacilities
+
+        /// <summary>
+        /// Add ReportingPeriodFacility success case
+        /// Add new record in ReportingPeriodFacility and check FacilityIsRelaventForPeriod value is true, FacilityReportingPeriodStatus is InProgress
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilitiesSuccess()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = GetReportingPeriodDomain();
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1,supplierVO, supplierReportingPerionStatus);
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+            try
+            {
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true);
+            }
+            catch(Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodFacility success case2.
+        /// Try to add duplicate record in ReportingPeriodFacility and check FacilityIsRelaventForPeriod value is false, then remove the existing record.
+        /// </summary>
+        [Fact]
+        public void AddDuplicatePeriodFacilityRemoveSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = GetReportingPeriodDomain();
+            
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+            try
+            {
+                reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, 1, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, 1, false);
+
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodFacility failure case1.
+        /// If add new record and FacilityReportingPeriodDataStatus is not InProgress then throw exception.
+        /// </summary>
+
+        [Fact]
+        public void AddPeriodFacilityFailsCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = GetReportingPeriodDomain();
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
+            
+            try
+            {
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true);
+            }
+            catch(Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodFacility failure case2.
+        /// Try to add duplicate record and FacilityIsRelaventForPeriod is true than throw exception.
+        /// </summary>
+
+        [Fact]
+        public void AddPeriodFacilityFailsCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = GetReportingPeriodDomain();
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+            try
+            {
+                reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        #endregion
     }
 }
