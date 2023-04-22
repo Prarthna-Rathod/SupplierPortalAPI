@@ -9,6 +9,7 @@ using Services.Mappers.Interfaces;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace UnitTest
 {
@@ -24,10 +25,7 @@ namespace UnitTest
         //ReportingPeriod
         private int reportingPeriodId = 1;
         private string displayName = "Reporting Period Data Year 2022";
-        //private int reportingPeriodTypeId = 1;
         private string collectionTimePeriod = "2022";
-        //private int reportingPeriodStatusId = 1;
-        private int reportingPeriodStatusId = 1;
         private DateTime startDate = new DateTime(2023,04,12);
         private DateTime? endDate = null;
         private bool isActive = true;
@@ -214,6 +212,18 @@ namespace UnitTest
             return supplierReportingPeriodStatuses;
         }
 
+        protected IEnumerable<FacilityReportingPeriodDataStatus> GetFacilityReportingPeriodDataStatus()
+        {
+            var facilityReportingPeriodDataStatuses = new List<FacilityReportingPeriodDataStatus>();
+            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "In-progress"));
+            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "Complete"));
+            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "Submitted"));
+
+            return facilityReportingPeriodDataStatuses;
+        }
+
+        #region ReportingPeriod methods
+
         protected ReportingPeriod GetReportingPeriodDomain()
         {
             var reportingPeriodEntity = CreateReportingPeriodEntity();
@@ -236,8 +246,43 @@ namespace UnitTest
             reportingPeriodEntity.IsActive = isActive;
 
             return reportingPeriodEntity;
-
         }
+
+        #endregion
+
+        #region PeriodSupplier methods
+
+        protected ReportingPeriodSupplierEntity CreateReportingPeriodSupplierEntity()
+        {
+            var periodSupplierEntity = new ReportingPeriodSupplierEntity();
+            periodSupplierEntity.Id = 1;
+            periodSupplierEntity.SupplierId = 1;
+            periodSupplierEntity.ReportingPeriodId = 1;
+            periodSupplierEntity.SupplierReportingPeriodStatusId = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked).Id;
+            periodSupplierEntity.IsActive = true;
+
+            return periodSupplierEntity;
+        }
+
+        #endregion
+
+        #region PeriodFacility methods
+
+        protected ReportingPeriodFacilityEntity CreateReportingPeriodFacilityEntity()
+        {
+            var periodFacilityEntity = new ReportingPeriodFacilityEntity();
+            periodFacilityEntity.Id = 1;
+            periodFacilityEntity.FacilityId = 1;
+            periodFacilityEntity.ReportingPeriodId = 1;
+            periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetSupplierReportingPeriodStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
+            periodFacilityEntity.ReportingPeriodSupplierId = 1;
+
+            return periodFacilityEntity;
+        }
+
+        #endregion
+
+        #region All ValueObjects methods
 
         protected SupplierVO GetAndConvertSupplierValueObject()
         {
@@ -248,6 +293,21 @@ namespace UnitTest
             var supplierVO = mapper.ConvertSupplierToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
             return supplierVO;
         }
+
+        protected FacilityVO GetAndConvertFacilityValueObject()
+        {
+            var supplierEntity = CreateSupplierEntity();
+            var facilityEntity = GenerateFacilityEntitiesForSupplier(supplierEntity.Id).First();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var facilityVO = mapper.ConvertFacilityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
+
+            return facilityVO;
+        }
+
+
+        #endregion
 
 
         protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
