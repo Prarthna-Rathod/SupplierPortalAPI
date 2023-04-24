@@ -276,7 +276,11 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod)
         {
-            var periodFacility = new PeriodFacility(periodFacilityId,facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+            int counter = 0;
+            var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+
+            var periodSupplier = _periodSupplier.First(x => x.Id == periodSupplierId);
+            var periodSupplierFacilities = periodSupplier.Supplier.Facilities;
 
             //Check existing PeriodSupplier
             foreach (var existingPeriodFacility in _periodfacilities)
@@ -286,8 +290,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                     if (facilityIsRelevantForPeriod)
                         throw new BadRequestException("ReportingPeriodFacility is already exists !!");
                     else
-                        _periodfacilities.Remove(existingPeriodFacility);                    
-                }       
+                        _periodfacilities.Remove(existingPeriodFacility);
+                }
             }
 
             if (facilityIsRelevantForPeriod)
@@ -295,10 +299,25 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                 if (facilityReportingPeriodDataStatus.Name != FacilityReportingPeriodDataStatusValues.InProgress)
                     throw new BadRequestException("FacilityReportingPeriodStatus should be InProgress only !!");
 
-                _periodfacilities.Add(periodFacility);
+                foreach (var supplierFacility in periodSupplierFacilities)
+                {
+                    if (supplierFacility.Id == facilityVO.Id)
+                    {
+                        _periodfacilities.Add(periodFacility);
+                        counter = 0;
+                        break;
+                    }
+                    else
+                        counter++;
+                }
             }
+
+            if (counter != 0)
+                throw new BadRequestException("The given facility is not relavent with given ReportingPeriodSupplier !!");
+
             return periodFacility;
         }
+
 
         public bool LoadPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId)
         {

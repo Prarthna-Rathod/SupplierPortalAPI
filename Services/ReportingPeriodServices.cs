@@ -6,6 +6,7 @@ using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using Microsoft.Extensions.Logging;
 using Services.DTOs;
+using Services.DTOs.ReadOnlyDTOs;
 using Services.Factories.Interface;
 using Services.Interfaces;
 using Services.Mappers.Interfaces;
@@ -336,6 +337,15 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var supplierReportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodSupplierDomainListToDtos(periodSuppliers, reportingPeriod);
 
         return supplierReportingPeriodDtos;
+    }
+
+    public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> GetReportingPeriodFacilities(int reportingPeriodId,int periodSupplierId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+        var periodFacilities = reportingPeriod.PeriodFacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
+        var periodFacilityDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities);
+
+        return periodFacilityDtos;
     }
 
     /// <summary>
