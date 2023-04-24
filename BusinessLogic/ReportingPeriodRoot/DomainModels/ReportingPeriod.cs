@@ -279,7 +279,11 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             int counter = 0;
             var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
 
-            var periodSupplier = _periodSupplier.First(x => x.Id == periodSupplierId);
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            if (periodSupplier == null)
+                throw new BadRequestException("ReportingPeriodSupplier is not relavent with given reportingPeriodId !!");
+
             var periodSupplierFacilities = periodSupplier.Supplier.Facilities;
 
             //Check existing PeriodSupplier
