@@ -72,6 +72,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                 }
                 return _periodfacilities.ToList();
             }
+            //Add GHGRPFacId, ReportingType and SupplyChainStage in periodFacility table
+            //if supplier is unlocked then and then periodFacility can be add
         }
 
         #region Private Methods

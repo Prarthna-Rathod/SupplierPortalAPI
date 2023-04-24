@@ -272,6 +272,10 @@ public partial class SupplierPortalDBContext : DbContext
         {
             entity.ToTable("ReportingPeriodFacilityEntity");
 
+            entity.Property(e => e.GhgrpfacilityId)
+                .HasMaxLength(50)
+                .HasColumnName("GHGRPFacilityId");
+
             entity.HasOne(d => d.Facility)
                 .WithMany(p => p.ReportingPeriodFacilityEntities)
                 .HasForeignKey(d => d.FacilityId)
@@ -295,6 +299,18 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasForeignKey(d => d.ReportingPeriodSupplierId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacility_ReportingPeriodSupplier");
+
+            entity.HasOne(d => d.ReportingType)
+                .WithMany(p => p.ReportingPeriodFacilityEntities)
+                .HasForeignKey(d => d.ReportingTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityEntity_ReportingType");
+
+            entity.HasOne(d => d.SupplyChainStage)
+                .WithMany(p => p.ReportingPeriodFacilityEntities)
+                .HasForeignKey(d => d.SupplyChainStageId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityEntity_SupplyChainStage");
         });
 
         modelBuilder.Entity<ReportingPeriodStatusEntity>(entity =>
