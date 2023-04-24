@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using System;
 using System.Collections.Generic;
@@ -382,6 +383,48 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
+
+
+        /// <summary>
+        /// Try to add facility which is not relavent with given PeriodSupplier Facilities then throw exception.
+        /// For this UnitTesting I have created new FacilityVO with different facilityId and supplierId.
+        /// </summary>
+
+        [Fact]
+        public void AddPeriodFacilityFailsCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = GetReportingPeriodDomain();
+            //Add periodSupplier
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus);
+
+            //Add new  PeriodFacility
+            var supplyChainStage = GenerateSupplyChainStage().First();
+            var reportingType = GenerateReportingType().First();
+            var facilityVO = new FacilityVO(10, "Test facility", 2, "123", true, supplyChainStage, reportingType);
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+            try
+            {
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true);
+
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+
+        }
+
+
+
 
         #endregion
     }

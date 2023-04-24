@@ -57,6 +57,25 @@ namespace Services.Mappers.ReportingPeriodMappers
         #endregion
 
         #region PeriodFacility
+
+        public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> ConvertPeriodFacilityDomainListToDtos(IEnumerable<PeriodFacility> periodFacilities)
+        {
+            var list = new List<ReportingPeriodSupplierRelaventFacilityDto>();
+            foreach(var periodFacility in periodFacilities)
+            {
+                list.Add(ConvertPeriodFacilityDomainToDto(periodFacility));
+            }
+
+            return list;
+        }
+
+        public ReportingPeriodSupplierRelaventFacilityDto ConvertPeriodFacilityDomainToDto(PeriodFacility periodFacility)
+        {
+            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(periodFacility.Id, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, periodFacility.FacilityReportingPeriodDataStatus.Id, periodFacility.FacilityReportingPeriodDataStatus.Name, periodFacility.ReportingPeriodId, periodFacility.ReportingPeriodSupplierId);
+
+            return periodFacilityDto;
+        }
+
         #endregion
 
         #region PeriodDocument

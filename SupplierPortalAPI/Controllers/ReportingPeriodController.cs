@@ -64,6 +64,13 @@ namespace SupplierPortalAPI.Controllers
         public IEnumerable<SupplierDto> GetInRelevantSuppliers() { 
             return _services.GetInRelevantSuppliers();
         }
+
+        [HttpGet("GetReportingPeriodFacilities")]
+        public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> GetReportingPeriodFacilities(int reportingPeriodId,int periodSupplierId)
+        {
+            return _services.GetReportingPeriodFacilities(reportingPeriodId, periodSupplierId);
+        }
+
         #endregion
 
         #region Remove_PeriodSupplier
