@@ -9,6 +9,7 @@ namespace DataAccess.Entities
         {
             FacilityEntities = new HashSet<FacilityEntity>();
             FacilityRequiredDocumentTypeEntities = new HashSet<FacilityRequiredDocumentTypeEntity>();
+            ReportingPeriodFacilityEntities = new HashSet<ReportingPeriodFacilityEntity>();
         }
 
         public int Id { get; set; }
@@ -18,5 +19,6 @@ namespace DataAccess.Entities
 
         public virtual ICollection<FacilityEntity> FacilityEntities { get; set; }
         public virtual ICollection<FacilityRequiredDocumentTypeEntity> FacilityRequiredDocumentTypeEntities { get; set; }
+        public virtual ICollection<ReportingPeriodFacilityEntity> ReportingPeriodFacilityEntities { get; set; }
     }
 }
