@@ -32,6 +32,8 @@ public interface IReportingPeriodDomainDtoMapper
 
     ReportingPeriodSupplierRelaventFacilityDto ConvertPeriodFacilityDomainToDto(PeriodFacility periodFacility);
 
+    ReportingPeriodSupplierFacilitiesDto ConvertReportingPeriodSupplierFacilitiesDomainToDto(PeriodSupplier periodSupplier, IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> periodFacilitiesDtos);
+
     #endregion
 
     #region PeriodDocument
