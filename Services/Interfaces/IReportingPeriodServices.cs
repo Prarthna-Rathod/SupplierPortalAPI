@@ -84,7 +84,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> GetReportingPeriodFacilities(int reportingPeriodId,int periodSupplierId);
+    ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId);
     #endregion
 
     #region ReportingPeriodDocuments
