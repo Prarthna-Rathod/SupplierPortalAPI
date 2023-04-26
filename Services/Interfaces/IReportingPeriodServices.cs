@@ -1,4 +1,5 @@
 using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
@@ -57,15 +58,15 @@ public interface IReportingPeriodServices
     /// Get ReportingPeriodSuppliers
     /// </summary>
     /// <returns></returns>
+    /// 
     IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
 
     /// <summary>
-    /// Get InRelevant Suppliers
+    /// Get Relevant PeriodSuppliers
     /// </summary>
     /// <returns></returns>
-    /// 
-    IEnumerable<SupplierDto> GetInRelevantSuppliers();
 
+    IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId);
 
     /// <summary>
     /// Remove Period Supplier
