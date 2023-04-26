@@ -44,12 +44,6 @@ namespace SupplierPortalAPI.Controllers
             return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
         }
 
-        [HttpPut("UpdatePeriodFacilities")]
-        public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
-        {
-            return "ok";
-        }
-
         #endregion
 
         #region GetAll Methods

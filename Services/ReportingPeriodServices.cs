@@ -295,11 +295,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "PeriodSupplierStatus is updated successfully...";
     }
 
-    public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
-    {
-        return "PeriodFacility is updated successfully...";
-    }
-
     /// <summary>
     /// Remove PeriodSupplier
     /// </summary>
@@ -348,6 +343,14 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return supplierReportingPeriodDtos;
     }
 
+    /// <summary>
+    /// Get ReportingPeriodSupplierFacilities
+    /// List of PeriodSupplier facilities.
+    /// Relevant and NotRelevant both are display with status 'FacilityIsRelevantForPeriod'
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    /// <exception cref="BadRequestException"></exception>
     public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
     {
         var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
