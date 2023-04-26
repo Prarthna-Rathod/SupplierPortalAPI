@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
@@ -54,21 +55,11 @@ namespace SupplierPortalAPI.Controllers
             return _services.GetActiveReportingPeriods();
         }
 
-        [HttpGet("GetReportingPeriodRelaventSuppliers")]
-        public IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId)
-        {
-            return _services.GetReportingPeriodSuppliers(reportingPeriodId);
-        }
 
-        [HttpGet("GetInRelevantSuppliers")]
-        public IEnumerable<SupplierDto> GetInRelevantSuppliers() { 
-            return _services.GetInRelevantSuppliers();
-        }
-
-        [HttpGet("GetReportingPeriodFacilities")]
-        public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> GetReportingPeriodFacilities(int reportingPeriodId,int periodSupplierId)
-        {
-            return _services.GetReportingPeriodFacilities(reportingPeriodId, periodSupplierId);
+        [HttpGet("GetReportingPeriodSuppliersList")]
+        public IEnumerable<ReportingPeriodRelevantSupplierDto> GetReportingPeriodSuppliersList(int reportingperiodId) 
+        { 
+            return _services.GetRelevantSuppliers(reportingperiodId);
         }
 
         #endregion

@@ -323,7 +323,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodType)
                                 .Include(x => x.ReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierEntities)
-                                .Include(x => x.ReportingPeriodFacilityEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;

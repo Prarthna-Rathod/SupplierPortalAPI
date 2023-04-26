@@ -76,7 +76,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     {
         var supplierReportingPeriodSelectedStatus = supplierReportingPeriodStatuses.FirstOrDefault(x => x.Id == reportingPeriodSupplierEntity.SupplierReportingPeriodStatusId);
 
-        var periodSupplier = new PeriodSupplier(reportingPeriodSupplierEntity.Id, supplierVO, reportingPeriodSupplierEntity.ReportingPeriodId, supplierReportingPeriodSelectedStatus);
+        var periodSupplier = new PeriodSupplier(reportingPeriodSupplierEntity.Id, supplierVO, reportingPeriodSupplierEntity.ReportingPeriodId, supplierReportingPeriodSelectedStatus,reportingPeriodSupplierEntity.ActiveForCurrentPeriod,reportingPeriodSupplierEntity.InitialDataRequest,reportingPeriodSupplierEntity.ResendInitialDataRequest);
 
         return periodSupplier;
     }

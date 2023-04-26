@@ -34,7 +34,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVo = GetAndConvertSupplierValueObject();
             var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVo, supplierReportingPeriodStatus);
+            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVo, supplierReportingPeriodStatus,true,true,true);
 
             var mapper= CreateInstanceOfReportingPeriodDomainDtoMapper();
             var periodSupplierDto = mapper.ConvertPeriodSupplierDomainToDto(periodSupplierDomain,reportingPeriod.DisplayName);
@@ -46,6 +46,9 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Id, periodSupplierDto.SupplierReportingPeriodStatusId);
             Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Name, periodSupplierDto.SupplierReportingPeriodStatusName);
             Assert.Equal(periodSupplierDomain.ReportingPeriodId, periodSupplierDto.ReportingPeriodId);
+            Assert.Equal(periodSupplierDomain.ActiveForCurrentPeriod, periodSupplierDto.ActiveForCurrentPeriod);
+            Assert.Equal(periodSupplierDomain.InitialDataRequest, periodSupplierDto.InitialDataRequest);
+            Assert.Equal(periodSupplierDomain.ResendInitialDataRequest, periodSupplierDto.ResendInitialDataRequest);
      
 
 

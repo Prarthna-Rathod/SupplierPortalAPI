@@ -70,7 +70,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPeriodStatus);
+            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPeriodStatus,true,true,true);
 
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
@@ -82,6 +82,9 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierDomain.ReportingPeriodId, periodSupplierEntity.ReportingPeriodId);
             Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Id, periodSupplierEntity.SupplierReportingPeriodStatusId);
             Assert.Equal(periodSupplierDomain.IsActive, periodSupplierEntity.IsActive);
+            Assert.Equal(periodSupplierDomain.ActiveForCurrentPeriod, periodSupplierEntity.ActiveForCurrentPeriod);
+            Assert.Equal(periodSupplierDomain.InitialDataRequest, periodSupplierEntity.InitialDataRequest);
+            Assert.Equal(periodSupplierDomain.ResendInitialDataRequest, periodSupplierEntity.ResendInitialDataRequest);
         }
 
         [Fact]
@@ -99,6 +102,9 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierEntity.SupplierId, periodSupplierDomain.Supplier.Id);
             Assert.Equal(periodSupplierEntity.ReportingPeriodId, periodSupplierDomain.ReportingPeriodId);
             Assert.Equal(periodSupplierEntity.SupplierReportingPeriodStatusId, periodSupplierDomain.SupplierReportingPeriodStatus.Id);
+            Assert.Equal(periodSupplierEntity.ActiveForCurrentPeriod, periodSupplierDomain.ActiveForCurrentPeriod);
+            Assert.Equal(periodSupplierEntity.InitialDataRequest, periodSupplierDomain.InitialDataRequest);
+            Assert.Equal(periodSupplierEntity.ResendInitialDataRequest, periodSupplierDomain.ResendInitialDataRequest);
         }
 
         [Fact]

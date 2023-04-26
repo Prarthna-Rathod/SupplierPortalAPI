@@ -1,5 +1,7 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.SupplierRoot.ValueObjects;
+using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Mappers.Interfaces;
@@ -49,9 +51,36 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         public ReportingPeriodSupplierDto ConvertPeriodSupplierDomainToDto(PeriodSupplier periodSuppliersDomain, string displayName)
         {
-            var dto = new ReportingPeriodSupplierDto(periodSuppliersDomain.Id, periodSuppliersDomain.Supplier.Id, periodSuppliersDomain.Supplier.Name, periodSuppliersDomain.ReportingPeriodId, displayName, periodSuppliersDomain.SupplierReportingPeriodStatus.Id, periodSuppliersDomain.SupplierReportingPeriodStatus.Name);
+            var dto = new ReportingPeriodSupplierDto(periodSuppliersDomain.Id, periodSuppliersDomain.Supplier.Id, periodSuppliersDomain.Supplier.Name, periodSuppliersDomain.ReportingPeriodId, displayName, periodSuppliersDomain.SupplierReportingPeriodStatus.Id, periodSuppliersDomain.SupplierReportingPeriodStatus.Name,periodSuppliersDomain.ActiveForCurrentPeriod,periodSuppliersDomain.InitialDataRequest,periodSuppliersDomain.ResendInitialDataRequest);
 
             return dto;
+        }
+
+        public  IEnumerable<ReportingPeriodRelevantSupplierDto> ConvertReleventPeriodSupplierDomainToDto(IEnumerable<PeriodSupplier> periodSupplierDomainList, IEnumerable<SupplierEntity> inRelevantSupplierList, ReportingPeriod reportingPeriod)
+        {
+           var periodSuppliersDtos = new List<ReportingPeriodRelevantSupplierDto>();
+            
+
+            foreach (var periodSupplier in periodSupplierDomainList)
+            {
+                var activeForCurrentPeriod = true;
+                var periodSuppliers = new ReportingPeriodRelevantSupplierDto(periodSupplier.Id,periodSupplier.Supplier.Id, periodSupplier.Supplier.Name,periodSupplier.ReportingPeriodId,periodSupplier.SupplierReportingPeriodStatus.Id,periodSupplier.SupplierReportingPeriodStatus.Name, activeForCurrentPeriod,periodSupplier.InitialDataRequest,periodSupplier.ResendInitialDataRequest);
+                periodSuppliersDtos.Add(periodSuppliers);
+
+            }
+
+            foreach(var supplier in inRelevantSupplierList)
+            {
+                var dto = ConvertSupplierEntityToDto(supplier);
+                periodSuppliersDtos.Add(dto);
+            }
+            return periodSuppliersDtos;
+        }
+
+        private ReportingPeriodRelevantSupplierDto ConvertSupplierEntityToDto(SupplierEntity supplierEntity)
+        {
+            var activeForCurrentPeriod = false;
+            return new ReportingPeriodRelevantSupplierDto(null,supplierEntity.Id, supplierEntity.Name, null,null,null,activeForCurrentPeriod,null,null);
         }
 
         #endregion
@@ -80,6 +109,10 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         #region PeriodDocument
         #endregion
+
+        
+
+
 
 
     }
