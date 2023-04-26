@@ -26,12 +26,6 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriod(reportingPeriodDto);
         }
 
-        /*[HttpPost("AddPeriodSupplier")]
-        public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
-        {
-            return _services.SetPeriodSupplier(reportingPeriodSupplierDto);
-        }*/
-
         [HttpPost("AddMultiplePeriodSuppliers")]
         public string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto)
         {
@@ -42,6 +36,12 @@ namespace SupplierPortalAPI.Controllers
         public string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
         {
             return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
+        }
+
+        [HttpPut("UpdatePeriodFacilities")]
+        public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+        {
+            return "ok";
         }
 
         #endregion
