@@ -1,7 +1,5 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
-using BusinessLogic.SupplierRoot.DomainModels;
-using BusinessLogic.SupplierRoot.Interfaces;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -251,14 +249,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #region Period Supplier
         public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO,Id, supplierReportingPeriodStatus);
+            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
-        public PeriodSupplier AddPeriodSupplier(int periodSupplierId,SupplierVO supplier,SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId,supplier, Id, supplierReportingPeriodStatus);
+            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus);
 
             //Check existing PeriodSupplier
             foreach (var periodSupplier in _periodSupplier)
@@ -276,6 +274,30 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                 throw new BadRequestException("Supplier is not Active or ReportingPeriodStatus is not InActive !!");
 
             return reportingPeriodSupplier;
+        }
+
+        public PeriodSupplier UpdateLockUnlockPeriodSupplierStatus(int periodSupplierId, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
+        {
+            var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();
+
+            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+                throw new BadRequestException("You can't update PeriodSupplierStatus because reportingPeriodStatus is InActive or Complete !!");
+            else
+            {
+                if (periodSupplier.SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
+                {
+                    var lockedStatus = supplierReportingPeriodStatuses.First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+                    periodSupplier.SupplierReportingPeriodStatus.Id = lockedStatus.Id;
+                    periodSupplier.SupplierReportingPeriodStatus.Name = lockedStatus.Name;
+                }
+                else
+                {
+                    var unlockedStatus = supplierReportingPeriodStatuses.First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+                    periodSupplier.SupplierReportingPeriodStatus.Id = unlockedStatus.Id;
+                    periodSupplier.SupplierReportingPeriodStatus.Name = unlockedStatus.Name;
+                }
+            }
+            return periodSupplier;
         }
 
         #endregion
@@ -337,9 +359,9 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         }
 
 
-        public bool LoadPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId)
+        public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId)
         {
-            var periodFacility = new PeriodFacility(periodFacilityId,facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+            var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
 
             return _periodfacilities.Add(periodFacility);
         }

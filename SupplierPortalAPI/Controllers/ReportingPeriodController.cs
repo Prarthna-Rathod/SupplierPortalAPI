@@ -38,6 +38,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
         }
 
+        [HttpPut("LockUnlockPeriodSupplierStatus")]
+        public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
+        {
+            return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
+        }
+
         [HttpPut("UpdatePeriodFacilities")]
         public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
         {
@@ -89,5 +95,6 @@ namespace SupplierPortalAPI.Controllers
         }
 */
         #endregion                   
+
     }
 }

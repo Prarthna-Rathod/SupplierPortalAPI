@@ -270,11 +270,35 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "ReportingPeriodFacilities added or removed successfully";
     }
 
+    /// <summary>
+    /// LockUnlockPeriodSupplierStatus
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    /// <exception cref="BadRequestException"></exception>
+    public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
+    {
+        var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
+
+        if (periodSupplierEntity is null)
+            throw new BadRequestException("PeriodSupplier is not found !!");
+
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
+        var periodSupplierStatus = GetAndConvertSupplierPeriodStatuses();
+
+        reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplierId,periodSupplierStatus);
+
+        var entities = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSuppliersDomainToEntity(reportingPeriod.PeriodSuppliers);
+
+        _reportingPeriodDataActions.UpdateReportingPeriodSuppliers(entities);
+
+        return "PeriodSupplierStatus is updated successfully...";
+    }
+
     public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
     {
         return "PeriodFacility is updated successfully...";
     }
-
 
     /// <summary>
     /// Remove PeriodSupplier
