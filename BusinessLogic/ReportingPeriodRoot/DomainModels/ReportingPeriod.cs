@@ -110,7 +110,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                         Regex format = new Regex("^[0-9]{4}$");
                         if (!format.IsMatch(collectionTimePeriod))
                         {
-                            throw new NoContentException("Collection time period should be in Year(ex: 2023)");
+                            throw new NoContentException("Collection time period should be in Year(ex: '2023')");
                         }
                     }
                     break;
@@ -127,11 +127,11 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                 case ReportingPeriodTypeValues.Monthly:
                     {
-                        Regex format = new Regex("^[A-Z]{3}[ ][0-9]{4}$");
+                        Regex format = new Regex("^[A-Za-z]{3,9}[ ][0-9]{4}$");
 
                         if (!format.IsMatch(collectionTimePeriod))
                         {
-                            throw new NoContentException("Collection time period should be in Month(ex: 'Jan 2023')");
+                            throw new NoContentException("Collection time period should be in Month(ex: 'January 2023')");
                         }
                     }
                     break;
@@ -226,16 +226,22 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                         if (ReportingPeriodStatus.Name != reportingPeriodStatus.Name && reportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
                         {
+                            //Check if any PeriodSupplier is remains Unlocked or not
+                            var periodSuppliersList = _periodSupplier.Where(x => x.IsActive && x.SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked).ToList();
+
+                            if (periodSuppliersList.Count() != 0)
+                                throw new BadRequestException("Some periodSupplier is still unlocked so can't change ReportingPeriodStatus to Complete !!");
+
                             ReportingPeriodStatus = reportingPeriodStatus;
                         }
                         else
                             throw new BadRequestException("ReportingPeriodStatus can be Close as it is or else you can set it to Complete only !!");
+                        
                     }
                     break;
                 default:
                     throw new BadRequestException("You cannot update any data because ReportingPeriod is Completed !!");
             }
-
         }
 
         #endregion
@@ -308,40 +314,46 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             if (periodSupplier == null)
                 throw new BadRequestException("ReportingPeriodSupplier is not relavent with given reportingPeriodId !!");
 
-            var periodSupplierFacilities = periodSupplier.Supplier.Facilities;
-
-            //Check existing PeriodSupplier
-            foreach (var existingPeriodFacility in _periodfacilities)
+            if (periodSupplier.SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
             {
-                if (existingPeriodFacility.FacilityVO.Id == facilityVO.Id && existingPeriodFacility.ReportingPeriodId == Id)
-                {
-                    if (facilityIsRelevantForPeriod)
-                        throw new BadRequestException("ReportingPeriodFacility is already exists !!");
-                    else
-                        _periodfacilities.Remove(existingPeriodFacility);
-                }
-            }
+                var periodSupplierFacilities = periodSupplier.Supplier.Facilities;
 
-            if (facilityIsRelevantForPeriod)
-            {
-                if (facilityReportingPeriodDataStatus.Name != FacilityReportingPeriodDataStatusValues.InProgress)
-                    throw new BadRequestException("FacilityReportingPeriodStatus should be InProgress only !!");
-
-                foreach (var supplierFacility in periodSupplierFacilities)
+                //Check existing PeriodSupplier
+                foreach (var existingPeriodFacility in _periodfacilities)
                 {
-                    if (supplierFacility.Id == facilityVO.Id)
+                    if (existingPeriodFacility.FacilityVO.Id == facilityVO.Id && existingPeriodFacility.ReportingPeriodId == Id)
                     {
-                        _periodfacilities.Add(periodFacility);
-                        counter = 0;
-                        break;
+                        if (facilityIsRelevantForPeriod)
+                            throw new BadRequestException("ReportingPeriodFacility is already exists !!");
+                        else
+                            _periodfacilities.Remove(existingPeriodFacility);
                     }
-                    else
-                        counter++;
                 }
-            }
 
-            if (counter != 0)
-                throw new BadRequestException("The given facility is not relavent with given ReportingPeriodSupplier !!");
+                if (facilityIsRelevantForPeriod)
+                {
+                    if (facilityReportingPeriodDataStatus.Name != FacilityReportingPeriodDataStatusValues.InProgress)
+                        throw new BadRequestException("FacilityReportingPeriodStatus should be InProgress only !!");
+
+                    foreach (var supplierFacility in periodSupplierFacilities)
+                    {
+                        if (supplierFacility.Id == facilityVO.Id)
+                        {
+                            _periodfacilities.Add(periodFacility);
+                            counter = 0;
+                            break;
+                        }
+                        else
+                            counter++;
+                    }
+                }
+
+                if (counter != 0)
+                    throw new BadRequestException("The given facility is not relavent with given ReportingPeriodSupplier !!");
+
+            }
+            else
+                throw new BadRequestException("SupplierReportingPeriodStatus is locked !! Can't add new PeriodFacility !!");
 
             return periodFacility;
         }
@@ -354,6 +366,15 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return _periodfacilities.Add(periodFacility);
         }
 
+        public PeriodFacility UpdatePeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod)
+        {
+            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+            periodFacility.FacilityReportingPeriodDataStatus.Id = facilityReportingPeriodDataStatus.Id;
+            periodFacility.FacilityReportingPeriodDataStatus.Name = facilityReportingPeriodDataStatus.Name;
+
+            return periodFacility;
+        }
 
         #endregion
 

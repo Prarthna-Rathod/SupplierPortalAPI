@@ -42,8 +42,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity)
     {
-        _context.ReportingPeriodSupplierEntities.Add(reportingPeriodSupplierEntity);
         reportingPeriodSupplierEntity.IsActive = true;
+        _context.ReportingPeriodSupplierEntities.Add(reportingPeriodSupplierEntity);
         _context.SaveChanges();
         return true;
     }

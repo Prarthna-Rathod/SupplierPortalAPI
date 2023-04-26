@@ -228,25 +228,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "ReportingPeriod added or updated successfully !!";
     }
 
-    /// <summary>
-    /// Add PeriodSupplier (Where supplier should be active & ReportingPeriodStatus should be InActive)
-    /// </summary>
-    /// <param name="reportingPeriodSupplierDto"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    /*public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
-    {
-        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodSupplierDto.ReportingPeriodId);
-
-        var supplierPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == reportingPeriodSupplierDto.SupplierReportingPeriodStatusId);
-
-        var periodSupplier = reportingPeriod.AddPeriodSupplier(GetAndConvertSupplierValueObject(reportingPeriodSupplierDto.SupplierId), supplierPeriodStatus ?? new SupplierReportingPeriodStatus());
-        var periodSupplierEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSupplierDomainToEntity(periodSupplier);
-        _reportingPeriodDataActions.AddPeriodSupplier(periodSupplierEntity);
-
-        return "ReportingPeriodSupplier added successfully....";
-    }*/
-
     public string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(multiplePeriodSuppliersDto.ReportingPeriodId);
@@ -314,6 +295,11 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "PeriodSupplierStatus is updated successfully...";
     }
 
+    public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+    {
+        return "PeriodFacility is updated successfully...";
+    }
+
     /// <summary>
     /// Remove PeriodSupplier
     /// </summary>
@@ -362,14 +348,37 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return supplierReportingPeriodDtos;
     }
 
-    public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> GetReportingPeriodFacilities(int reportingPeriodId, int periodSupplierId)
+    public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
     {
-        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-        var periodFacilities = reportingPeriod.PeriodFacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
-        var periodFacilityDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities);
+        var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
 
-        return periodFacilityDtos;
+        if (periodSupplierEntity == null)
+            throw new BadRequestException("ReportingPeriodSupplierEntity is not found !!");
+
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
+
+        //Get PeriodSupplierFacilities
+        var periodFacilities = reportingPeriod.PeriodFacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
+
+        var allFacilities = periodSupplierEntity.Supplier.FacilityEntities;
+        var inRelaventFacilities = new List<FacilityEntity>();
+        
+        foreach(var facility in allFacilities)
+        {
+            if(facility.ReportingPeriodFacilityEntities.Count() == 0)
+            {
+                inRelaventFacilities.Add(facility);
+            }
+        }
+
+        var periodFacilitiesDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities, inRelaventFacilities);
+        var supplierFacilitiesDto = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodSupplierFacilitiesDomainToDto(periodSupplier, periodFacilitiesDtos);
+
+        return supplierFacilitiesDto;
+
     }
+
 
     /// <summary>
     /// Get Suppliers those are not relavent with any ReportingPeriod
