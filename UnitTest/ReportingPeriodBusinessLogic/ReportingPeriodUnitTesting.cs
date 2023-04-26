@@ -256,6 +256,76 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.Null(exceptionMessage);
         }
 
+        /// <summary>
+        /// Update LockUnlockPeriodSupplierStatus Success Case
+        /// Updated PeriodSupplierStatus from Unlock to Lock and Viceversa
+        /// Check reportingPeriodStatus is Open or Close then only Update PeriodSupplierStatus
+        /// </summary>
+        [Fact]
+        public void LockUnlockPeriodSupplierStatusSucceedCase()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = GetReportingPeriodDomain();
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus);
+
+            //set this status open and close here
+            reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open).Id;
+            reportingPeriod.ReportingPeriodStatus.Name = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open).Name;
+
+            var updatedStatus = GetSupplierReportingPeriodStatuses();
+
+            try
+            {
+                reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplier.Id, updatedStatus);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+        }
+
+        /// <summary>
+        /// Update LockUnlockPeriodSupplierStatus Failure case
+        /// If reportingPeriodStatus is InActive or Complete then can't update periodSupplierStatus
+        /// </summary>
+        [Fact]
+        public void LockUnlockPeriodSupplierStatusFailCase()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = GetReportingPeriodDomain();
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus);
+
+            //set this status complete here
+            reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Complete).Id;
+            reportingPeriod.ReportingPeriodStatus.Name = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Complete).Name;
+
+            var updatedStatuses = GetSupplierReportingPeriodStatuses();
+
+            try
+            {
+                reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplier.Id, updatedStatuses);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+        }
 
         #endregion
 

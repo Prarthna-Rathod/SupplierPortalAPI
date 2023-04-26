@@ -11,12 +11,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
     public class PeriodFacility
     {
- /*       private HashSet<Facility> _facilities;
-        private HashSet<FacilityReportingPeriodDataStatus> _facilityReportingPeriodDataStatuses;
-        private HashSet<ReportingType> _reportingTypes;
-        //private HashSet<ReportingPeriodSupplier> ReportingPeriodSuppliers;
-
-*/
+ 
         public int Id { get; private set; }
         public FacilityVO FacilityVO { get; private set; }
         public FacilityReportingPeriodDataStatus FacilityReportingPeriodDataStatus { get; private set; }

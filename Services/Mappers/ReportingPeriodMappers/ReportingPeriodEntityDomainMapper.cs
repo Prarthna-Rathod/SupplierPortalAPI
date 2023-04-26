@@ -168,6 +168,9 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityEntity.FacilityId = periodFacility.FacilityVO.Id;
         periodFacilityEntity.FacilityReportingPeriodDataStatusId = periodFacility.FacilityReportingPeriodDataStatus.Id;
         periodFacilityEntity.ReportingPeriodId = periodFacility.ReportingPeriodId;
+        periodFacilityEntity.ReportingTypeId = periodFacility.FacilityVO.ReportingType.Id;
+        periodFacilityEntity.GhgrpfacilityId = periodFacility.FacilityVO.GHGRPFacilityId;
+        periodFacilityEntity.SupplyChainStageId = periodFacility.FacilityVO.SupplyChainStage.Id;
         periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
 
         return periodFacilityEntity;

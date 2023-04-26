@@ -48,6 +48,13 @@ public interface IReportingPeriodServices
     string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto);
 
     /// <summary>
+    /// LockUnlockPeriodSupplierStatus
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    string LockUnlockPeriodSupplierStatus(int periodSupplierId);
+
+    /// <summary>
     /// Get ReportingPeriodSuppliers
     /// </summary>
     /// <returns></returns>
@@ -79,10 +86,18 @@ public interface IReportingPeriodServices
     /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
      string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
-    
+
+    /// <summary>
+    /// Get ReportingPeriodFacilities
+    /// </summary>
+    /// <param name="reportingPeriodId"></param>
+    /// <returns></returns>
+    ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId);
     #endregion
 
     #region ReportingPeriodDocuments
     #endregion
+
+    
 
 }

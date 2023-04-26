@@ -10,21 +10,17 @@ namespace Services.DTOs
     {
         public int Id { get; set; }
         public IEnumerable<int> FacilityIds { get; set; }
-        //public string FacilityName { get; set; }
         public int FacilityReportingPeriodDataStatusId { get; set; }
         public string FacilityReportingPeriodDataStatusName { get; set; }
         public int ReportingPeriodId { get; set; }
         public int ReportingPeriodSupplierId { get; set; }
-
         public bool FacilityIsRelevantForPeriod { get; set; }
 
-        public ReportingPeriodFacilityDto(int id, IEnumerable<int> facilityIds, 
-            //string facilityName, 
+        public ReportingPeriodFacilityDto(int id, IEnumerable<int> facilityIds,
             int facilityReportingPeriodDataStatusId, string facilityReportingPeriodDataStatusName, int reportingPeriodId, int reportingPeriodSupplierId, bool facilityIsRelevantForPeriod)
         {
             Id = id;
             FacilityIds = facilityIds;
-            //FacilityName = facilityName;
             FacilityReportingPeriodDataStatusId = facilityReportingPeriodDataStatusId;
             FacilityReportingPeriodDataStatusName = facilityReportingPeriodDataStatusName;
             ReportingPeriodId = reportingPeriodId;

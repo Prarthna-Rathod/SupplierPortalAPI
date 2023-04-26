@@ -14,7 +14,6 @@
         public bool InitialDataRequest { get; set; }
 
         public bool ResendInitialDataRequest { get; set; }
-        //public IDictionary<int, string> Suppliers { get; set; }
 
         public MultiplePeriodSuppliersDto(int id, int reportingPeriodId, string reportingPeriodName, int supplierReportingPeriodStatusId, string supplierReportingPeriodStatusName, IEnumerable<int> supplierIds,bool activeForCurrentPeriod,bool initialDataRequest,bool resendInitialDataRequest)
         {
@@ -27,8 +26,6 @@
             ActiveForCurrentPeriod = activeForCurrentPeriod;
             InitialDataRequest = initialDataRequest;
             ResendInitialDataRequest= resendInitialDataRequest;
-
-
         }
     }
 }
