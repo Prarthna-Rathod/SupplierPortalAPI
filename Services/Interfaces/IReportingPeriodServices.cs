@@ -80,6 +80,13 @@ public interface IReportingPeriodServices
      string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
     
     /// <summary>
+    /// Update PeriodFacilities
+    /// </summary>
+    /// <param name="reportingPeriodFacilityDto"></param>
+    /// <returns></returns>
+    string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
+
+    /// <summary>
     /// Get ReportingPeriodFacilities
     /// </summary>
     /// <param name="reportingPeriodId"></param>

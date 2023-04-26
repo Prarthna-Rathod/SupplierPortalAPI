@@ -112,7 +112,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                         Regex format = new Regex("^[0-9]{4}$");
                         if (!format.IsMatch(collectionTimePeriod))
                         {
-                            throw new NoContentException("Collection time period should be in Year(ex: 2023)");
+                            throw new NoContentException("Collection time period should be in Year(ex: '2023')");
                         }
                     }
                     break;
@@ -129,11 +129,11 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                 case ReportingPeriodTypeValues.Monthly:
                     {
-                        Regex format = new Regex("^[A-Z]{3}[ ][0-9]{4}$");
+                        Regex format = new Regex("^[A-Za-z]{3,9}[ ][0-9]{4}$");
 
                         if (!format.IsMatch(collectionTimePeriod))
                         {
-                            throw new NoContentException("Collection time period should be in Month(ex: 'Jan 2023')");
+                            throw new NoContentException("Collection time period should be in Month(ex: 'January 2023')");
                         }
                     }
                     break;
@@ -228,16 +228,22 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                         if (ReportingPeriodStatus.Name != reportingPeriodStatus.Name && reportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
                         {
+                            //Check if any PeriodSupplier is remains Unlocked or not
+                            var periodSuppliersList = _periodSupplier.Where(x => x.IsActive && x.SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked).ToList();
+
+                            if (periodSuppliersList.Count() != 0)
+                                throw new BadRequestException("Some periodSupplier is still unlocked so can't change ReportingPeriodStatus to Complete !!");
+
                             ReportingPeriodStatus = reportingPeriodStatus;
                         }
                         else
                             throw new BadRequestException("ReportingPeriodStatus can be Close as it is or else you can set it to Complete only !!");
+                        
                     }
                     break;
                 default:
                     throw new BadRequestException("You cannot update any data because ReportingPeriod is Completed !!");
             }
-
         }
 
         #endregion
@@ -338,6 +344,15 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return _periodfacilities.Add(periodFacility);
         }
 
+        public PeriodFacility UpdatePeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod)
+        {
+            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+            periodFacility.FacilityReportingPeriodDataStatus.Id = facilityReportingPeriodDataStatus.Id;
+            periodFacility.FacilityReportingPeriodDataStatus.Name = facilityReportingPeriodDataStatus.Name;
+
+            return periodFacility;
+        }
 
         #endregion
 

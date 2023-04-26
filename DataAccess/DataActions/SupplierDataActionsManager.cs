@@ -183,6 +183,7 @@ namespace DataAccess.DataActions
             var allFacility = _context.FacilityEntities.Include(x => x.AssociatePipeline)
                                                        .Include(x => x.ReportingType)
                                                        .Include(x => x.SupplyChainStage)
+                                                       .Include(x => x.ReportingPeriodFacilityEntities)
                                                        .ToList();
             return allFacility;
         }
@@ -223,6 +224,7 @@ namespace DataAccess.DataActions
                                          .Include(x => x.ContactEntities)
                                             .ThenInclude(x => x.User)
                                          .Include(x => x.FacilityEntities)
+                                            .ThenInclude(x => x.ReportingPeriodFacilityEntities)
                                          .Include(x => x.ReportingPeriodSupplierEntities)
                                          .FirstOrDefault();
             return supplier;
@@ -240,6 +242,7 @@ namespace DataAccess.DataActions
             var facility = _context.FacilityEntities.Include(x => x.AssociatePipeline)
                                                     .Include(x => x.ReportingType)
                                                     .Include(x => x.SupplyChainStage)
+                                                    .Include(x => x.ReportingPeriodFacilityEntities)
                                                     .FirstOrDefault(x => x.Id == facilityId);
             return facility;
         }
@@ -361,83 +364,7 @@ namespace DataAccess.DataActions
             return true;
         }
 
-        /*public bool UpdateFacility(FacilityEntity facility)
-        {
-            var facilityEntity = _context.FacilityEntities
-                                .Where(x => x.Id == facility.Id)
-                                .Include(x => x.ReportingType)
-                                .Include(x => x.AssociatePipeline)
-                                .Include(x => x.SupplyChainStage)
-                                .FirstOrDefault();
-
-            if (facilityEntity == null)
-            {
-                throw new Exception("Facility not found !!");
-            }
-
-            if (facilityEntity.SupplierId != facility.SupplierId)
-            {
-                throw new Exception("Supplier cannot be changed !!");
-            }
-
-            if (facility.AssociatePipelineId != null)
-            {
-                if (facility.AssociatePipelineId == 0 && facility.AssociatePipeline.Name != null)
-                {
-                    var associatePipeline = AddAssociatePipeline(facility.AssociatePipeline.Name);
-                    facility.AssociatePipeline = associatePipeline;
-                    facility.AssociatePipelineId = associatePipeline.Id;
-                }
-                else
-                {
-                    facilityEntity.AssociatePipeline = facility.AssociatePipeline;
-                    facilityEntity.AssociatePipelineId = facilityEntity.AssociatePipelineId;
-                }
-            }
-
-            var reportingType = _context.ReportingTypeEntities.FirstOrDefault(x => x.Id == facility.ReportingTypeId);
-
-            if (!facility.IsActive && facilityEntity.IsPrimary && facilityEntity.ReportingType.Name == REPORTING_TYPE_GHGRP)
-            {
-                throw new Exception("Cannot update GHGRP primary facility to InActive !!");
-            }
-
-            if (reportingType.Name == REPORTING_TYPE_GHGRP && facility.GhgrpfacilityId != null)
-            {
-                var existingFacility = FindExistingFacility(facility.GhgrpfacilityId);
-
-                if (existingFacility != null)
-                {
-                    if (facility.IsPrimary)
-                        existingFacility.IsPrimary = false;
-
-                    _context.FacilityEntities.Update(existingFacility);
-                }
-                else
-                    facility.IsPrimary = true;
-            }
-
-            if(reportingType.Name == REPORTING_TYPE_GHGRP && facilityEntity.GhgrpfacilityId == null && facility.GhgrpfacilityId != null)
-            {
-                facilityEntity.GhgrpfacilityId = facility.GhgrpfacilityId;
-            }
-
-            facilityEntity.Name = facility.Name;
-            facilityEntity.Description = facility.Description;
-            facilityEntity.IsPrimary = facility.IsPrimary;
-            facilityEntity.AssociatePipelineId = facility.AssociatePipelineId;
-            facilityEntity.ReportingTypeId = facility.ReportingTypeId;
-            facilityEntity.SupplyChainStageId = facility.SupplyChainStageId;
-            facilityEntity.IsActive = facility.IsActive;
-            facilityEntity.UpdatedOn = DateTime.UtcNow;
-            facilityEntity.UpdatedBy = "System";
-
-            _context.FacilityEntities.Update(facilityEntity);
-            _context.SaveChanges();
-            return true;
-
-        }
-*/
+       
         public bool UpdateAllFacilities(IEnumerable<FacilityEntity> facilityEntities)
         {
             var supplierId = facilityEntities.First().SupplierId;

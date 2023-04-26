@@ -1,6 +1,5 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
-using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
@@ -108,7 +107,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
             throw new ArgumentNullException("ReportingPeriodEntity not found !!");
 
         var reportingPeriodDomain = ConfigureReportingPeriod(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatus);
-                    
+
         //Load existing PeriodSuppliersList in ReportingPeriodDomain
         foreach (var periodSupplier in reportingPeriodEntity.ReportingPeriodSupplierEntities)
         {
@@ -117,12 +116,12 @@ public class ReportingPeriodServices : IReportingPeriodServices
             reportingPeriodDomain.LoadPeriodSupplier(periodSupplier.Id, supplierVO, supplierReportingPeriodStatus);
         }
 
-        foreach(var periodFacility in reportingPeriodEntity.ReportingPeriodFacilityEntities)
+        foreach (var periodFacility in reportingPeriodEntity.ReportingPeriodFacilityEntities)
         {
             var facilityVO = GetAndConvertFacilityValueObject(periodFacility.FacilityId);
             var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacility.FacilityReportingPeriodDataStatusId);
 
-            reportingPeriodDomain.LoadPeriodFacility(periodFacility.Id,facilityVO, facilityReportingPeriodStatus, periodFacility.ReportingPeriodSupplierId);
+            reportingPeriodDomain.LoadPeriodFacility(periodFacility.Id, facilityVO, facilityReportingPeriodStatus, periodFacility.ReportingPeriodSupplierId);
         }
 
         return reportingPeriodDomain;
@@ -157,7 +156,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         if (facilityEntity == null)
             throw new BadRequestException("Facility not found !!");
 
-        var facilityVO = _reportingPeriodEntityDomainMapper.ConvertFacilityToFacilityValueObject(facilityEntity,supplyChainStages,reportingTypes);
+        var facilityVO = _reportingPeriodEntityDomainMapper.ConvertFacilityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
 
         return facilityVO;
     }
@@ -229,25 +228,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "ReportingPeriod added or updated successfully !!";
     }
 
-    /// <summary>
-    /// Add PeriodSupplier (Where supplier should be active & ReportingPeriodStatus should be InActive)
-    /// </summary>
-    /// <param name="reportingPeriodSupplierDto"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    /*public string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto)
-    {
-        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodSupplierDto.ReportingPeriodId);
-
-        var supplierPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == reportingPeriodSupplierDto.SupplierReportingPeriodStatusId);
-
-        var periodSupplier = reportingPeriod.AddPeriodSupplier(GetAndConvertSupplierValueObject(reportingPeriodSupplierDto.SupplierId), supplierPeriodStatus ?? new SupplierReportingPeriodStatus());
-        var periodSupplierEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSupplierDomainToEntity(periodSupplier);
-        _reportingPeriodDataActions.AddPeriodSupplier(periodSupplierEntity);
-
-        return "ReportingPeriodSupplier added successfully....";
-    }*/
-
     public string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(multiplePeriodSuppliersDto.ReportingPeriodId);
@@ -257,7 +237,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         foreach (var supplierId in multiplePeriodSuppliersDto.SupplierIds)
         {
             var supplierVO = GetAndConvertSupplierValueObject(supplierId);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(multiplePeriodSuppliersDto.Id,supplierVO, supplierPeriodStatus ?? new SupplierReportingPeriodStatus());
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(multiplePeriodSuppliersDto.Id, supplierVO, supplierPeriodStatus ?? new SupplierReportingPeriodStatus());
 
             var periodSupplierEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSupplierDomainToEntity(periodSupplier);
             _reportingPeriodDataActions.AddPeriodSupplier(periodSupplierEntity);
@@ -288,6 +268,11 @@ public class ReportingPeriodServices : IReportingPeriodServices
         }
 
         return "ReportingPeriodFacilities added or removed successfully";
+    }
+
+    public string UpdatePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+    {
+        return "PeriodFacility is updated successfully...";
     }
 
 
@@ -342,17 +327,34 @@ public class ReportingPeriodServices : IReportingPeriodServices
     public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
     {
         var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
+
         if (periodSupplierEntity == null)
             throw new BadRequestException("ReportingPeriodSupplierEntity is not found !!");
+
         var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
         var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
+
+        //Get PeriodSupplierFacilities
         var periodFacilities = reportingPeriod.PeriodFacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
-        var periodFacilitiesDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities);
+
+        var allFacilities = periodSupplierEntity.Supplier.FacilityEntities;
+        var inRelaventFacilities = new List<FacilityEntity>();
+        
+        foreach(var facility in allFacilities)
+        {
+            if(facility.ReportingPeriodFacilityEntities.Count() == 0)
+            {
+                inRelaventFacilities.Add(facility);
+            }
+        }
+
+        var periodFacilitiesDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities, inRelaventFacilities);
         var supplierFacilitiesDto = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodSupplierFacilitiesDomainToDto(periodSupplier, periodFacilitiesDtos);
-        
+
         return supplierFacilitiesDto;
-        
+
     }
+
 
     /// <summary>
     /// Get Suppliers those are not relavent with any ReportingPeriod

@@ -1,5 +1,7 @@
 ﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.SupplierRoot.ValueObjects;
+using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Mappers.Interfaces;
@@ -58,20 +60,34 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         #region PeriodFacility
 
-        public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> ConvertPeriodFacilityDomainListToDtos(IEnumerable<PeriodFacility> periodFacilities)
+        public IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> ConvertPeriodFacilityDomainListToDtos(IEnumerable<PeriodFacility> periodFacilities, IEnumerable<FacilityEntity> facilityEntities)
         {
             var list = new List<ReportingPeriodSupplierRelaventFacilityDto>();
+            bool isRelaventForPeriodStatus = true;
             foreach(var periodFacility in periodFacilities)
             {
-                list.Add(ConvertPeriodFacilityDomainToDto(periodFacility));
+                list.Add(ConvertPeriodFacilityDomainToDto(periodFacility, isRelaventForPeriodStatus));
+            }
+
+            foreach(var facility in facilityEntities)
+            {
+                isRelaventForPeriodStatus = false;
+                list.Add(ConvertFacilityEntityToDto(facility, isRelaventForPeriodStatus));
             }
 
             return list;
         }
 
-        public ReportingPeriodSupplierRelaventFacilityDto ConvertPeriodFacilityDomainToDto(PeriodFacility periodFacility)
+        public ReportingPeriodSupplierRelaventFacilityDto ConvertPeriodFacilityDomainToDto(PeriodFacility periodFacility, bool isRelaventForPeriodStatus)
         {
-            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(periodFacility.Id, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, periodFacility.FacilityVO.GHGRPFacilityId, periodFacility.FacilityVO.ReportingType.Id, periodFacility.FacilityVO.ReportingType.Name, periodFacility.FacilityVO.SupplyChainStage.Id, periodFacility.FacilityVO.SupplyChainStage.Name, periodFacility.FacilityVO.IsActive,  periodFacility.FacilityReportingPeriodDataStatus.Id, periodFacility.FacilityReportingPeriodDataStatus.Name, true);
+            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(periodFacility.Id, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, periodFacility.FacilityVO.GHGRPFacilityId, periodFacility.FacilityVO.ReportingType.Id, periodFacility.FacilityVO.ReportingType.Name, periodFacility.FacilityVO.SupplyChainStage.Id, periodFacility.FacilityVO.SupplyChainStage.Name, periodFacility.FacilityVO.IsActive, periodFacility.ReportingPeriodId,  periodFacility.FacilityReportingPeriodDataStatus?.Id, periodFacility.FacilityReportingPeriodDataStatus?.Name, isRelaventForPeriodStatus);
+
+            return periodFacilityDto;
+        }
+
+        private ReportingPeriodSupplierRelaventFacilityDto ConvertFacilityEntityToDto(FacilityEntity facilityEntity, bool isRelaventForPeriodStatus)
+        {
+            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(null, facilityEntity.Id, facilityEntity.Name, facilityEntity.GhgrpfacilityId, facilityEntity.ReportingTypeId, facilityEntity.ReportingType.Name, facilityEntity.SupplyChainStageId, facilityEntity.SupplyChainStage.Name, facilityEntity.IsActive, null, null, null, isRelaventForPeriodStatus);
 
             return periodFacilityDto;
         }
