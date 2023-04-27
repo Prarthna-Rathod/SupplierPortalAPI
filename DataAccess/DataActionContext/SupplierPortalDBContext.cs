@@ -22,12 +22,14 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<DocumentRequiredStatusEntity> DocumentRequiredStatusEntities { get; set; } = null!;
     public virtual DbSet<DocumentStatusEntity> DocumentStatusEntities { get; set; } = null!;
     public virtual DbSet<DocumentTypeEntity> DocumentTypeEntities { get; set; } = null!;
+    public virtual DbSet<ElectricityGridMixComponentEntity> ElectricityGridMixComponentEntities { get; set; } = null!;
     public virtual DbSet<FacilityEntity> FacilityEntities { get; set; } = null!;
     public virtual DbSet<FacilityReportingPeriodDataStatusEntity> FacilityReportingPeriodDataStatusEntities { get; set; } = null!;
     public virtual DbSet<FacilityRequiredDocumentTypeEntity> FacilityRequiredDocumentTypeEntities { get; set; } = null!;
     public virtual DbSet<Log> Logs { get; set; } = null!;
     public virtual DbSet<ReportingPeriodEntity> ReportingPeriodEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityDocumentEntity> ReportingPeriodFacilityDocumentEntities { get; set; } = null!;
+    public virtual DbSet<ReportingPeriodFacilityElectricityGridMixEntity> ReportingPeriodFacilityElectricityGridMixEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityEntity> ReportingPeriodFacilityEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodStatusEntity> ReportingPeriodStatusEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodSupplierDocumentEntity> ReportingPeriodSupplierDocumentEntities { get; set; } = null!;
@@ -38,6 +40,7 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<SupplierEntity> SupplierEntities { get; set; } = null!;
     public virtual DbSet<SupplierReportingPeriodStatusEntity> SupplierReportingPeriodStatusEntities { get; set; } = null!;
     public virtual DbSet<SupplyChainStageEntity> SupplyChainStageEntities { get; set; } = null!;
+    public virtual DbSet<UnitOfMeasureEntity> UnitOfMeasureEntities { get; set; } = null!;
     public virtual DbSet<UserEntity> UserEntities { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -115,6 +118,13 @@ public partial class SupplierPortalDBContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<ElectricityGridMixComponentEntity>(entity =>
+        {
+            entity.ToTable("ElectricityGridMixComponentEntity");
+
+            entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<FacilityEntity>(entity =>
         {
             entity.ToTable("FacilityEntity");
@@ -169,6 +179,10 @@ public partial class SupplierPortalDBContext : DbContext
         modelBuilder.Entity<FacilityRequiredDocumentTypeEntity>(entity =>
         {
             entity.ToTable("FacilityRequiredDocumentTypeEntity");
+
+            entity.Property(e => e.CreatedBy).HasMaxLength(50);
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 
             entity.HasOne(d => d.DocumentRequiredStatus)
                 .WithMany(p => p.FacilityRequiredDocumentTypeEntities)
@@ -266,6 +280,35 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasForeignKey(d => d.ReportingPeriodFacilityId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacilityDocument_ReportingPeriodFacility");
+        });
+
+        modelBuilder.Entity<ReportingPeriodFacilityElectricityGridMixEntity>(entity =>
+        {
+            entity.ToTable("ReportingPeriodFacilityElectricityGridMixEntity");
+
+            entity.Property(e => e.Content).HasColumnType("decimal(30, 20)");
+
+            entity.Property(e => e.CreatedBy).HasMaxLength(50);
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+
+            entity.HasOne(d => d.ElectricityGridMixComponent)
+                .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
+                .HasForeignKey(d => d.ElectricityGridMixComponentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_ElectricityGridMixComponentEntity");
+
+            entity.HasOne(d => d.ReportingPeriodFacility)
+                .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
+                .HasForeignKey(d => d.ReportingPeriodFacilityId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_ReportingPeriodFacilityEntity");
+
+            entity.HasOne(d => d.UnitOfMeasure)
+                .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
+                .HasForeignKey(d => d.UnitOfMeasureId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_UnitOfMeasureEntity");
         });
 
         modelBuilder.Entity<ReportingPeriodFacilityEntity>(entity =>
@@ -436,6 +479,13 @@ public partial class SupplierPortalDBContext : DbContext
             entity.ToTable("SupplyChainStageEntity");
 
             entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<UnitOfMeasureEntity>(entity =>
+        {
+            entity.ToTable("UnitOfMeasureEntity");
+
+            entity.Property(e => e.Name).HasMaxLength(50);
         });
 
         modelBuilder.Entity<UserEntity>(entity =>

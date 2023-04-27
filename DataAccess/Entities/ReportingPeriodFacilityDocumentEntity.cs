@@ -14,6 +14,7 @@ namespace DataAccess.Entities
         public int DocumentStatusId { get; set; }
         public int DocumentTypeId { get; set; }
         public string ValidationError { get; set; } = null!;
+        public bool IsActive { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public string CreatedBy { get; set; } = null!;

@@ -88,7 +88,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         foreach (var periodSupplierEntity in reportingPeriodSupplierEntities)
         {
-            var supplierVO = ConvertSupplierToSupplierValueObject(periodSupplierEntity.Supplier, supplyChainStages, reportingTypes);
+            var supplierVO = ConvertSupplierEntityToSupplierValueObject(periodSupplierEntity.Supplier, supplyChainStages, reportingTypes);
             periodSupplierDomainList.Add(ConvertPeriodSupplierEntityToDomain(periodSupplierEntity, supplierReportingPeriodStatuses, supplierVO));
         }
 
@@ -119,7 +119,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     }
 
 
-    public SupplierVO ConvertSupplierToSupplierValueObject(SupplierEntity supplierEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
+    public SupplierVO ConvertSupplierEntityToSupplierValueObject(SupplierEntity supplierEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
     {
         var facilityVOs = new List<FacilityVO>();
 
@@ -141,7 +141,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         foreach (var supplierEntity in supplierEntities)
         {
-            supplierVOs.Add(ConvertSupplierToSupplierValueObject(supplierEntity, null, null));
+            supplierVOs.Add(ConvertSupplierEntityToSupplierValueObject(supplierEntity, null, null));
         }
         return supplierVOs;
     }
@@ -151,7 +151,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     #region PeriodFacility
 
-    public FacilityVO ConvertFacilityToFacilityValueObject(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
+    public FacilityVO ConvertFacilityEntityToFacilityValueObject(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
     {
         var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
         var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
@@ -172,6 +172,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityEntity.GhgrpfacilityId = periodFacility.FacilityVO.GHGRPFacilityId;
         periodFacilityEntity.SupplyChainStageId = periodFacility.FacilityVO.SupplyChainStage.Id;
         periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
+        periodFacilityEntity.IsActive = periodFacility.IsActive;
 
         return periodFacilityEntity;
     }

@@ -12,27 +12,13 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 {
     public interface IReportingPeriod
     {
-        int Id { get; }
-        string DisplayName { get; }
-        string CollectionTimePeriod { get; }
-        DateTime StartDate { get; }
-        DateTime? EndDate { get; }
-        bool IsActive { get; }
-
-        ReportingPeriodType ReportingPeriodType { get; }
-        ReportingPeriodStatus ReportingPeriodStatus { get;}
-        
-        IEnumerable<PeriodSupplier> PeriodSuppliers { get; }
-
         PeriodSupplier AddPeriodSupplier(int periodSupplierId,SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus,bool activeForCurrentPeriod,bool initialDataRequest,bool resendInitialDataRequest);
         
         bool LoadPeriodSupplier(int reportingPeriodSupplierId,SupplierVO supplierVO,SupplierReportingPeriodStatus supplierReportingPeriodStatus,bool activeForCurrentPeriod,bool initialDataRequest,bool resendInitialDataRequest);
 
-        PeriodFacility AddPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus,int periodSupplierId, bool facilityIsRelevantForPeriod);
+        PeriodFacility AddPeriodFacility(int periodFacilityId,FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus,int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive);
 
-        bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId);
-
-        PeriodFacility UpdatePeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod);
+        bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive);
 
         /*
 

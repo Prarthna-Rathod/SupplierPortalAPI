@@ -17,18 +17,20 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         public FacilityReportingPeriodDataStatus FacilityReportingPeriodDataStatus { get; private set; }
         public int ReportingPeriodId { get; private set; }
         public int ReportingPeriodSupplierId { get; private set; }
+        public bool IsActive { get; private set; }
 
         internal PeriodFacility() { }
 
-        internal PeriodFacility(FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId)
+        internal PeriodFacility(FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, bool isActive)
         {
             FacilityVO = facilityVO;
             FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
             ReportingPeriodId = reportingPeriodId;
             ReportingPeriodSupplierId = reportingPeriodSupplierId;
+            IsActive = isActive;
         }
 
-        internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId)
+        internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, bool isActive) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId, isActive)
         {
             Id = id;
         }

@@ -115,7 +115,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var supplyChainStages = GenerateSupplyChainStage();
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
-            var supplierVO = mapper.ConvertSupplierToSupplierValueObject(supplierEntity, supplyChainStages,reportingTypes );
+            var supplierVO = mapper.ConvertSupplierEntityToSupplierValueObject(supplierEntity, supplyChainStages,reportingTypes );
 
             Assert.NotNull(supplierVO);
             Assert.Equal(supplierEntity.Id, supplierVO.Id);
@@ -136,7 +136,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var supplyChainStages = GenerateSupplyChainStage();
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
-            var facilityVO = mapper.ConvertFacilityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
+            var facilityVO = mapper.ConvertFacilityEntityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
 
             Assert.NotNull(facilityVO);
             Assert.Equal(facilityEntity.Id, facilityVO.Id);
@@ -155,7 +155,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var reportingPeriod = GetReportingPeriodDomain();
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
             var periodFacilityEntity = mapper.ConvertReportingPeriodFacilityDomainToEntity(periodFacility);
@@ -166,6 +166,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodFacility.FacilityReportingPeriodDataStatus.Id, periodFacilityEntity.FacilityReportingPeriodDataStatusId);
             Assert.Equal(periodFacility.ReportingPeriodId, periodFacilityEntity.ReportingPeriodId);
             Assert.Equal(periodFacility.ReportingPeriodSupplierId, periodFacilityEntity.ReportingPeriodSupplierId);
+            Assert.Equal(periodFacility.IsActive, periodFacilityEntity.IsActive);
 
         }
         #endregion

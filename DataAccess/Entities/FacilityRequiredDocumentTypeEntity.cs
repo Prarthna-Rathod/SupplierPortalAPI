@@ -10,6 +10,9 @@ namespace DataAccess.Entities
         public int SupplyChainStageId { get; set; }
         public int DocumentTypeId { get; set; }
         public int DocumentRequiredStatusId { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public string CreatedBy { get; set; } = null!;
 
         public virtual DocumentRequiredStatusEntity DocumentRequiredStatus { get; set; } = null!;
         public virtual DocumentTypeEntity DocumentType { get; set; } = null!;
