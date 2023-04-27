@@ -2,23 +2,17 @@
 {
     public class AddMultiplePeriodFacilityElectricityGridMixDto
     {
+        public int Id { get; set; }
         public int ReportingPeriodFacilityId { get; set; }
-        public int ReportingPeriodId { get; set; }
-        public int SupplierId { get; set; }
-        public int FacilityId { get; set; }
-        public string FacilityName { get; set; }
-        public string? GHGRPFacilityId { get; set; }
+        public int ReportingPeriodSupplierId { get; set; }
         public IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> ReportingPeriodFacilityElectricityGridMixDtos { get; set; }
         public bool IsActive { get; set; }
 
-        public AddMultiplePeriodFacilityElectricityGridMixDto(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int facilityId, string facilityName, string? ghgrpFacilityId, IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos,bool isActive)
+        public AddMultiplePeriodFacilityElectricityGridMixDto(int id, int reportingPeriodFacilityId, int reportingPeriodSupplierId, IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos,bool isActive)
         {
+            Id = id;
             ReportingPeriodFacilityId = reportingPeriodFacilityId;
-            ReportingPeriodId = reportingPeriodId;
-            SupplierId = supplierId;
-            FacilityId = facilityId;
-            FacilityName = facilityName;
-            GHGRPFacilityId = ghgrpFacilityId;
+            ReportingPeriodSupplierId = reportingPeriodSupplierId;
             ReportingPeriodFacilityElectricityGridMixDtos = reportingPeriodFacilityElectricityGridMixDtos;
             IsActive = isActive;
         }

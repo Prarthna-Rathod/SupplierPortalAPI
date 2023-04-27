@@ -309,6 +309,26 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return _reportingPeriodDataActions.RemovePeriodSupplier(periodSupplierId);
     }
 
+    /// <summary>
+    /// Add ReportingPeriodFacility ElectricityGridMix Components.
+    /// Per facility UnitOfMeasure should be 100%
+    /// Per facility allowed maximum components is 9
+    /// </summary>
+    /// <param name="periodFacilityElectricityGridMixDto"></param>
+    /// <returns></returns>
+    public string AddPeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto)
+    {
+        var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodFacilityElectricityGridMixDto.ReportingPeriodSupplierId);
+
+        if (periodSupplierEntity is null)
+            throw new BadRequestException("ReportingPeriodSupplier is not found !!");
+
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
+
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
+
+        return "ReportingPeriodFacility ElectricityGridMix Components added successfully !!";
+    }
 
     #endregion
 

@@ -3,7 +3,6 @@ using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace DataAccess.DataActions;
 
 public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
@@ -60,6 +59,16 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         if(facilityIsRelaventForPeriod)
             _context.ReportingPeriodFacilityEntities.Add(reportingPeriodFacilityEntity);
 
+        _context.SaveChanges();
+        return true;
+    }
+
+
+    public bool AddPeriodFacilityElectricityGridMix(ReportingPeriodFacilityElectricityGridMixEntity periodFacilityElectricityGridMixEntity)
+    {
+        periodFacilityElectricityGridMixEntity.CreatedOn = DateTime.UtcNow;
+        periodFacilityElectricityGridMixEntity.CreatedBy = "System";
+        _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(periodFacilityElectricityGridMixEntity);
         _context.SaveChanges();
         return true;
     }
@@ -237,6 +246,17 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     }
 
+    public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityElectricityGridMixId)
+    {
+        var entity = _context.ReportingPeriodFacilityElectricityGridMixEntities.FirstOrDefault(x => x.Id == periodFacilityElectricityGridMixId);
+        if (entity == null)
+            throw new Exception("RemovePeriodFacilityElectricityGridMix not found !!");
+
+        _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(entity);
+        _context.SaveChanges();
+        return true;
+    }
+
     #endregion
 
     #region GetAll Methods
@@ -362,16 +382,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.SupplierReportingPeriodStatus)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
-    }
-
-    public ICollection<ReportingPeriodSupplierEntity> GetperiodSupplierById(int periodSupplierId)
-    {
-        var periodSupplier = _context.ReportingPeriodSupplierEntities
-                                .Include(x => x.Supplier)
-                                .Include(x => x.ReportingPeriod)
-                                .Include(x => x.SupplierReportingPeriodStatus)
-                                .Where(x => x.Id == periodSupplierId);
-        return periodSupplier.ToList();
     }
 
     public async Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId)

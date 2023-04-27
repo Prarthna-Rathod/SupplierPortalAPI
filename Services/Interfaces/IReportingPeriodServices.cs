@@ -93,6 +93,9 @@ public interface IReportingPeriodServices
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
     ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId);
+
+    string AddPeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
+
     #endregion
 
     #region ReportingPeriodDocuments
