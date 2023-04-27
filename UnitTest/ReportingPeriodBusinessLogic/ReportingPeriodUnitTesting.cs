@@ -270,7 +270,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus,true,true,true);
 
             //set this status open and close here
             reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open).Id;
@@ -305,7 +305,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus,true,true,true);
 
             //set this status complete here
             reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Complete).Id;
