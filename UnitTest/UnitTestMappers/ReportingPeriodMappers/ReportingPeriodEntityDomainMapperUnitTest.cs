@@ -153,9 +153,13 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         public void ConvertPeriodFacilityDomainToEntity()
         {
             var reportingPeriod = GetReportingPeriodDomain();
+            
+            var periodSupplierDomain = reportingPeriod.PeriodSuppliers.First();
+            
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+            var periodFacility = periodSupplierDomain.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+            
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
             var periodFacilityEntity = mapper.ConvertReportingPeriodFacilityDomainToEntity(periodFacility);
