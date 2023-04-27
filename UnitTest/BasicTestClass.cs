@@ -290,7 +290,7 @@ namespace UnitTest
             var reportingTypes = GenerateReportingType();
             var supplyChainStages = GenerateSupplyChainStage();
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
-            var supplierVO = mapper.ConvertSupplierToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
+            var supplierVO = mapper.ConvertSupplierEntityToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
             return supplierVO;
         }
 
@@ -301,7 +301,7 @@ namespace UnitTest
             var reportingTypes = GenerateReportingType();
             var supplyChainStages = GenerateSupplyChainStage();
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
-            var facilityVO = mapper.ConvertFacilityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
+            var facilityVO = mapper.ConvertFacilityEntityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
 
             return facilityVO;
         }

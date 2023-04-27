@@ -15,9 +15,10 @@ namespace Services.DTOs
         public int ReportingPeriodId { get; set; }
         public int ReportingPeriodSupplierId { get; set; }
         public bool FacilityIsRelevantForPeriod { get; set; }
+        public bool IsActive { get; set; }
 
         public ReportingPeriodFacilityDto(int id, IEnumerable<int> facilityIds,
-            int facilityReportingPeriodDataStatusId, string facilityReportingPeriodDataStatusName, int reportingPeriodId, int reportingPeriodSupplierId, bool facilityIsRelevantForPeriod)
+            int facilityReportingPeriodDataStatusId, string facilityReportingPeriodDataStatusName, int reportingPeriodId, int reportingPeriodSupplierId, bool facilityIsRelevantForPeriod, bool isActive)
         {
             Id = id;
             FacilityIds = facilityIds;
@@ -26,6 +27,7 @@ namespace Services.DTOs
             ReportingPeriodId = reportingPeriodId;
             ReportingPeriodSupplierId = reportingPeriodSupplierId;
             FacilityIsRelevantForPeriod = facilityIsRelevantForPeriod;
+            IsActive = isActive;
         }
 
 

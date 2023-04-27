@@ -304,10 +304,10 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region Period Facility
 
-        public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod)
+        public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive)
         {
             int counter = 0;
-            var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+            var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
 
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
@@ -359,21 +359,11 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         }
 
 
-        public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId)
+        public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive)
         {
-            var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId);
+            var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
 
             return _periodfacilities.Add(periodFacility);
-        }
-
-        public PeriodFacility UpdatePeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod)
-        {
-            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
-
-            periodFacility.FacilityReportingPeriodDataStatus.Id = facilityReportingPeriodDataStatus.Id;
-            periodFacility.FacilityReportingPeriodDataStatus.Name = facilityReportingPeriodDataStatus.Name;
-
-            return periodFacility;
         }
 
         #endregion
