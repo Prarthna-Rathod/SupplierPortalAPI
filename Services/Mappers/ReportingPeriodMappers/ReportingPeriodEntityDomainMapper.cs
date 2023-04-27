@@ -76,7 +76,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     {
         var supplierReportingPeriodSelectedStatus = supplierReportingPeriodStatuses.FirstOrDefault(x => x.Id == reportingPeriodSupplierEntity.SupplierReportingPeriodStatusId);
 
-        var periodSupplier = new PeriodSupplier(reportingPeriodSupplierEntity.Id, supplierVO, reportingPeriodSupplierEntity.ReportingPeriodId, supplierReportingPeriodSelectedStatus,reportingPeriodSupplierEntity.ActiveForCurrentPeriod,reportingPeriodSupplierEntity.InitialDataRequest,reportingPeriodSupplierEntity.ResendInitialDataRequest);
+        var periodSupplier = new PeriodSupplier(reportingPeriodSupplierEntity.Id, supplierVO, reportingPeriodSupplierEntity.ReportingPeriodId, supplierReportingPeriodSelectedStatus, reportingPeriodSupplierEntity.ActiveForCurrentPeriod, reportingPeriodSupplierEntity.InitialDataRequest, reportingPeriodSupplierEntity.ResendInitialDataRequest);
 
         return periodSupplier;
     }
@@ -156,7 +156,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
         var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
 
-        var facilityVOs = new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage,selectedReprtingType);
+        var facilityVOs = new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType);
 
         return facilityVOs;
     }

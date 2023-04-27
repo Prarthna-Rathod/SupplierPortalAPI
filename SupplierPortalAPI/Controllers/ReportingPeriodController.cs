@@ -1,7 +1,4 @@
-﻿using BusinessLogic.ReferenceLookups;
-using BusinessLogic.ReportingPeriodRoot.DomainModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Interfaces;
@@ -56,8 +53,8 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpGet("GetReportingPeriodSuppliersList")]
-        public IEnumerable<ReportingPeriodRelevantSupplierDto> GetReportingPeriodSuppliersList(int reportingperiodId) 
-        { 
+        public IEnumerable<ReportingPeriodRelevantSupplierDto> GetReportingPeriodSuppliersList(int reportingperiodId)
+        {
             return _services.GetRelevantSuppliers(reportingperiodId);
         }
 

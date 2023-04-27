@@ -57,8 +57,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             if (existingPeriodFacility.FacilityId == reportingPeriodFacilityEntity.FacilityId && existingPeriodFacility.ReportingPeriodId == reportingPeriodFacilityEntity.ReportingPeriodId && !facilityIsRelaventForPeriod)
                 _context.ReportingPeriodFacilityEntities.Remove(existingPeriodFacility);
         }
-        if(facilityIsRelaventForPeriod)
+        if (facilityIsRelaventForPeriod)
+        {
             _context.ReportingPeriodFacilityEntities.Add(reportingPeriodFacilityEntity);
+        }
 
         _context.SaveChanges();
         return true;
@@ -430,7 +432,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         GC.SuppressFinalize(this);
     }
 
-  
+
 
     #endregion
 }

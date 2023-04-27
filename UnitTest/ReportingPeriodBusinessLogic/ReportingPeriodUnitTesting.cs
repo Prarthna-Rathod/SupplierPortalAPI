@@ -352,7 +352,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
             }
             catch(Exception ex)
             {
@@ -369,21 +369,27 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         /// Add ReportingPeriodFacility success case2.
         /// Try to add duplicate record in ReportingPeriodFacility and check FacilityIsRelaventForPeriod value is false, then remove the existing record.
         /// </summary>
+        
         [Fact]
         public void AddDuplicatePeriodFacilityRemoveSuccessCase2()
         {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
-            
+
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, true, true, true);
+
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
 
             try
             {
-                reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, 1, true, true);
-                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, 1, false, true);
+                periodSupplier.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, 1, true, true);
+                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, 1, false, true);
 
             }
             catch (Exception ex)
@@ -408,12 +414,18 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
+
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, true, true, true);
+
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
             
             try
             {
-                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
             }
             catch(Exception ex)
             {
@@ -436,13 +448,19 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
+
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, true, true, true);
+
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
 
             try
             {
-                reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
-                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+                periodSupplier.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
             }
             catch (Exception ex)
             {
@@ -466,6 +484,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = GetReportingPeriodDomain();
+
             //Add periodSupplier
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
@@ -479,7 +498,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
 
             }
             catch (Exception ex)
