@@ -335,6 +335,21 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return _context.ReportingTypeEntities;
     }
 
+    public IEnumerable<ElectricityGridMixComponentEntity> GetElectricityGridMixComponentEntities()
+    {
+        return _context.ElectricityGridMixComponentEntities;
+    }
+
+    public IEnumerable<UnitOfMeasureEntity> GetUnitOfMeasureEntities()
+    {
+        return _context.UnitOfMeasureEntities;
+    }
+    public IEnumerable<FercRegionEntity> GetFercRegionEntities()
+    {
+        return _context.FercRegionEntities;
+    }
+
+
     #endregion
 
     #region GetById
@@ -382,6 +397,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.Supplier)
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.SupplierReportingPeriodStatus)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }

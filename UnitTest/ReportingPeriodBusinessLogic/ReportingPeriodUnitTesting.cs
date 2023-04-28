@@ -352,7 +352,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
             }
             catch(Exception ex)
             {
@@ -388,8 +388,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                periodSupplier.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, 1, true, true);
-                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, 1, false, true);
+                reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, 1, true, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, 1, false, true);
 
             }
             catch (Exception ex)
@@ -425,7 +425,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             
             try
             {
-                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
             }
             catch(Exception ex)
             {
@@ -459,8 +459,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                periodSupplier.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
-                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+                reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
             }
             catch (Exception ex)
             {
@@ -498,7 +498,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                periodSupplier.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+                reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
 
             }
             catch (Exception ex)

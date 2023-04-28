@@ -67,6 +67,12 @@ namespace DataAccess.DataActions.Interfaces
         IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType();
         IEnumerable<ReportingTypeEntity> GetReportingTypes();
 
+        IEnumerable<ElectricityGridMixComponentEntity> GetElectricityGridMixComponentEntities();
+
+        IEnumerable<UnitOfMeasureEntity> GetUnitOfMeasureEntities();
+        IEnumerable<FercRegionEntity> GetFercRegionEntities();
+        
+
         #endregion
 
         #region GetById Methods

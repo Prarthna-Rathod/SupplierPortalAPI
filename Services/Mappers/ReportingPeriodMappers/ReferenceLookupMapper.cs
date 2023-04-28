@@ -44,6 +44,30 @@ namespace Services.Mappers.ReportingPeriodMappers
             }
         }
 
+        public IEnumerable<ElectricityGridMixComponent> GetElectricityGridMixComponentsLookUp(IEnumerable<ElectricityGridMixComponentEntity> electricityGridMixComponentEntities)
+        {
+            foreach (var item in electricityGridMixComponentEntities)
+            {
+                yield return new ElectricityGridMixComponent(item.Id, item.Name);
+            }
+        }
+
+        public IEnumerable<UnitOfMeasure> GetUnitOfMeasuresLookUp(IEnumerable<UnitOfMeasureEntity> unitOfMeasureEntities)
+        {
+            foreach (var item in unitOfMeasureEntities)
+            {
+                yield return new UnitOfMeasure(item.Id, item.Name);
+            }
+        }
+
+        public IEnumerable<FercRegion> GetFercRegionsLookUp(IEnumerable<FercRegionEntity> fercRegionsEntities)
+        {
+            foreach (var item in fercRegionsEntities)
+            {
+                yield return new FercRegion(item.Id, item.Name);
+            }
+        }
+
         //SupplierFacility
         public IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities)
         {

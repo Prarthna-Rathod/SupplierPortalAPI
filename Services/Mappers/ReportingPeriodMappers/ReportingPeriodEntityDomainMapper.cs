@@ -72,7 +72,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     #region PeriodSupplier
 
-    public PeriodSupplier ConvertPeriodSupplierEntityToDomain(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses, SupplierVO supplierVO)
+  /*  public PeriodSupplier ConvertPeriodSupplierEntityToDomain(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses, SupplierVO supplierVO)
     {
         var supplierReportingPeriodSelectedStatus = supplierReportingPeriodStatuses.FirstOrDefault(x => x.Id == reportingPeriodSupplierEntity.SupplierReportingPeriodStatusId);
 
@@ -93,7 +93,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         }
 
         return periodSupplierDomainList;
-    }
+    }*/
 
 
     public ReportingPeriodSupplierEntity ConvertReportingPeriodSupplierDomainToEntity(PeriodSupplier periodSupplier)
@@ -175,6 +175,19 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityEntity.IsActive = periodFacility.IsActive;
 
         return periodFacilityEntity;
+    }
+
+    public ReportingPeriodFacilityElectricityGridMixEntity ConvertPeriodFacilityElectricityGridMixDomainToEntity(PeriodFacilityElectricityGridMix facilityElectricityGridMix)
+    {
+        var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
+        entity.ReportingPeriodFacilityId = facilityElectricityGridMix.PeriodFacilityId;
+        entity.ElectricityGridMixComponentId = facilityElectricityGridMix.ElectricityGridMixComponent.Id;
+        entity.UnitOfMeasureId = facilityElectricityGridMix.UnitOfMeasure.Id;
+        entity.FercRegionId = facilityElectricityGridMix.FercRegion.Id;
+        entity.Content = facilityElectricityGridMix.Content;
+        entity.IsActive = facilityElectricityGridMix.IsActive;
+
+        return entity;
     }
 
     #endregion
