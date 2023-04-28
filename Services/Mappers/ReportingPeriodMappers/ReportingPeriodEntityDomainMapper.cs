@@ -104,6 +104,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
             SupplierId = periodSupplier.Supplier.Id,
             ReportingPeriodId = periodSupplier.ReportingPeriodId,
             SupplierReportingPeriodStatusId = periodSupplier.SupplierReportingPeriodStatus.Id,
+            InitialDataRequestDate = periodSupplier.InitialDataRequestDate,
+            ResendDataRequestDate = periodSupplier.ResendDataRequestDate,
             IsActive = periodSupplier.IsActive
         };
     }

@@ -232,16 +232,16 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #endregion
 
         #region Period Supplier
-        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest)
+        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus, activeForCurrentPeriod, initialDataRequest, resendInitialDataRequest);
+            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
-        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest)
+        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus, activeForCurrentPeriod, initialDataRequest, resendInitialDataRequest);
+            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate);
 
             //Check existing PeriodSupplier
             foreach (var periodSupplier in _periodSupplier)

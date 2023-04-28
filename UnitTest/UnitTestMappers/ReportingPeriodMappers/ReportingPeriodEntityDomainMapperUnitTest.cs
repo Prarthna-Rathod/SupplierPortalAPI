@@ -70,7 +70,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPeriodStatus,true,true,true);
+            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPeriodStatus,new DateTime(2024,02,11), new DateTime(2024, 02, 11));
 
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
@@ -82,9 +82,8 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierDomain.ReportingPeriodId, periodSupplierEntity.ReportingPeriodId);
             Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Id, periodSupplierEntity.SupplierReportingPeriodStatusId);
             Assert.Equal(periodSupplierDomain.IsActive, periodSupplierEntity.IsActive);
-            Assert.Equal(periodSupplierDomain.ActiveForCurrentPeriod, periodSupplierEntity.ActiveForCurrentPeriod);
-            Assert.Equal(periodSupplierDomain.InitialDataRequest, periodSupplierEntity.InitialDataRequest);
-            Assert.Equal(periodSupplierDomain.ResendInitialDataRequest, periodSupplierEntity.ResendInitialDataRequest);
+            Assert.Equal(periodSupplierDomain.InitialDataRequestDate, periodSupplierEntity.InitialDataRequestDate);
+            Assert.Equal(periodSupplierDomain.ResendDataRequestDate, periodSupplierEntity.ResendDataRequestDate);
         }
 
        /* [Fact]
