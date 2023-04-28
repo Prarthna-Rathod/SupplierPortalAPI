@@ -29,11 +29,11 @@ public interface IReportingPeriodEntityDomainMapper
 
     IEnumerable<SupplierVO> ConvertSupplierEntityToSupplierValueObject(IEnumerable<SupplierEntity> supplierEntities);
 
-    PeriodSupplier ConvertPeriodSupplierEntityToDomain(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses, SupplierVO supplierVO);
+   /* PeriodSupplier ConvertPeriodSupplierEntityToDomain(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses, SupplierVO supplierVO);
 
     IEnumerable<PeriodSupplier> ConvertPeriodSuppliersEntitiesToDomainList(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntities,
         IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses,
-        IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages);
+        IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages);*/
 
     #endregion
 
@@ -42,6 +42,8 @@ public interface IReportingPeriodEntityDomainMapper
     FacilityVO ConvertFacilityEntityToFacilityValueObject(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes);
 
     ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility);
+
+    ReportingPeriodFacilityElectricityGridMixEntity ConvertPeriodFacilityElectricityGridMixDomainToEntity(PeriodFacilityElectricityGridMix facilityElectricityGridMix);
 
     #endregion
 

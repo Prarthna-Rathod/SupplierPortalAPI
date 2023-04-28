@@ -26,6 +26,7 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<FacilityEntity> FacilityEntities { get; set; } = null!;
     public virtual DbSet<FacilityReportingPeriodDataStatusEntity> FacilityReportingPeriodDataStatusEntities { get; set; } = null!;
     public virtual DbSet<FacilityRequiredDocumentTypeEntity> FacilityRequiredDocumentTypeEntities { get; set; } = null!;
+    public virtual DbSet<FercRegionEntity> FercRegionEntities { get; set; } = null!;
     public virtual DbSet<Log> Logs { get; set; } = null!;
     public virtual DbSet<ReportingPeriodEntity> ReportingPeriodEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityDocumentEntity> ReportingPeriodFacilityDocumentEntities { get; set; } = null!;
@@ -209,6 +210,13 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasConstraintName("FK_FacilityRequiredDocumentType_SupplyChainStage");
         });
 
+        modelBuilder.Entity<FercRegionEntity>(entity =>
+        {
+            entity.ToTable("FercRegionEntity");
+
+            entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<Log>(entity =>
         {
             entity.Property(e => e.TimeStamp).HasColumnType("datetime");
@@ -297,6 +305,12 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasForeignKey(d => d.ElectricityGridMixComponentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_ElectricityGridMixComponentEntity");
+
+            entity.HasOne(d => d.FercRegion)
+                .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
+                .HasForeignKey(d => d.FercRegionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_FercRegionEntity");
 
             entity.HasOne(d => d.ReportingPeriodFacility)
                 .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)

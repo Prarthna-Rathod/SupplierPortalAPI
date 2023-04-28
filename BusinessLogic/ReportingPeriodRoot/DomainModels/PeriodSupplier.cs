@@ -8,7 +8,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 public class PeriodSupplier
 {
     private HashSet<PeriodFacility> _periodfacilities;
-    public PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest)
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
@@ -19,7 +19,7 @@ public class PeriodSupplier
         _periodfacilities = new HashSet<PeriodFacility>();
     }
 
-    public PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, activeForCurrentPeriod, initialDataRequest, resendInitialDataRequest)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, activeForCurrentPeriod, initialDataRequest, resendInitialDataRequest)
     {
         Id = id;
     }
@@ -51,7 +51,7 @@ public class PeriodSupplier
         }
     }
 
-    public void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+    internal void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
     {
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
 
@@ -59,7 +59,7 @@ public class PeriodSupplier
 
     #region Period Facility
 
-    public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
+    internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
     {
         int counter = 0;
         var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id, isActive);
@@ -109,12 +109,13 @@ public class PeriodSupplier
     }
 
 
-    public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool isActive)
+    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, bool isActive)
     {
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
 
         return _periodfacilities.Add(periodFacility);
     }
+
 
     #endregion
 
