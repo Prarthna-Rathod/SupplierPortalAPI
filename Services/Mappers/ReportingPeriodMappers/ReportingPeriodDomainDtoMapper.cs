@@ -51,7 +51,7 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         public ReportingPeriodSupplierDto ConvertPeriodSupplierDomainToDto(PeriodSupplier periodSuppliersDomain, string displayName)
         {
-            var dto = new ReportingPeriodSupplierDto(periodSuppliersDomain.Id, periodSuppliersDomain.Supplier.Id, periodSuppliersDomain.Supplier.Name, periodSuppliersDomain.ReportingPeriodId, displayName, periodSuppliersDomain.SupplierReportingPeriodStatus.Id, periodSuppliersDomain.SupplierReportingPeriodStatus.Name,periodSuppliersDomain.ActiveForCurrentPeriod,periodSuppliersDomain.InitialDataRequest,periodSuppliersDomain.ResendInitialDataRequest);
+            var dto = new ReportingPeriodSupplierDto(periodSuppliersDomain.Id, periodSuppliersDomain.Supplier.Id, periodSuppliersDomain.Supplier.Name, periodSuppliersDomain.ReportingPeriodId, displayName, periodSuppliersDomain.SupplierReportingPeriodStatus.Id, periodSuppliersDomain.SupplierReportingPeriodStatus.Name,periodSuppliersDomain.InitialDataRequestDate,periodSuppliersDomain.ResendDataRequestDate);
 
             return dto;
         }
@@ -64,7 +64,7 @@ namespace Services.Mappers.ReportingPeriodMappers
             foreach (var periodSupplier in periodSupplierDomainList)
             {
                 var activeForCurrentPeriod = true;
-                var periodSuppliers = new ReportingPeriodRelevantSupplierDto(periodSupplier.Id,periodSupplier.Supplier.Id, periodSupplier.Supplier.Name,periodSupplier.ReportingPeriodId,periodSupplier.SupplierReportingPeriodStatus.Id,periodSupplier.SupplierReportingPeriodStatus.Name, activeForCurrentPeriod,periodSupplier.InitialDataRequest,periodSupplier.ResendInitialDataRequest);
+                var periodSuppliers = new ReportingPeriodRelevantSupplierDto(periodSupplier.Id,periodSupplier.Supplier.Id, periodSupplier.Supplier.Name,periodSupplier.ReportingPeriodId,periodSupplier.SupplierReportingPeriodStatus.Id,periodSupplier.SupplierReportingPeriodStatus.Name, activeForCurrentPeriod,periodSupplier.InitialDataRequestDate,periodSupplier.ResendDataRequestDate);
                 periodSuppliersDtos.Add(periodSuppliers);
 
             }

@@ -285,7 +285,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         {
             var supplierVO = GetAndConvertSupplierValueObject(supplierId);
 
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(multiplePeriodSuppliersDto.Id, supplierVO, supplierPeriodStatus ?? new SupplierReportingPeriodStatus(), multiplePeriodSuppliersDto.ActiveForCurrentPeriod, multiplePeriodSuppliersDto.InitialDataRequest, multiplePeriodSuppliersDto.ResendInitialDataRequest);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(multiplePeriodSuppliersDto.Id, supplierVO, supplierPeriodStatus ?? new SupplierReportingPeriodStatus(), multiplePeriodSuppliersDto.InitialDataRequestDate, multiplePeriodSuppliersDto.ResendDataRequestDate);
 
             var periodSupplierEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSupplierDomainToEntity(periodSupplier);
             _reportingPeriodDataActions.AddPeriodSupplier(periodSupplierEntity);
