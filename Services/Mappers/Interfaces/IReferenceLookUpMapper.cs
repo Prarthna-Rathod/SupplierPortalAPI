@@ -16,11 +16,17 @@ public interface IReferenceLookUpMapper
     
     IEnumerable<SupplierReportingPeriodStatus> GetSupplierReportingPeriodStatusesLookUp(IEnumerable<SupplierReportingPeriodStatusEntity> supplierReportingPeriodStatusEntities);
 
+    IEnumerable<FacilityReportingPeriodDataStatus> GetFacilityReportingPeriodDataStatusLookUp(IEnumerable<FacilityReportingPeriodDataStatusEntity> facilityReportingPeriodDataStatusEntities);
+
+    IEnumerable<ElectricityGridMixComponent> GetElectricityGridMixComponentsLookUp(IEnumerable<ElectricityGridMixComponentEntity> electricityGridMixComponentEntities);
+
+    IEnumerable<UnitOfMeasure> GetUnitOfMeasuresLookUp(IEnumerable<UnitOfMeasureEntity> unitOfMeasureEntities);
+
+    IEnumerable<FercRegion> GetFercRegionsLookUp(IEnumerable<FercRegionEntity> fercRegionsEntities);
 
     //Supplier
     IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities);
     IEnumerable<ReportingType> GetReportingTypeLookUp(IEnumerable<ReportingTypeEntity> reportingTypeEntities);
     IEnumerable<SupplyChainStage> GetSupplyChainStagesLookUp(IEnumerable<SupplyChainStageEntity> supplyChainStageEntities);
 
-    IEnumerable<FacilityReportingPeriodDataStatus> GetFacilityReportingPeriodDataStatusLookUp(IEnumerable<FacilityReportingPeriodDataStatusEntity> facilityReportingPeriodDataStatusEntities);
 }

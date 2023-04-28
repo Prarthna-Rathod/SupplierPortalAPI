@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
+using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -284,7 +285,25 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier;
         }
 
-        #endregion        
+        #endregion
+
+        #region Period Facility
+
+        public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, isActive);
+        }
+
+
+        public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+        }
+
+        #endregion
 
         #region Period Document
 
