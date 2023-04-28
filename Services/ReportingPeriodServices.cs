@@ -117,7 +117,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         {
             var supplierVO = GetAndConvertSupplierValueObject(periodSupplier.SupplierId);
             var supplierReportingPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == periodSupplier.SupplierReportingPeriodStatusId);
-            reportingPeriodDomain.LoadPeriodSupplier(periodSupplier.Id, supplierVO, supplierReportingPeriodStatus, periodSupplier.ActiveForCurrentPeriod, periodSupplier.InitialDataRequest, periodSupplier.ResendInitialDataRequest);
+            reportingPeriodDomain.LoadPeriodSupplier(periodSupplier.Id, supplierVO, supplierReportingPeriodStatus, periodSupplier.InitialDataRequestDate, periodSupplier.ResendDataRequestDate);
         }
 
         foreach (var periodFacility in reportingPeriodEntity.ReportingPeriodFacilityEntities)
