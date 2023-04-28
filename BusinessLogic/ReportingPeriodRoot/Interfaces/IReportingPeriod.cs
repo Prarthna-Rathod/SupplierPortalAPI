@@ -14,6 +14,7 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive);
 
+        PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(int periodFacilityId, int periodSupplierId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive);
         /*
 
        // PeriodSupplier RemovePeriodSupplier(int periodSupplierId);

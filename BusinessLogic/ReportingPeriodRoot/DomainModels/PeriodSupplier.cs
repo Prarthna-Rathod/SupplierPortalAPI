@@ -107,11 +107,20 @@ public class PeriodSupplier
 
     internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, bool isActive)
     {
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, periodSupplierId, isActive);
 
         return _periodfacilities.Add(periodFacility);
     }
 
+    internal PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility is null)
+            throw new BadRequestException("ReportingPeriodFacility not found !!");
+
+        return periodFacility.AddElectricityGridMixComponents(electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive);
+    }
 
     #endregion
 

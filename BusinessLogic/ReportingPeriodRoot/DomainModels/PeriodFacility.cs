@@ -49,7 +49,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             Id = id;
         }
 
-        public PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive )
+        internal PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive )
         {
             var periodFacilityElectricityGridMix = new PeriodFacilityElectricityGridMix(Id, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive);
 
