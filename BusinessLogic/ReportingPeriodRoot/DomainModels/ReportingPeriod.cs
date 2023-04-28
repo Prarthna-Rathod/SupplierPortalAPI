@@ -300,7 +300,22 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
-            return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+            return periodSupplier.
+                LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+        }
+
+        #endregion
+
+        #region PeriodFacilityElectricityGridMix
+
+        public PeriodFacilityElectricityGridMix AddPeriodFacilityElectricityGridMix(int periodFacilityId,int periodSupplierId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            if (periodSupplier == null)
+                throw new BadRequestException("PeriodSupplier is not found !!");
+
+            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId,electricityGridMixComponent,unitOfMeasure,fercRegion,content,isActive);
         }
 
         #endregion

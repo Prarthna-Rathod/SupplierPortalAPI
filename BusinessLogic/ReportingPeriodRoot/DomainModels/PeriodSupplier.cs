@@ -112,6 +112,15 @@ public class PeriodSupplier
         return _periodfacilities.Add(periodFacility);
     }
 
+    internal PeriodFacilityElectricityGridMix AddPeriodFacilityElectricityGridMix(int periodFacilityId,ElectricityGridMixComponent electricityGridMixComponent,UnitOfMeasure unitOfMeasure,FercRegion fercRegion,decimal content,bool isActive)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility == null)
+            throw new BadRequestException("PeriodFacility is not found !!");
+
+        return periodFacility.AddElectricityGridMixComponents(electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive);
+    }
 
     #endregion
 

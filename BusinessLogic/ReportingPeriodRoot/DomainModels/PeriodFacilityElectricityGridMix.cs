@@ -19,7 +19,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         internal PeriodFacilityElectricityGridMix()  {  }
 
-        public PeriodFacilityElectricityGridMix(int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
+        internal PeriodFacilityElectricityGridMix(int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
         {
             PeriodFacilityId = periodFacilityId;
             ElectricityGridMixComponent = electricityGridMixComponent;
@@ -29,7 +29,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             IsActive = isActive;
         }
 
-        public PeriodFacilityElectricityGridMix(int id,int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive): this(periodFacilityId, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive)
+        internal PeriodFacilityElectricityGridMix(int id,int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive): this(periodFacilityId, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive)
         {
             Id = id;
         }
