@@ -303,6 +303,12 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
         }
 
+        public PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(int periodFacilityId, int periodSupplierId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+           return periodSupplier.AddElectricityGridMixComponents(periodFacilityId, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive);
+        }
+
         #endregion
 
         #region Period Document
