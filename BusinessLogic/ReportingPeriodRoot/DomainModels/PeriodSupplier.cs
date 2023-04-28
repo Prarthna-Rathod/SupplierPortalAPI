@@ -8,18 +8,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 public class PeriodSupplier
 {
     private HashSet<PeriodFacility> _periodfacilities;
-    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest)
+
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
-        ActiveForCurrentPeriod = activeForCurrentPeriod;
-        InitialDataRequest = initialDataRequest;
-        ResendInitialDataRequest = resendInitialDataRequest;
+        InitialDataRequestDate = initialDataRequestDate;
+        ResendDataRequestDate = resendDataRequestDate;
         _periodfacilities = new HashSet<PeriodFacility>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, bool activeForCurrentPeriod, bool initialDataRequest, bool resendInitialDataRequest) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, activeForCurrentPeriod, initialDataRequest, resendInitialDataRequest)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus,DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
     {
         Id = id;
     }
@@ -31,12 +31,8 @@ public class PeriodSupplier
     public SupplierVO Supplier { get; private set; }
     public int ReportingPeriodId { get; private set; }
     public SupplierReportingPeriodStatus SupplierReportingPeriodStatus { get; private set; }
-
-    public bool ActiveForCurrentPeriod { get; private set; }
-
-    public bool InitialDataRequest { get; private set; }
-
-    public bool ResendInitialDataRequest { get; private set; }
+    public DateTime InitialDataRequestDate { get; private set; }
+    public DateTime ResendDataRequestDate { get; private set; }
     public bool IsActive { get; private set; }
 
     public IEnumerable<PeriodFacility> PeriodFacilities

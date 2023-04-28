@@ -416,6 +416,10 @@ public partial class SupplierPortalDBContext : DbContext
         {
             entity.ToTable("ReportingPeriodSupplierEntity");
 
+            entity.Property(e => e.InitialDataRequestDate).HasColumnType("datetime");
+
+            entity.Property(e => e.ResendDataRequestDate).HasColumnType("datetime");
+
             entity.HasOne(d => d.ReportingPeriod)
                 .WithMany(p => p.ReportingPeriodSupplierEntities)
                 .HasForeignKey(d => d.ReportingPeriodId)
