@@ -1,11 +1,8 @@
 using BusinessLogic.ReferenceLookups;
-using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BusinessLogic.ValueConstants;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
@@ -21,10 +18,10 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         public bool IsActive { get; private set; }
 
         public IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityElectricityGridMixes
-        { 
+        {
             get
             {
-                if(_periodFacilityElectricityGridMix == null)
+                if (_periodFacilityElectricityGridMix == null)
                 {
                     return new List<PeriodFacilityElectricityGridMix>();
                 }
@@ -49,13 +46,36 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             Id = id;
         }
 
-        internal PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive )
+        internal IEnumerable<PeriodFacilityElectricityGridMix> AddElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents, bool isActive)
         {
-            var periodFacilityElectricityGridMix = new PeriodFacilityElectricityGridMix(Id, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive);
+            decimal sum = 0;
 
-            _periodFacilityElectricityGridMix.Add(periodFacilityElectricityGridMix);
-            return periodFacilityElectricityGridMix;
+            if (fercRegion.Name != FercRegionValues.Custom_Mix)
+                throw new BadRequestException("FercRegion should be CustomMix for add electricityGridMix components !!");
+            else if (gridMixComponentPercents.Count() == 0)
+                throw new BadRequestException("Please add gridMixComponents !!");
+
+            foreach (var facilityGridMix in gridMixComponentPercents)
+            {
+                var periodFacilityGridMixDomain = new PeriodFacilityElectricityGridMix(Id, facilityGridMix.ElectricityGridMixComponent, unitOfMeasure, fercRegion, facilityGridMix.Content, isActive);
+
+                foreach (var existingComponent in _periodFacilityElectricityGridMix)
+                {
+                    if (existingComponent.ElectricityGridMixComponent.Id == facilityGridMix.ElectricityGridMixComponent.Id)
+                        throw new BadRequestException($"{facilityGridMix.ElectricityGridMixComponent.Name} component is already exists in this periodFacility !!");
+
+                }
+                sum = sum + facilityGridMix.Content;
+
+                _periodFacilityElectricityGridMix.Add(periodFacilityGridMixDomain);
+            }
+
+            if (sum != 100)
+                throw new BadRequestException("Please adjust ContentValues because total should be 100 !!");
+
+
+            return _periodFacilityElectricityGridMix;
         }
-    
+
     }
 }

@@ -43,6 +43,8 @@ public interface IReportingPeriodEntityDomainMapper
 
     ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility);
 
+    IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> ConvertPeriodFacilityElectricityGridMixDomainListToEntities(IEnumerable< PeriodFacilityElectricityGridMix> facilityElectricityGridMixes);
+
     ReportingPeriodFacilityElectricityGridMixEntity ConvertPeriodFacilityElectricityGridMixDomainToEntity(PeriodFacilityElectricityGridMix facilityElectricityGridMix);
 
     #endregion

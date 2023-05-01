@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
@@ -303,10 +304,10 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
         }
 
-        public PeriodFacilityElectricityGridMix AddElectricityGridMixComponents(int periodFacilityId, int periodSupplierId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
+        public IEnumerable<PeriodFacilityElectricityGridMix> AddElectricityGridMixComponents(int periodFacilityId, int periodSupplierId,UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents, bool isActive)
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-           return periodSupplier.AddElectricityGridMixComponents(periodFacilityId, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive);
+           return periodSupplier.AddElectricityGridMixComponents(periodFacilityId, unitOfMeasure, fercRegion, gridMixComponentPercents, isActive);
         }
 
         #endregion

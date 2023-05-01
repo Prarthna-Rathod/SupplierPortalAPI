@@ -192,6 +192,18 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         return entity;
     }
 
+    public IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> ConvertPeriodFacilityElectricityGridMixDomainListToEntities(IEnumerable<PeriodFacilityElectricityGridMix> facilityElectricityGridMixes)
+    {
+        var list = new List<ReportingPeriodFacilityElectricityGridMixEntity>();
+
+        foreach(var domain in facilityElectricityGridMixes)
+        {
+            list.Add(ConvertPeriodFacilityElectricityGridMixDomainToEntity(domain));
+        }
+
+        return list;
+    }
+
     #endregion
 
     #region PeriodDocument
