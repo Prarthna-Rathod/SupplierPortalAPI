@@ -10,6 +10,7 @@ using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 
 namespace UnitTest
 {
@@ -216,10 +217,49 @@ namespace UnitTest
         {
             var facilityReportingPeriodDataStatuses = new List<FacilityReportingPeriodDataStatus>();
             facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "In-progress"));
-            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "Complete"));
-            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "Submitted"));
+            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(2, "Complete"));
+            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(3, "Submitted"));
 
             return facilityReportingPeriodDataStatuses;
+        }
+
+        protected IEnumerable<UnitOfMeasure> GetUnitOfMeasures()
+        {
+            var unitOfMeasure = new List<UnitOfMeasure>();
+            unitOfMeasure.Add(new UnitOfMeasure(1, "kg/m3"));
+            unitOfMeasure.Add(new UnitOfMeasure(2, "MMbtu/Mcf"));
+            unitOfMeasure.Add(new UnitOfMeasure(3, "MMbtu/bbl"));
+            unitOfMeasure.Add(new UnitOfMeasure(4, "MWh"));
+            unitOfMeasure.Add(new UnitOfMeasure(5, "tonne"));
+            unitOfMeasure.Add(new UnitOfMeasure(6, "Mass % "));
+            return unitOfMeasure;
+        }
+
+        protected IEnumerable<FercRegion> GetFercRegions()
+        {
+            var fercRegion = new List<FercRegion>();
+            fercRegion.Add(new FercRegion(1, "None"));
+            fercRegion.Add(new FercRegion(2, "CAISO"));
+            fercRegion.Add(new FercRegion(3, "MISO"));
+            fercRegion.Add(new FercRegion(4, "PJM"));
+            fercRegion.Add(new FercRegion(5, "SPP"));
+            fercRegion.Add(new FercRegion(6, "Custom Mix"));
+            return fercRegion;
+        }
+
+        protected IEnumerable<ElectricityGridMixComponent> GetElectricityGridMixComponents()
+        {
+            var electricityGridMixComponent = new List<ElectricityGridMixComponent>();
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(1, "Biomass"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(2, "Coal"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(3, "NaturalGas"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(4, "Geothermal"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(5, "Hydro"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(6, "Nuclear"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(7, "Petroleum"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(8, "Solar"));
+            electricityGridMixComponent.Add(new ElectricityGridMixComponent(9, "Wind"));
+            return electricityGridMixComponent;
         }
 
         #region ReportingPeriod methods
@@ -278,6 +318,21 @@ namespace UnitTest
             periodFacilityEntity.ReportingPeriodSupplierId = 1;
 
             return periodFacilityEntity;
+        }
+
+        #endregion
+
+        #region PeriodFacilityElectricityGridMix
+        protected IEnumerable<ElectricityGridMixComponentPercent> GetElectricityGridMixComponentPercents()
+        {
+            var list = new List<ElectricityGridMixComponentPercent>();
+            var electricityGridMIxComponent = GetElectricityGridMixComponents();
+            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.First(),(decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 2), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 3), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 4), (decimal)25.00));
+            //list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 4), (decimal)20.00));
+            return list;
         }
 
         #endregion

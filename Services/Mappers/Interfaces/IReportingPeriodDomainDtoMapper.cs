@@ -1,4 +1,6 @@
-﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+﻿using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
@@ -37,6 +39,12 @@ public interface IReportingPeriodDomainDtoMapper
     ReportingPeriodSupplierRelaventFacilityDto ConvertPeriodFacilityDomainToDto(PeriodFacility periodFacility, bool isRelaventForPeriodStatus);
 
     ReportingPeriodSupplierFacilitiesDto ConvertReportingPeriodSupplierFacilitiesDomainToDto(PeriodSupplier periodSupplier, IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> periodFacilitiesDtos);
+
+    IEnumerable<ElectricityGridMixComponentPercent> ConvertPeriodElectricityGridMixDtosToValueObjects(IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos,IEnumerable<ElectricityGridMixComponent> electricityGridMixComponents);
+
+    ElectricityGridMixComponentPercent ConvertPeriodElectricityGridMixDtoToValueObject(ElectricityGridMixComponent electricityGridMixComponent, decimal content);
+
+
 
     #endregion
 

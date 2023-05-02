@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 
 namespace BusinessLogic.ReportingPeriodRoot.Interfaces
@@ -13,6 +14,8 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive);
 
         bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive);
+
+        IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents, bool isActive);
 
         /*
 

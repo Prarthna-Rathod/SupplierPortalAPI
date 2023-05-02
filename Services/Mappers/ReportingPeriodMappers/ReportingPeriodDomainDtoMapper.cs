@@ -1,4 +1,6 @@
-﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+﻿using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
@@ -126,15 +128,29 @@ namespace Services.Mappers.ReportingPeriodMappers
             return periodSupplierFacilitiesDto;
         }
 
+        public IEnumerable<ElectricityGridMixComponentPercent> ConvertPeriodElectricityGridMixDtosToValueObjects(IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos,IEnumerable<ElectricityGridMixComponent> electricityGridMixComponents)
+        {
+            var list = new List<ElectricityGridMixComponentPercent>();
+            foreach (var electricityGridMix in reportingPeriodFacilityElectricityGridMixDtos)
+            {
+                var electricityGridMixComponent = electricityGridMixComponents.FirstOrDefault(x => x.Id == electricityGridMix.ElectricityGridMixComponentId);
+               
+                list.Add(ConvertPeriodElectricityGridMixDtoToValueObject(electricityGridMixComponent,electricityGridMix.Content));
+            }
+            return list;
+        }
+
+        public ElectricityGridMixComponentPercent ConvertPeriodElectricityGridMixDtoToValueObject(ElectricityGridMixComponent electricityGridMixComponent,decimal content)
+        {
+            var gridMixDomain = new ElectricityGridMixComponentPercent(electricityGridMixComponent,content);
+            return gridMixDomain;
+        }
+
+
         #endregion
 
         #region PeriodDocument
         #endregion
-
-        
-
-
-
 
     }
 }

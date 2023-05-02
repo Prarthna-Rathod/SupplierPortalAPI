@@ -1,6 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
-using BusinessLogic.SupplierRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -300,7 +300,22 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
-            return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+            return periodSupplier.
+                LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+        }
+
+        #endregion
+
+        #region PeriodFacilityElectricityGridMix
+
+        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents, bool isActive)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            if (periodSupplier == null)
+                throw new BadRequestException("PeriodSupplier is not found !!");
+
+            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, fercRegion, electricityGridMixComponentPercents, isActive);
         }
 
         #endregion

@@ -1,4 +1,5 @@
 using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -112,6 +113,15 @@ public class PeriodSupplier
         return _periodfacilities.Add(periodFacility);
     }
 
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId,UnitOfMeasure unitOfMeasure,FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents, bool isActive)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility == null)
+            throw new BadRequestException("PeriodFacility is not found !!");
+
+        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, fercRegion, electricityGridMixComponentPercents, isActive);
+    }
 
     #endregion
 

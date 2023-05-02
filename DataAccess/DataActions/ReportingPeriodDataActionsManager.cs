@@ -66,11 +66,22 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     }
 
 
-    public bool AddPeriodFacilityElectricityGridMix(ReportingPeriodFacilityElectricityGridMixEntity periodFacilityElectricityGridMixEntity)
+    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities)
     {
-        periodFacilityElectricityGridMixEntity.CreatedOn = DateTime.UtcNow;
-        periodFacilityElectricityGridMixEntity.CreatedBy = "System";
-        _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(periodFacilityElectricityGridMixEntity);
+        foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
+        {
+            var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
+            entity.ReportingPeriodFacilityId = gridMixEntity.ReportingPeriodFacilityId;
+            entity.ElectricityGridMixComponentId = gridMixEntity.ElectricityGridMixComponentId;
+            entity.UnitOfMeasureId = gridMixEntity.UnitOfMeasureId;
+            entity.FercRegionId = gridMixEntity.FercRegionId;
+            entity.Content = gridMixEntity.Content;
+            entity.IsActive = gridMixEntity.IsActive;
+            entity.CreatedBy = "System";
+            entity.CreatedOn = DateTime.UtcNow;
+            _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
+
+        }
         _context.SaveChanges();
         return true;
     }
@@ -248,13 +259,13 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     }
 
-    public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityElectricityGridMixId)
+    public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId)
     {
-        var entity = _context.ReportingPeriodFacilityElectricityGridMixEntities.FirstOrDefault(x => x.Id == periodFacilityElectricityGridMixId);
-        if (entity == null)
-            throw new Exception("RemovePeriodFacilityElectricityGridMix not found !!");
-
-        _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(entity);
+        var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
+        foreach (var facility in existingFacility)
+        {
+            _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
+        }
         _context.SaveChanges();
         return true;
     }
@@ -398,6 +409,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.SupplierReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }

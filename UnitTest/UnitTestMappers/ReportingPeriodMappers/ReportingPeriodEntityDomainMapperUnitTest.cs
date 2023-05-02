@@ -106,6 +106,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierEntity.ResendInitialDataRequest, periodSupplierDomain.ResendInitialDataRequest);
         }
 */
+
         [Fact]
         public void ConvertSupplierEntityToSupplierVO()
         {
@@ -171,6 +172,47 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodFacility.IsActive, periodFacilityEntity.IsActive);
 
         }
+
+        #endregion
+
+        #region PeriodFacilityElectricityGridMix
+
+        [Fact]
+        public void ConvertPeriodFacilityElectricityGridMixDomainToEntity()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+
+            //Add PeriodSupplier
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPeriodStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, periodSupplier.Id, true, true);
+
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
+            var percent = GetElectricityGridMixComponentPercents();
+
+            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id,periodSupplier.Id,unitOfMeasure,fercRegion,percent,true);
+
+            var gridMixDomain = facilityElectricityGridMixDomain.First();
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var periodFacilityElectricityGridMixEntity = mapper.ConvertPeriodFacilityElectricityGridMixDomainToEntity(gridMixDomain);
+
+            Assert.NotNull(periodFacilityElectricityGridMixEntity);
+            Assert.Equal(gridMixDomain.Id,periodFacilityElectricityGridMixEntity.Id);
+            Assert.Equal(gridMixDomain.PeriodFacilityId, periodFacilityElectricityGridMixEntity.ReportingPeriodFacilityId);
+            Assert.Equal(gridMixDomain.ElectricityGridMixComponent.Id, periodFacilityElectricityGridMixEntity.ElectricityGridMixComponentId);
+            Assert.Equal(gridMixDomain.UnitOfMeasure.Id, periodFacilityElectricityGridMixEntity.UnitOfMeasureId);
+            Assert.Equal(gridMixDomain.FercRegion.Id, periodFacilityElectricityGridMixEntity.FercRegionId);
+            Assert.Equal(gridMixDomain.Content, periodFacilityElectricityGridMixEntity.Content);
+            Assert.Equal(gridMixDomain.IsActive, periodFacilityElectricityGridMixEntity.IsActive);
+        }
+
         #endregion
     }
 }
