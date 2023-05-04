@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
 using System;
@@ -29,12 +30,6 @@ public interface IReportingPeriodEntityDomainMapper
 
     IEnumerable<SupplierVO> ConvertSupplierEntityToSupplierValueObject(IEnumerable<SupplierEntity> supplierEntities);
 
-   /* PeriodSupplier ConvertPeriodSupplierEntityToDomain(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses, SupplierVO supplierVO);
-
-    IEnumerable<PeriodSupplier> ConvertPeriodSuppliersEntitiesToDomainList(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntities,
-        IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses,
-        IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages);*/
-
     #endregion
 
     #region PeriodFacility
@@ -46,6 +41,10 @@ public interface IReportingPeriodEntityDomainMapper
     IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> ConvertPeriodFacilityElectricityGridMixDomainListToEntities(IEnumerable< PeriodFacilityElectricityGridMix> facilityElectricityGridMixes);
 
     ReportingPeriodFacilityElectricityGridMixEntity ConvertPeriodFacilityElectricityGridMixDomainToEntity(PeriodFacilityElectricityGridMix facilityElectricityGridMix);
+
+    IEnumerable<ElectricityGridMixComponentPercent> ConvertPeriodFacilityElectricityGridMixEntityListToValueObjectList(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> facilityElectricityGridMixeEntities, IEnumerable<ElectricityGridMixComponent> electricityGridMixesLookUps);
+
+    ElectricityGridMixComponentPercent ConvertPeriodFacilityElectricityGridMixEntityToValueObject(int id, decimal content, ElectricityGridMixComponent electricityGridMixLookUp);
 
     #endregion
 

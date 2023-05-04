@@ -7,6 +7,7 @@ using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Mappers.Interfaces;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,7 +122,7 @@ namespace Services.Mappers.ReportingPeriodMappers
             return periodFacilityDto;
         }
 
-        public ReportingPeriodSupplierFacilitiesDto ConvertReportingPeriodSupplierFacilitiesDomainToDto(PeriodSupplier periodSupplier, IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> periodFacilitiesDtos)
+        public ReportingPeriodSupplierFacilitiesDto ConvertReportingPeriodSupplierFacilityDomainToDto(PeriodSupplier periodSupplier, IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> periodFacilitiesDtos)
         {
             var periodSupplierFacilitiesDto = new ReportingPeriodSupplierFacilitiesDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, periodFacilitiesDtos);
 
@@ -137,7 +138,7 @@ namespace Services.Mappers.ReportingPeriodMappers
                 var gridMixComponent = electricityGridMixes.FirstOrDefault(x => x.Id == gridMixDto.ElectricityGridMixComponentId);
 
                 if (gridMixComponent is null)
-                    throw new Exception("ElectricityGridMix component not found !!");
+                    throw new NotFoundException("ElectricityGridMix component not found !!");
 
                 list.Add(ConvertPeriodFacilityElectricityGridMixDtoToValueObject(gridMixComponent, gridMixDto.Content));
             }
@@ -147,7 +148,7 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         public ElectricityGridMixComponentPercent ConvertPeriodFacilityElectricityGridMixDtoToValueObject(ElectricityGridMixComponent electricityGridMix, decimal content)
         {
-            return new ElectricityGridMixComponentPercent(electricityGridMix, content);
+            return new ElectricityGridMixComponentPercent(0, electricityGridMix, content);
         }
 
         #endregion

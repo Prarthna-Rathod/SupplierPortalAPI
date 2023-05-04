@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
 using Services.Mappers.Interfaces;
@@ -184,8 +185,19 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
         entity.ReportingPeriodFacilityId = facilityElectricityGridMix.PeriodFacilityId;
         entity.ElectricityGridMixComponentId = facilityElectricityGridMix.ElectricityGridMixComponent.Id;
-        entity.UnitOfMeasureId = facilityElectricityGridMix.UnitOfMeasure.Id;
-        entity.FercRegionId = facilityElectricityGridMix.FercRegion.Id;
+
+        var unitOfMeasureEntity = new UnitOfMeasureEntity();
+        unitOfMeasureEntity.Id = facilityElectricityGridMix.UnitOfMeasure.Id;
+        unitOfMeasureEntity.Name = facilityElectricityGridMix.UnitOfMeasure.Name;
+
+        var fercRegionEntity = new FercRegionEntity();
+        fercRegionEntity.Id = facilityElectricityGridMix.FercRegion.Id;
+        fercRegionEntity.Name = facilityElectricityGridMix.FercRegion.Name;
+
+        entity.UnitOfMeasure = unitOfMeasureEntity;
+        entity.UnitOfMeasureId = unitOfMeasureEntity.Id;
+        entity.FercRegion = fercRegionEntity;
+        entity.FercRegionId = fercRegionEntity.Id;
         entity.Content = facilityElectricityGridMix.Content;
         entity.IsActive = facilityElectricityGridMix.IsActive;
 
@@ -202,6 +214,24 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         }
 
         return list;
+    }
+
+    public IEnumerable<ElectricityGridMixComponentPercent> ConvertPeriodFacilityElectricityGridMixEntityListToValueObjectList(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> facilityElectricityGridMixeEntities, IEnumerable<ElectricityGridMixComponent> electricityGridMixesLookUps)
+    {
+        var valueObjectList = new List<ElectricityGridMixComponentPercent>();
+
+        foreach(var entity in facilityElectricityGridMixeEntities)
+        {
+            var gridMixLookUp = electricityGridMixesLookUps.FirstOrDefault(x => x.Id == entity.ElectricityGridMixComponentId);
+            valueObjectList.Add(ConvertPeriodFacilityElectricityGridMixEntityToValueObject(entity.Id, entity.Content, gridMixLookUp));
+        }
+
+        return valueObjectList;
+    }
+
+    public ElectricityGridMixComponentPercent ConvertPeriodFacilityElectricityGridMixEntityToValueObject(int id, decimal content, ElectricityGridMixComponent electricityGridMixLookUp)
+    {
+        return new ElectricityGridMixComponentPercent(id, electricityGridMixLookUp, content);
     }
 
     #endregion

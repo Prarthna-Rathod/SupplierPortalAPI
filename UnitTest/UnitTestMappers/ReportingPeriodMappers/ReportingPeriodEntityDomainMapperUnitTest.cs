@@ -1,4 +1,5 @@
-﻿using BusinessLogic.ValueConstants;
+﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ValueConstants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -170,6 +171,41 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodFacility.ReportingPeriodSupplierId, periodFacilityEntity.ReportingPeriodSupplierId);
             Assert.Equal(periodFacility.IsActive, periodFacilityEntity.IsActive);
 
+        }
+
+        [Fact]
+        public void ConvertPeriodFacilityElectricityGridMixDomainToEntity()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+            //Add PeriodSupplier
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2023, 5, 5), new DateTime(2023, 5, 6));
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            var list = reportingPeriod.AddRemoveElectricityGridMixComponents(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, gridMixComponentPercents);
+            var singleDomain = list.FirstOrDefault();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+
+            //Act
+            var gridMixEntity = mapper.ConvertPeriodFacilityElectricityGridMixDomainToEntity(singleDomain);
+
+            //Assert
+            Assert.NotNull(gridMixEntity);
+            Assert.Equal(singleDomain.Id, gridMixEntity.Id);
+            Assert.Equal(singleDomain.PeriodFacilityId, gridMixEntity.ReportingPeriodFacilityId);
+            Assert.Equal(singleDomain.ElectricityGridMixComponent.Id, gridMixEntity.ElectricityGridMixComponentId);
+            Assert.Equal(singleDomain.UnitOfMeasure.Id, gridMixEntity.UnitOfMeasureId);
+            Assert.Equal(singleDomain.FercRegion.Id, gridMixEntity.FercRegionId);
+            Assert.Equal(singleDomain.Content, gridMixEntity.Content);
+            Assert.Equal(singleDomain.IsActive, gridMixEntity.IsActive);
         }
         #endregion
     }

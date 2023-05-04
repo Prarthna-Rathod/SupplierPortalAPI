@@ -113,14 +113,24 @@ public class PeriodSupplier
         return _periodfacilities.Add(periodFacility);
     }
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents, bool isActive)
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
     {
         var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
 
-        if (periodFacility is null)
-            throw new BadRequestException("ReportingPeriodFacility not found !!");
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new BadRequestException("SupplierReportingPeriodStatus should be UnLocked !!");
 
-        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, fercRegion, gridMixComponentPercents, isActive);
+        if (periodFacility is null)
+            throw new NotFoundException("ReportingPeriodFacility is not found !!");
+
+        return periodFacility.AddRemoveElectricityGridMixComponents(unitOfMeasure, fercRegion, gridMixComponentPercents);
+    }
+
+    internal bool LoadElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        return periodFacility.LoadElectricityGridMixComponents(unitOfMeasure, fercRegion, gridMixComponentPercents);
     }
 
     #endregion

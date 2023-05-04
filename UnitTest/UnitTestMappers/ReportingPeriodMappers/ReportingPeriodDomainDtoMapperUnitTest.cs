@@ -1,4 +1,5 @@
-﻿using BusinessLogic.ValueConstants;
+﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ValueConstants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,9 +50,41 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierDomain.InitialDataRequestDate, periodSupplierDto.InitialDataRequestDate);
             Assert.Equal(periodSupplierDomain.ResendDataRequestDate, periodSupplierDto.ResendDataRequestDate);
      
+        }
 
+        [Fact]
+        public void ConvertPeriodFacilityDomainToDto()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+            //Add PeriodSupplier
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2023, 5, 5), new DateTime(2023, 5, 6));
 
-            
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+
+            //Act
+            var periodFacilityDto = mapper.ConvertPeriodFacilityDomainToDto(periodFacility, true);
+
+            //Assert
+            Assert.NotNull(periodFacilityDto);
+            Assert.Equal(periodFacility.Id, periodFacilityDto.Id);
+            Assert.Equal(periodFacility.FacilityVO.Id, periodFacilityDto.FacilityId);
+            Assert.Equal(periodFacility.FacilityVO.FacilityName, periodFacilityDto.FacilityName);
+            Assert.Equal(periodFacility.FacilityVO.GHGRPFacilityId, periodFacilityDto.GhgrpFacilityId);
+            Assert.Equal(periodFacility.FacilityVO.ReportingType.Id, periodFacilityDto.ReportingTypeId);
+            Assert.Equal(periodFacility.FacilityVO.ReportingType.Name, periodFacilityDto.ReportingTypeName);
+            Assert.Equal(periodFacility.FacilityVO.SupplyChainStage.Id, periodFacilityDto.SupplyChainStageId);
+            Assert.Equal(periodFacility.FacilityVO.SupplyChainStage.Name, periodFacilityDto.SupplyChainStageName);
+            Assert.Equal(periodFacility.IsActive, periodFacilityDto.IsActive);
+            Assert.Equal(periodFacility.ReportingPeriodId, periodFacilityDto.ReportingPeriodId);
+            Assert.Equal(periodFacility.FacilityReportingPeriodDataStatus.Id, periodFacilityDto.FacilityReportingPeriodDataStatusId);
+            Assert.Equal(periodFacility.FacilityReportingPeriodDataStatus.Name, periodFacilityDto.FacilityReportingPeriodDataStatusName);
+
         }
     }
 }
