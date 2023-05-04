@@ -20,7 +20,7 @@ public class PeriodSupplier
         _periodfacilities = new HashSet<PeriodFacility>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus,DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
     {
         Id = id;
     }
@@ -113,14 +113,28 @@ public class PeriodSupplier
         return _periodfacilities.Add(periodFacility);
     }
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId,UnitOfMeasure unitOfMeasure,FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents, bool isActive)
+
+    #endregion
+
+    #region PeriodFacilityElectricityGridMix
+
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
     {
         var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
 
-        if (periodFacility == null)
-            throw new BadRequestException("PeriodFacility is not found !!");
+        if (periodFacility is null)
+            throw new NotFoundException("PeriodFacility is not found !!");
 
-        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, fercRegion, electricityGridMixComponentPercents, isActive);
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new BadRequestException("SupplierReportingPeriodStatus should be Unlocked !!");
+
+        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+    }
+
+    internal bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+        return periodFacility.LoadPeriodFacilityElectricityGridMix(unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
     }
 
     #endregion

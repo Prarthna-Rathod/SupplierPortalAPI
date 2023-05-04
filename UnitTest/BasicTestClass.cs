@@ -1,16 +1,12 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
-using BusinessLogic.ValueConstants;
 using BusinessLogic.SupplierRoot.ValueObjects;
-using DataAccess.DataActions.Interfaces;
+using BusinessLogic.ValueConstants;
 using DataAccess.Entities;
-using Services.Mappers.Interfaces;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
-using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 
 namespace UnitTest
 {
@@ -27,7 +23,7 @@ namespace UnitTest
         private int reportingPeriodId = 1;
         private string displayName = "Reporting Period Data Year 2022";
         private string collectionTimePeriod = "2022";
-        private DateTime startDate = new DateTime(2023,04,12);
+        private DateTime startDate = new DateTime(2023, 04, 12);
         private DateTime? endDate = null;
         private bool isActive = true;
 
@@ -105,7 +101,7 @@ namespace UnitTest
                     Email = "abc@gmail.com",
                     ContactNo = "+85940494",
                     RoleId = 2,
-                    IsActive= true,
+                    IsActive = true,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = "System"
                 }
@@ -147,7 +143,7 @@ namespace UnitTest
                 SupplyChainStageId = 3,
                 IsActive = true,
                 CreatedOn = DateTime.UtcNow,
-                CreatedBy= "System",
+                CreatedBy = "System",
             });
             facilityEntities.Add(new FacilityEntity()
             {
@@ -168,7 +164,7 @@ namespace UnitTest
             return facilityEntities;
         }
 
-       
+
         protected SupplierEntityDomainMapper CreateInstanceOfSupplierEntityToDomain()
         {
             return new SupplierEntityDomainMapper();
@@ -327,11 +323,21 @@ namespace UnitTest
         {
             var list = new List<ElectricityGridMixComponentPercent>();
             var electricityGridMIxComponent = GetElectricityGridMixComponents();
-            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.First(),(decimal)25.00));
-            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 2), (decimal)25.00));
-            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 3), (decimal)25.00));
-            list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 4), (decimal)25.00));
-            //list.Add(new ElectricityGridMixComponentPercent(electricityGridMIxComponent.FirstOrDefault(x => x.Id == 4), (decimal)20.00));
+            list.Add(new ElectricityGridMixComponentPercent(1, electricityGridMIxComponent.First(), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMIxComponent.FirstOrDefault(x => x.Id == 2), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(3, electricityGridMIxComponent.FirstOrDefault(x => x.Id == 3), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(4, electricityGridMIxComponent.FirstOrDefault(x => x.Id == 4), (decimal)25.00));
+            //list.Add(new ElectricityGridMixComponentPercent(5, electricityGridMIxComponent.FirstOrDefault(x => x.Id == 4), (decimal)20.00));
+            return list;
+        }
+
+        //Repeated method because check testcase in existing AddPeriodFacilityElectricityGridMix are remove it and add new electricityGridMix
+        protected IEnumerable<ElectricityGridMixComponentPercent> GetElectricityGridMixComponentPercents2()
+        {
+            var list = new List<ElectricityGridMixComponentPercent>();
+            var electricityGridMIxComponent = GetElectricityGridMixComponents();
+            list.Add(new ElectricityGridMixComponentPercent(1, electricityGridMIxComponent.First(), (decimal)50.00));
+            list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMIxComponent.FirstOrDefault(x => x.Id == 2), (decimal)50.00));
             return list;
         }
 

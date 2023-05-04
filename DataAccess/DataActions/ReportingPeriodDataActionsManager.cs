@@ -9,6 +9,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 {
     private readonly SupplierPortalDBContext _context;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
+    private readonly string FERC_REGION_CUSTOM_MIX = "Custom Mix";
     public ReportingPeriodDataActionsManager(SupplierPortalDBContext context)
     {
         _context = context;
@@ -68,19 +69,30 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities)
     {
-        foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
-        {
-            var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
-            entity.ReportingPeriodFacilityId = gridMixEntity.ReportingPeriodFacilityId;
-            entity.ElectricityGridMixComponentId = gridMixEntity.ElectricityGridMixComponentId;
-            entity.UnitOfMeasureId = gridMixEntity.UnitOfMeasureId;
-            entity.FercRegionId = gridMixEntity.FercRegionId;
-            entity.Content = gridMixEntity.Content;
-            entity.IsActive = gridMixEntity.IsActive;
-            entity.CreatedBy = "System";
-            entity.CreatedOn = DateTime.UtcNow;
-            _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
+        var periodFacilityId = periodFacilityElectricityGridMixEntities.First().ReportingPeriodFacilityId;
 
+        var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
+
+        var newFercRegion = periodFacilityElectricityGridMixEntities.First().FercRegion;
+
+        if (existingFacility.Count() != 0)
+            RemovePeriodFacilityElectricityGridMix(periodFacilityId);
+
+        if (newFercRegion.Name == FERC_REGION_CUSTOM_MIX)
+        {
+            foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
+            {
+                var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
+                entity.ReportingPeriodFacilityId = gridMixEntity.ReportingPeriodFacilityId;
+                entity.ElectricityGridMixComponentId = gridMixEntity.ElectricityGridMixComponentId;
+                entity.UnitOfMeasureId = gridMixEntity.UnitOfMeasureId;
+                entity.FercRegionId = gridMixEntity.FercRegionId;
+                entity.Content = gridMixEntity.Content;
+                entity.IsActive = true;
+                entity.CreatedBy = "System";
+                entity.CreatedOn = DateTime.UtcNow;
+                _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
+            }
         }
         _context.SaveChanges();
         return true;
@@ -243,15 +255,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         var periodSupplier = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId)
             .Include(x => x.ReportingPeriodFacilityEntities).FirstOrDefault();
 
-        //var periodSupplierRelevantFacility = _context.ReportingPeriodSupplierEntities.Where(x=>x.Id == periodSupplierId).Include(x=>x .ReportingPeriodFacilityEntities).ToList();
         if (periodSupplier == null)
         {
             return false;
         }
-        //if(periodSupplierRelevantFacility.Count() != 0 )
-        //{
-        //    throw new Exception("Supplier has relevant facilities");
-        //}
 
         _context.ReportingPeriodSupplierEntities.Remove(periodSupplier);
         _context.SaveChanges();
@@ -371,6 +378,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodType)
                                 .Include(x => x.ReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;
@@ -409,11 +418,19 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.SupplierReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
-                                    .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }
 
+    public ReportingPeriodFacilityEntity GetPeriodFacilityById(int periodFacilityId)
+    {
+        var periodFacility = _context.ReportingPeriodFacilityEntities
+                                .Include(x => x.ReportingPeriod)
+                                .Include(x => x.ReportingPeriodSupplier)
+                                .Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
+                                .FirstOrDefault(x => x.Id == periodFacilityId);
+        return periodFacility;
+    }
     public async Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId)
     {
         return await _context.ReportingPeriodFacilityEntities

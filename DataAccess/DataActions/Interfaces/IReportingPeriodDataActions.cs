@@ -83,6 +83,8 @@ namespace DataAccess.DataActions.Interfaces
 
         ReportingPeriodSupplierEntity GetPeriodSupplierById(int periodSupplierId);
 
+        ReportingPeriodFacilityEntity GetPeriodFacilityById(int periodFacilityId);
+
         IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId);
         
         IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId);

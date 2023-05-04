@@ -7,6 +7,31 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 {
     public class ReportingPeriodUnitTesting : BasicTestClass
     {
+        #region private method
+
+        private ReportingPeriod AddPeriodSupplierAndPeriodFacilityForReportingPeriod()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            return reportingPeriod;
+        }
+
+        #endregion
+
         #region Update ReportingPeriod
 
         /// <summary>
@@ -516,30 +541,25 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         /// FercRegion is Custom Mix for add and Content value sum is 100
         /// </summary>
         [Fact]
-        public void AddPeriodFacilityElectricityGridMixSuccessCase()
+        public void AddPeriodFacilityElectricityGridMixSuccessCase1()
         {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
-            var reportingPeriod = GetReportingPeriodDomain();
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            //ElectricityGridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
             var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
-
-            //Get PeriodSupplier Domain
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
-
-            IEnumerable<PeriodFacilityElectricityGridMix> list = null;
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, electricityGridMixComponentPercents, true);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -548,6 +568,78 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             }
 
             Assert.NotNull(list);
+            Assert.Equal(electricityGridMixComponentPercents.Count(), list.Count());
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityElectricityGridMix Success case2
+        /// If periodFacilityElectricityGridMix is already exists than replace old electricityGridMix
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityElectricityGridMixSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //ElectricityGridMix
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
+            var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
+            reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            var percents = GetElectricityGridMixComponentPercents2();
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, percents);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(list);
+            Assert.NotEqual(electricityGridMixComponentPercents.Count(), list.Count());
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityElectricityGridMix Success case3
+        /// If periodFacilityElectricityGridMix is already exists and update fercRegion 
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityElectricityGridMixSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //ElectricityGridMix
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
+            var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
+            reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            var percents = new List<ElectricityGridMixComponentPercent>();
+
+            try
+            {
+                fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, percents);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(list);
+            Assert.Equal(electricityGridMixComponentPercents.Count(), list.Count());
             Assert.Equal(0, exceptionCounter);
             Assert.Null(exceptionMessage);
         }
@@ -561,24 +653,17 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
-            var reportingPeriod = GetReportingPeriodDomain();
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //ElectricityGridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
             var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
-
-            //Get PeriodSupplier Domain
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, electricityGridMixComponentPercents, true);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -586,6 +671,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
                 exceptionMessage = ex.Message;
             }
 
+            Assert.Null(list);
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
@@ -599,25 +685,17 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
-            var reportingPeriod = GetReportingPeriodDomain();
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //ElectricityGridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
-
-            //Get PeriodSupplier Domain
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
-
             var percents = new List<ElectricityGridMixComponentPercent>();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, percents, true);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, percents);
             }
             catch (Exception ex)
             {
@@ -625,6 +703,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
                 exceptionMessage = ex.Message;
             }
 
+            Assert.Null(list);
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
@@ -639,24 +718,17 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
-            var reportingPeriod = GetReportingPeriodDomain();
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //ElectricityGridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
             var electricityGridMixComponentPercent = GetElectricityGridMixComponentPercents();
-
-            //Get PeriodSupplier Domain
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, electricityGridMixComponentPercent, true);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercent);
             }
             catch (Exception ex)
             {
@@ -664,6 +736,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
                 exceptionMessage = ex.Message;
             }
 
+            Assert.Null(list);
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
@@ -678,24 +751,17 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         {
             int exceptionCounter = 0;
             string? exceptionMessage = null;
-            var reportingPeriod = GetReportingPeriodDomain();
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+          
+            //ElecetricityGridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
-            var electricityGridMixComponentPercent = GetElectricityGridMixComponentPercents();
-
-            //Get PeriodSupplier Domain
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(0, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+            var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, electricityGridMixComponentPercent, true);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -703,6 +769,77 @@ namespace UnitTest.ReportingPeriodBusinessLogic
                 exceptionMessage = ex.Message;
             }
 
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityElectricityGridMix Fail case5
+        /// If reportingPeriodStatus is InActive or Complete than throw exception
+        /// for this testcase go to AddPeriodSupplierAndPeriodFacilityForReportingPeriod method and set the ReportingPeriodStatus is InActive or Complete
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityElectricityGridMixFailCase5()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //ElectricityGridMix
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
+            var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityElectricityGridMix Fail case6
+        /// If periodSupplierStatus is Locked than throw exception
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityElectricityGridMixFailCase6()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+            var unlockedPeriodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            unlockedPeriodSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPerionStatus.Id;
+            unlockedPeriodSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPerionStatus.Name;
+
+            //ElectricityGridMix
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
+            var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
         }
