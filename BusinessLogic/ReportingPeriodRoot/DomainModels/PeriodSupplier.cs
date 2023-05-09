@@ -8,18 +8,28 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 public class PeriodSupplier
 {
     private HashSet<PeriodFacility> _periodfacilities;
-
-    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+    
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate,bool isActive)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
         InitialDataRequestDate = initialDataRequestDate;
         ResendDataRequestDate = resendDataRequestDate;
+        IsActive = isActive;
         _periodfacilities = new HashSet<PeriodFacility>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus,DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
+    //internal PeriodSupplier(int supplierId, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate) : this(supplierId, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
+    //{
+    //    SupplierId = supplierId;
+    //    ReportingPeriodId = reportingPeriodId;
+    //    SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
+    //    InitialDataRequestDate = initialDataRequestDate;
+    //    ResendDataRequestDate = resendDataRequestDate;
+    //}
+
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus,DateTime? initialDataRequestDate, DateTime? resendDataRequestDate,bool isActive) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate,isActive)
     {
         Id = id;
     }
@@ -31,8 +41,8 @@ public class PeriodSupplier
     public SupplierVO Supplier { get; private set; }
     public int ReportingPeriodId { get; private set; }
     public SupplierReportingPeriodStatus SupplierReportingPeriodStatus { get; private set; }
-    public DateTime InitialDataRequestDate { get; private set; }
-    public DateTime ResendDataRequestDate { get; private set; }
+    public DateTime? InitialDataRequestDate { get; private set; }
+    public DateTime? ResendDataRequestDate { get; private set; }
     public bool IsActive { get; private set; }
 
     public IEnumerable<PeriodFacility> PeriodFacilities

@@ -25,7 +25,7 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpPost("AddMultiplePeriodSuppliers")]
-        public string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto)
+        public string SetMultiplePeriodSuppliers(IEnumerable<MultiplePeriodSuppliersDto> multiplePeriodSuppliersDto)
         {
             return _services.SetMultiplePeriodSuppliers(multiplePeriodSuppliersDto);
         }

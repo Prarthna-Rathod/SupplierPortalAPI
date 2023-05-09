@@ -15,20 +15,19 @@ namespace Services
     public class SupplierServices : ISupplierServices
     {
         private ISupplierFactory _supplierFactory;
-        private readonly ILogger _logger;
         private ISupplierEntityDomainMapper _supplierEntityDomainMapper;
         private ISupplierDomainDtoMapper _supplierDomainDtoMapper;
         private ISupplierDataActions _persister;
         private IReferenceLookUpMapper _referenceLookUpMapper;
         private IReportingPeriodDataActions _reportingPeriodDataActions;
 
-        public SupplierServices(ILoggerFactory loggerFactory, ISupplierFactory supplierFactory,
+        public SupplierServices(/*ILoggerFactory loggerFactory,*/ ISupplierFactory supplierFactory,
             ISupplierEntityDomainMapper supplierEntityDomainMapper,
             ISupplierDomainDtoMapper supplierDomainDtoMapper,
             ISupplierDataActions persister, IReferenceLookUpMapper referenceLookUpMapper,
             IReportingPeriodDataActions reportingPeriodDataActions)
         {
-            _logger = loggerFactory.CreateLogger<SupplierServices>();
+            //_logger = loggerFactory.CreateLogger<SupplierServices>();
             _supplierFactory = supplierFactory;
             _supplierEntityDomainMapper = supplierEntityDomainMapper;
             _supplierDomainDtoMapper = supplierDomainDtoMapper;

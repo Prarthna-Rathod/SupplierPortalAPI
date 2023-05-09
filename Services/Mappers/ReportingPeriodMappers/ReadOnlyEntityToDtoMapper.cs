@@ -21,7 +21,7 @@ namespace Services.Mappers.ReportingPeriodMappers
                 reportingPeriodSupplierEntity.ReportingPeriod.DisplayName,
                 reportingPeriodSupplierEntity.SupplierReportingPeriodStatusId,
                 reportingPeriodSupplierEntity.SupplierReportingPeriodStatus.Name
-                ) ;
+                );
         }
 
         public InternalReportingPeriodDTO ConvertReportingPeriodEntityToInternalPeriodDTO(ReportingPeriodEntity reportingPeriodEntity)

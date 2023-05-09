@@ -3,13 +3,12 @@ using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.ValueConstants;
 using BusinessLogic.SupplierRoot.ValueObjects;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using Services.Mappers.Interfaces;
-using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
-using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
-using Microsoft.EntityFrameworkCore;
+using Services.Mappers.ReportingPeriodMappers;
 
 namespace UnitTest
 {
@@ -87,6 +86,35 @@ namespace UnitTest
             supplier.FacilityEntities = facilities;
 
             return supplier;
+        }
+
+        protected List<ReportingPeriodActiveSupplier> createSupplierEntities()
+        {
+            var activeSupplierEntities = new List<ReportingPeriodActiveSupplier>();
+
+            activeSupplierEntities.Add(new ReportingPeriodActiveSupplier()
+            {
+                ReportingPeriodSupplierId = 1,
+                Supplier = GetAndConvertSupplierValueObject(),
+                PeriodId = 3,
+                SupplierPeriodStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked),
+                InitialDataRequestDate = new DateTime(2023,5,10),
+                ResendDataRequestDate = new DateTime(2023,6,10),
+                IsActive = true 
+            });
+            activeSupplierEntities.Add(new ReportingPeriodActiveSupplier()
+            {
+                ReportingPeriodSupplierId = 2,
+                Supplier = GetAndConvertSupplierValueObject(),
+                PeriodId = 4,
+                SupplierPeriodStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked),
+                InitialDataRequestDate = new DateTime(2023, 5, 10),
+                ResendDataRequestDate = new DateTime(2023, 6, 10),
+                IsActive = true
+            });
+
+            return activeSupplierEntities;
+
         }
 
         protected List<ContactEntity> GenerateContactEntitiesForSupplier(int supplierId)
@@ -229,6 +257,8 @@ namespace UnitTest
             var reportingPeriodEntity = CreateReportingPeriodEntity();
             var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
             var reportingPeriodStatuses = GetAndConvertReportingPeriodStatus();
+            //var supplierVo = GetAndConvertSupplierValueObject();
+
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
             return mapper.ConvertReportingPeriodEntityToDomain(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatuses);
         }
@@ -239,7 +269,7 @@ namespace UnitTest
             reportingPeriodEntity.Id = reportingPeriodId;
             reportingPeriodEntity.DisplayName = displayName;
             reportingPeriodEntity.ReportingPeriodTypeId = GetAndConvertReportingPeriodTypes().FirstOrDefault(x => x.Name == ReportingPeriodTypeValues.Annual).Id;
-            reportingPeriodEntity.ReportingPeriodStatusId = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.InActive).Id;
+            reportingPeriodEntity.ReportingPeriodStatusId = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open).Id;
             reportingPeriodEntity.CollectionTimePeriod = collectionTimePeriod;
             reportingPeriodEntity.StartDate = startDate;
             reportingPeriodEntity.EndDate = endDate;
@@ -263,6 +293,8 @@ namespace UnitTest
 
             return periodSupplierEntity;
         }
+
+
 
         #endregion
 
@@ -305,6 +337,16 @@ namespace UnitTest
 
             return facilityVO;
         }
+
+        //protected ReportingPeriodActiveSupplier GetReportingPeriodActiveSupplier()
+        //{
+        //    var supplierEntity = CreateSupplierEntity();
+        //    var reportingTypes = GenerateReportingType();
+        //    var supplyChainStages = GenerateSupplyChainStage();
+        //    var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+        //    var reportingPeriodActiveSuppliers = mapper.ConvertSupplierEntityToSupplierValueObjectList(supplierEntity, supplyChainStages, reportingTypes);
+        //    return reportingPeriodActiveSuppliers;
+        //}
 
 
         #endregion

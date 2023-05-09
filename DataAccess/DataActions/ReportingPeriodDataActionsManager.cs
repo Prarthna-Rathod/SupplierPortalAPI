@@ -39,10 +39,39 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity)
+    public bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity)
     {
-        reportingPeriodSupplierEntity.IsActive = true;
-        _context.ReportingPeriodSupplierEntities.Add(reportingPeriodSupplierEntity);
+        var allSuppliers = _context.ReportingPeriodSupplierEntities;
+
+        foreach (var entity in reportingPeriodSupplierEntity)
+        {
+            var isExist = allSuppliers.FirstOrDefault(x => x.SupplierId == entity.SupplierId &&
+            x.ReportingPeriodId == entity.ReportingPeriodId);
+
+            if (isExist is null)
+            {
+                _context.ReportingPeriodSupplierEntities.Add(entity);
+            }
+
+        }
+        _context.SaveChanges();
+
+        foreach (var entity in allSuppliers)
+        {
+            var isExist = reportingPeriodSupplierEntity.Where(x => x.SupplierId
+            == entity.SupplierId && x.ReportingPeriodId == entity.ReportingPeriodId && !entity.IsActive).FirstOrDefault();
+
+            //var removeEntity = allSuppliers.FirstOrDefault(x => x.Id == entity.Id);
+
+            if (isExist is not null)
+            {
+                _context.ReportingPeriodSupplierEntities.Remove(entity);
+            }
+        }
+
+        
+        
+
         _context.SaveChanges();
         return true;
     }
@@ -227,26 +256,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #region Remove Methods
 
-    public bool RemovePeriodSupplier(int periodSupplierId)
-    {
-        var periodSupplier = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId)
-            .Include(x => x.ReportingPeriodFacilityEntities).FirstOrDefault();
-
-        //var periodSupplierRelevantFacility = _context.ReportingPeriodSupplierEntities.Where(x=>x.Id == periodSupplierId).Include(x=>x .ReportingPeriodFacilityEntities).ToList();
-        if (periodSupplier == null)
-        {
-            return false;
-        }
-        //if(periodSupplierRelevantFacility.Count() != 0 )
-        //{
-        //    throw new Exception("Supplier has relevant facilities");
-        //}
-
-        _context.ReportingPeriodSupplierEntities.Remove(periodSupplier);
-        _context.SaveChanges();
-        return true;
-
-    }
 
     public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityElectricityGridMixId)
     {
@@ -263,6 +272,17 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #region GetAll Methods
 
+    public IEnumerable<SupplierEntity> GetSuppliers(IEnumerable<int> id)
+    {
+        var suppliers = new List<SupplierEntity>();
+
+        foreach (var supplierId in id)
+        {
+            var supplier = _context.SupplierEntities.Include(x => x.FacilityEntities).FirstOrDefault(x => x.Id == supplierId /*&& x.IsActive*/);
+            suppliers.Add(supplier);
+        }
+        return suppliers;
+    }
 
     public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypes()
     {
@@ -457,6 +477,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+
 
 
 

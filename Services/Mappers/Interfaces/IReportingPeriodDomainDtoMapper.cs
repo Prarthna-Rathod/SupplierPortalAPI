@@ -1,4 +1,6 @@
-﻿using BusinessLogic.ReportingPeriodRoot.DomainModels;
+﻿using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
@@ -20,13 +22,16 @@ public interface IReportingPeriodDomainDtoMapper
 
     #endregion
 
+    #region 
 
-    #region PeriodSupplier
+   
 
     IEnumerable<ReportingPeriodSupplierDto> ConvertPeriodSupplierDomainListToDtos(IEnumerable<PeriodSupplier> periodSuppliersDomain, ReportingPeriod reportingPeriod);
     ReportingPeriodSupplierDto ConvertPeriodSupplierDomainToDto(PeriodSupplier periodSuppliersDomain, string displayName);
 
     IEnumerable<ReportingPeriodRelevantSupplierDto> ConvertReleventPeriodSupplierDomainToDto(IEnumerable<PeriodSupplier> periodSupplierDomainList,IEnumerable<SupplierEntity> inRelevantSupplierList, ReportingPeriod reportingPeriod);
+
+    IEnumerable<ReportingPeriodActiveSupplier> ConvertMultiplePeriodSupplierDtosToValueObject(IEnumerable<MultiplePeriodSuppliersDto> multiplePeriodSuppliersDtos,IEnumerable<SupplierVO>supplierVO,IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses);
 
     #endregion
 

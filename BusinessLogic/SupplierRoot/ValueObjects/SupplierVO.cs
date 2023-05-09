@@ -15,6 +15,10 @@ public class SupplierVO
         IsActive = isActive;
         Facilities = facilities;
     }
+    public SupplierVO()
+    {
+
+    }
 
     public int Id { get; set; }
     public string Name { get; set; }

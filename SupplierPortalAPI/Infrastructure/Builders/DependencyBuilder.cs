@@ -7,9 +7,9 @@ using Services.Factories.Interfaces;
 using Services.Interfaces;
 using Services.Mappers.Interfaces;
 using Services.Mappers.SupplierMappers;
-using Services.Mappers.ReportingPeriodMappers;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using Services.Mappers.ReportingPeriodMappers;
 
 namespace SupplierPortalAPI.Infrastructure.Builders
 {

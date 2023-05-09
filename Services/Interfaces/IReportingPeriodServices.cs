@@ -45,7 +45,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="multiplePeriodSuppliersDto"></param>
     /// <returns></returns>
-    string SetMultiplePeriodSuppliers(MultiplePeriodSuppliersDto multiplePeriodSuppliersDto);
+    string SetMultiplePeriodSuppliers(IEnumerable<MultiplePeriodSuppliersDto> multiplePeriodSuppliersDtos);
 
     /// <summary>
     /// LockUnlockPeriodSupplierStatus
@@ -73,7 +73,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="PeriodSupplierId"></param>
     /// <returns></returns>
-    bool RemovePeriodSupplier(int PeriodSupplierId);
+   // bool RemovePeriodSupplier(int PeriodSupplierId);
 
     #endregion
 

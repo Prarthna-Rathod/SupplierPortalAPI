@@ -1,4 +1,5 @@
-﻿using BusinessLogic.ValueConstants;
+﻿using BusinessLogic.ReportingPeriodRoot.ValueObjects;
+using BusinessLogic.ValueConstants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
 {
-    public class ReportingPeriodDomainDtoMapperUnitTest: BasicTestClass
+    public class ReportingPeriodDomainDtoMapperUnitTest : BasicTestClass
     {
         [Fact]
         public void ConvertReportingPeriodDomainToDto()
         {
             var reportingPeriod = GetReportingPeriodDomain();
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
-            
+
             var reportingPeriodDto = mapper.ConvertReportingPeriodDomainToDto(reportingPeriod);
 
             Assert.NotNull(reportingPeriodDto);
@@ -29,29 +30,29 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         }
 
         [Fact]
-        public void ConvertPeriodSupplierDomainToDto() 
+        public void ConvertPeriodSupplierDomainToDto()
         {
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVo = GetAndConvertSupplierValueObject();
             var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVo, supplierReportingPeriodStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
+            var periodSuppliersDomain = reportingPeriod.AddRemovePeriodSupplier(createSupplierEntities()).First();
+;
 
-            var mapper= CreateInstanceOfReportingPeriodDomainDtoMapper();
-            var periodSupplierDto = mapper.ConvertPeriodSupplierDomainToDto(periodSupplierDomain,reportingPeriod.DisplayName);
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var periodSupplierDto = mapper.ConvertPeriodSupplierDomainToDto(periodSuppliersDomain, reportingPeriod.DisplayName);
 
             Assert.NotNull(periodSupplierDto);
-            Assert.Equal(periodSupplierDomain.Id, periodSupplierDto.Id);
-            Assert.Equal(periodSupplierDomain.Supplier.Id, periodSupplierDto.SupplierId);
-            Assert.Equal(periodSupplierDomain.Supplier.Name, periodSupplierDto.SupplierName);
-            Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Id, periodSupplierDto.SupplierReportingPeriodStatusId);
-            Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Name, periodSupplierDto.SupplierReportingPeriodStatusName);
-            Assert.Equal(periodSupplierDomain.ReportingPeriodId, periodSupplierDto.ReportingPeriodId);          
-            Assert.Equal(periodSupplierDomain.InitialDataRequestDate, periodSupplierDto.InitialDataRequestDate);
-            Assert.Equal(periodSupplierDomain.ResendDataRequestDate, periodSupplierDto.ResendDataRequestDate);
-     
+            Assert.Equal(periodSuppliersDomain.Id, periodSupplierDto.Id);
+            Assert.Equal(periodSuppliersDomain.Supplier.Id, periodSupplierDto.SupplierId);
+            Assert.Equal(periodSuppliersDomain.SupplierReportingPeriodStatus.Id, periodSupplierDto.SupplierReportingPeriodStatusId);
+            Assert.Equal(periodSuppliersDomain.InitialDataRequestDate, periodSupplierDto.InitialDataRequestDate);
+            Assert.Equal(periodSuppliersDomain.ResendDataRequestDate, periodSupplierDto.ResendDataRequestDate);
+            //Assert.Equal(periodSuppliersDomain.IsActive,periodSupplierDto.Is)
 
 
-            
+
+
+
         }
     }
 }
