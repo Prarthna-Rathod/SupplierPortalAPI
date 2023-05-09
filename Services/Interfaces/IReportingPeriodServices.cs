@@ -1,13 +1,5 @@
-using BusinessLogic.ReferenceLookups;
-using BusinessLogic.ReportingPeriodRoot.DomainModels;
-using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Interfaces;
 
@@ -85,7 +77,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
-     string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
+    string AddRemovePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto);
 
     /// <summary>
     /// Get ReportingPeriodFacilities
@@ -94,12 +86,27 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId);
 
+    #endregion
+
+    #region PeriodFacilityElectricityGridMix
+
     /// <summary>
     /// AddRemove PeriodFacilityElectricityGridMix
     /// </summary>
     /// <param name="periodFacilityElectricityGridMixDto"></param>
     /// <returns></returns>
     string AddRemovePeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
+
+    #endregion
+
+    #region PeriodFacilityGasSupplyBreakdown
+
+    /// <summary>
+    /// Add PeriodFacilityGasSupplyBreakdown
+    /// </summary>
+    /// <param name="periodFacilityGasSupplyBreakdownDto"></param>
+    /// <returns></returns>
+    string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto);
 
     #endregion
 

@@ -98,6 +98,21 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
+    public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities)
+    {
+        var periodFacilityIds = periodFacilityGasSupplyBreakDownEntities.Select(x => x.PeriodFacilityId).Distinct();
+        RemovePeriodFacilityGasSupplyBreakdown(periodFacilityIds);
+        
+        foreach(var gasSupplyBreakdown in periodFacilityGasSupplyBreakDownEntities)
+        {
+            gasSupplyBreakdown.CreatedOn = DateTime.UtcNow;
+            gasSupplyBreakdown.CreatedBy = "System";
+            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(gasSupplyBreakdown);
+        }
+        _context.SaveChanges();
+        return true;
+    }
+
     public async Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
     {
         await _context.ReportingPeriodFacilityDocumentEntities.AddAsync(reportingPeriodFacilityDocument);
@@ -277,6 +292,18 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
+    public bool RemovePeriodFacilityGasSupplyBreakdown(IEnumerable<int> periodFacilityIds)
+    {
+        foreach(var periodFacilityId in periodFacilityIds)
+        {
+            var existingPeriodFacility = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Where(x => x.PeriodFacilityId == periodFacilityId).ToList();
+            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingPeriodFacility);
+        }
+
+        _context.SaveChanges();
+        return true;
+    }
+
     #endregion
 
     #region GetAll Methods
@@ -367,6 +394,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return _context.FercRegionEntities;
     }
 
+    public IEnumerable<SiteEntity> GetSiteEntities()
+    {
+        return _context.SiteEntities;
+    }
 
     #endregion
 
@@ -380,6 +411,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodSupplierEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;

@@ -5,6 +5,7 @@ using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Mappers.Interfaces;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace Services.Mappers.ReportingPeriodMappers
 {
@@ -141,6 +142,31 @@ namespace Services.Mappers.ReportingPeriodMappers
         {
             var gridMixDomain = new ElectricityGridMixComponentPercent(0, electricityGridMixComponent, content);
             return gridMixDomain;
+        }
+
+        #endregion
+
+        #region PeriodFacilityGasSupplyBreakdown
+
+        public IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakDownDtosToValueObjects(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> periodFacilityGasSupplyBreakdownDtos, IEnumerable<Site> sites,IEnumerable<UnitOfMeasure> unitOfMeasures)
+        {
+            var list = new List<GasSupplyBreakdownVO>();
+            foreach(var dto in periodFacilityGasSupplyBreakdownDtos)
+            {
+                var site = sites.FirstOrDefault(x => x.Id == dto.SiteId);
+                var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.Id == dto.UnitOfMeasureId);
+
+                if (site is null || unitOfMeasure is null)
+                    throw new NotFoundException("Site or UnitOfMeasure is not found !!");
+
+                list.Add(ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(dto,site,unitOfMeasure,dto.Content));
+            }
+            return list;
+        }
+
+        public GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto,Site site,UnitOfMeasure unitOfMeasure, decimal content)
+        {
+            return new GasSupplyBreakdownVO(0, periodFacilityGasSupplyBreakdownDto.PeriodFacilityId, periodFacilityGasSupplyBreakdownDto.FacilityId, site,unitOfMeasure, content);
         }
 
         #endregion

@@ -1,9 +1,4 @@
 ﻿using DataAccess.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.DataActions.Interfaces
 {
@@ -19,6 +14,8 @@ namespace DataAccess.DataActions.Interfaces
         bool AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, bool facilityIsRelaventForPeriod);
 
         bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities);
+
+        bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities);
 
         Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 
@@ -41,8 +38,8 @@ namespace DataAccess.DataActions.Interfaces
         #region Remove Methods
 
         bool RemovePeriodSupplier(int periodSupplierId);
-
         bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId);
+        bool RemovePeriodFacilityGasSupplyBreakdown(IEnumerable<int> periodFacilityIds);
 
         #endregion
 
@@ -71,7 +68,8 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<UnitOfMeasureEntity> GetUnitOfMeasureEntities();
         IEnumerable<FercRegionEntity> GetFercRegionEntities();
-        
+        IEnumerable<SiteEntity> GetSiteEntities();
+
 
         #endregion
 
@@ -86,7 +84,7 @@ namespace DataAccess.DataActions.Interfaces
         ReportingPeriodFacilityEntity GetPeriodFacilityById(int periodFacilityId);
 
         IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId);
-        
+
         IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId);
 
         Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId);

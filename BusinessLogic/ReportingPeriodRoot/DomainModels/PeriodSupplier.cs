@@ -139,4 +139,60 @@ public class PeriodSupplier
 
     #endregion
 
+    #region PeriodFacilityGasSupplyBreakdown
+
+    internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new BadRequestException("SupplierReportingPeriodStatus should be Unlocked !!");
+
+        var list = new List<PeriodFacilityGasSupplyBreakdown>();
+
+        //Check site wise content values
+        var siteData = gasSupplyBreakdownVOs.GroupBy(x => x.Site.Id);
+        foreach (var singleSiteData in siteData)
+        {
+            var siteName = singleSiteData.Select(x => x.Site.Name);
+            var totalContentValue = singleSiteData.Sum(x => x.Content);
+
+            var newCount = singleSiteData.Select(x => x.PeriodFacilityId).Distinct().Count();
+            var count = singleSiteData.Select(x => x.PeriodFacilityId).Count();
+            var facilityIsExists = newCount < count;
+            if (facilityIsExists)
+                throw new BadRequestException($"Site '{siteName}' is already exists in same PeriodFacility !!");
+
+            if (totalContentValue != 100)
+                throw new Exception($"Please add more content values in site {siteName}");
+        }
+
+        var periodFacility = gasSupplyBreakdownVOs.GroupBy(x => x.PeriodFacilityId);
+        foreach (var facility in periodFacility)
+        {
+            var periodFacilityId = facility.First().PeriodFacilityId;
+            var periodFacilityDomain = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+            if (periodFacilityDomain is null)
+                throw new NotFoundException("PeriodFacility is not found !!");
+
+            list.AddRange(periodFacilityDomain.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs));
+
+        }
+
+        return list;
+    }
+
+    internal bool LoadPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+    {
+        foreach (var gasSupplyBreakdownVo in gasSupplyBreakdownVOs)
+        {
+            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == gasSupplyBreakdownVo.PeriodFacilityId);
+
+            periodFacility.LoadPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVo.Site, gasSupplyBreakdownVo.UnitOfMeasure, gasSupplyBreakdownVo.Content);
+        }
+
+        return true;
+    }
+
+    #endregion
+
 }

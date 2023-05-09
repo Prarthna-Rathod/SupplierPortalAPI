@@ -210,7 +210,6 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(gridMixDomain.UnitOfMeasure.Id, periodFacilityElectricityGridMixEntity.UnitOfMeasureId);
             Assert.Equal(gridMixDomain.FercRegion.Id, periodFacilityElectricityGridMixEntity.FercRegionId);
             Assert.Equal(gridMixDomain.Content, periodFacilityElectricityGridMixEntity.Content);
-            Assert.Equal(gridMixDomain.IsActive, periodFacilityElectricityGridMixEntity.IsActive);
         }
 
         #endregion

@@ -30,22 +30,28 @@ namespace SupplierPortalAPI.Controllers
             return _services.SetMultiplePeriodSuppliers(multiplePeriodSuppliersDto);
         }
 
-        [HttpPost("AddPeriodFacilities")]
-        public string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+        [HttpPut("LockUnlockPeriodSupplierStatus")]
+        public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
         {
-            return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
+            return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
         }
 
-        [HttpPost("AddRemovePeriodFacilityElectricityGridMixComponents")]
+        [HttpPost("AddRemovePeriodFacilities")]
+        public string AddRemovePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+        {
+            return _services.AddRemovePeriodFacilities(reportingPeriodFacilityDto);
+        }
+
+        [HttpPost("AddRemovePeriodFacility_ElectricityGridMixComponents")]
         public string AddRemovePeriodFacilityElectricityGridMixComponents(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDto)
         {
             return _services.AddRemovePeriodFacilityElectricityGridMix(addMultiplePeriodFacilityElectricityGridMixDto);
         }
 
-        [HttpPut("LockUnlockPeriodSupplierStatus")]
-        public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
+        [HttpPost("AddRemovePeriodFacility_GasSupplyBreakdowns")]
+        public string AddRemovePeriodFacilityGasSupplyBreakdowns(AddMultiplePeriodFacilityGasSupplyBreakdownDto addMultiplePeriodFacilityGasSupplyBreakdownDto)
         {
-            return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
+            return _services.AddRemovePeriodFacilityGasSupplyBreakdown(addMultiplePeriodFacilityGasSupplyBreakdownDto);
         }
 
         #endregion

@@ -47,6 +47,18 @@ public interface IReportingPeriodEntityDomainMapper
 
     #endregion
 
+    #region PeriodFacilityGasSupplyBreakdown
+
+    ReportingPeriodFacilityGasSupplyBreakDownEntity ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity(PeriodFacilityGasSupplyBreakdown periodFacilityGasSupplyBreakdown);
+
+    IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(IEnumerable<PeriodFacilityGasSupplyBreakdown> periodFacilityGasSupplyBreakdowns);
+
+    IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjects(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures);
+
+    GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(ReportingPeriodFacilityGasSupplyBreakDownEntity entity, Site site, UnitOfMeasure unitOfMeasure);
+
+    #endregion
+
     #region PeriodDocument
     #endregion
 

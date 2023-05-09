@@ -68,6 +68,14 @@ namespace Services.Mappers.ReportingPeriodMappers
             }
         }
 
+        public IEnumerable<Site> GetSitesLookUp(IEnumerable<SiteEntity> siteEntities)
+        {
+            foreach(var item in siteEntities)
+            {
+                yield return new Site(item.Id,item.Name);
+            }
+        }
+
         //SupplierFacility
         public IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities)
         {

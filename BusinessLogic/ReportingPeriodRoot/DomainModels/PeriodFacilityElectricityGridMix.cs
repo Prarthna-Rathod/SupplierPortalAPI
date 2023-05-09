@@ -15,21 +15,19 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         public UnitOfMeasure UnitOfMeasure { get; private set; }
         public FercRegion FercRegion { get; private set; }
         public decimal Content { get; private set; }
-        public bool IsActive { get; private set; }
 
         internal PeriodFacilityElectricityGridMix()  {  }
 
-        internal PeriodFacilityElectricityGridMix(int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive)
+        internal PeriodFacilityElectricityGridMix(int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content)
         {
             PeriodFacilityId = periodFacilityId;
             ElectricityGridMixComponent = electricityGridMixComponent;
             UnitOfMeasure = unitOfMeasure;
             FercRegion = fercRegion;
             Content = content;
-            IsActive = isActive;
         }
 
-        internal PeriodFacilityElectricityGridMix(int id,int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content, bool isActive): this(periodFacilityId, electricityGridMixComponent, unitOfMeasure, fercRegion, content, isActive)
+        internal PeriodFacilityElectricityGridMix(int id,int periodFacilityId, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, decimal content): this(periodFacilityId, electricityGridMixComponent, unitOfMeasure, fercRegion, content)
         {
             Id = id;
         }

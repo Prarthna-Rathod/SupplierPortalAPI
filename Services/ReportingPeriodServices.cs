@@ -107,6 +107,12 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return _referenceLookUpMapper.GetFercRegionsLookUp(fercRegions);
     }
 
+    private IEnumerable<Site> GetAndConvertSites()
+    {
+        var sites = _reportingPeriodDataActions.GetSiteEntities();
+        return _referenceLookUpMapper.GetSitesLookUp(sites);
+    }
+
     /// <summary>
     /// Retrieve ReportingPeriod Entity and Convert it to DomainModel
     /// </summary>
@@ -142,6 +148,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
             //Load existing periodFacilityList
             reportingPeriodDomain.LoadPeriodFacility(periodFacility.Id, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, periodFacility.IsActive);
 
+            //Load existing periodFacilityElecrticityGridMixList
             var electricityGridMixEntities = periodFacility.ReportingPeriodFacilityElectricityGridMixEntities;
 
             if (electricityGridMixEntities.Count() != 0)
@@ -154,10 +161,21 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
                 var fercRegionId = electricityGridMixEntities.First().FercRegionId;
                 var fercRegion = GetAndConvertFercRegions().FirstOrDefault(x => x.Id == fercRegionId);
-
-                //Load existing periodFacilityElecrticityGridMixList
+                
                 reportingPeriodDomain.LoadPeriodFacilityElectricityGridMix(periodFacility.Id, periodSupplier.Id, unitOfMeasure, fercRegion, electricityGridMixComponentPercentVOs);
 
+            }
+
+            //Load existing periodFacilityGasSupplyBreakdownList
+            var gasSupplyBreakdownEntities = periodFacility.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+            if (gasSupplyBreakdownEntities.Count() != 0)
+            {
+                var sites = GetAndConvertSites();
+                var unitOfMeasures = GetAndConvertUnitOfMeasures();
+                var gasSupplyBreakdownVOs = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjects(gasSupplyBreakdownEntities,sites,unitOfMeasures);
+
+                reportingPeriodDomain.LoadPeriodFacilityGasSupplyBreakdown(periodSupplier.Id, gasSupplyBreakdownVOs);
             }
         }
 
@@ -301,7 +319,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     /// <param name="reportingPeriodFacilityDto"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public string AddPeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
+    public string AddRemovePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodFacilityDto.ReportingPeriodId);
 
@@ -393,6 +411,30 @@ public class ReportingPeriodServices : IReportingPeriodServices
         _reportingPeriodDataActions.AddPeriodFacilityElectricityGridMix(entity);
 
         return "ReportingPeriodFacility ElectricityGridMix Components added successfully !!";
+    }
+
+    /// <summary>
+    /// AddRemove ReportingPeriodFacility GasSupplyBreakdown
+    /// Per periodSupplier per site ContentValues should be 100
+    /// </summary>
+    /// <param name="periodFacilityGasSupplyBreakdownDto"></param>
+    /// <returns></returns>
+    public string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(periodFacilityGasSupplyBreakdownDto.ReporingPeriodId);
+
+        var sites = GetAndConvertSites();
+        var unitOfMeasures = GetAndConvertUnitOfMeasures();
+
+        var valueObjectList = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityGasSupplyBreakDownDtosToValueObjects(periodFacilityGasSupplyBreakdownDto.PeriodFacilityGasSupplyBreakdowns, sites, unitOfMeasures);
+
+        var gasSupplyDomainList = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(periodFacilityGasSupplyBreakdownDto.ReportingPeriodSupplierId, valueObjectList);
+
+        var gasSupplyBreakdownEntities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(gasSupplyDomainList);
+
+        _reportingPeriodDataActions.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownEntities);
+
+        return "PeriodFacilityGasSupplyBreakdown is added successfully...";
     }
 
     #endregion

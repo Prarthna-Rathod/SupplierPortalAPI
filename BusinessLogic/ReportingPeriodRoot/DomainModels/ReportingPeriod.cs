@@ -329,6 +329,30 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #endregion
 
+        #region PeriodSupplierGasSupplyBreakdown
+
+        public IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier is not found !!");
+
+            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+                throw new BadRequestException("ReportingPeriodStatus should be open or close !!");
+
+            return periodSupplier.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
+        }
+
+        public bool LoadPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
+        }
+
+        #endregion
+
         #region Period Document
 
         /*
