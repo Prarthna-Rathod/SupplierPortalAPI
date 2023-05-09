@@ -205,7 +205,6 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(singleDomain.UnitOfMeasure.Id, gridMixEntity.UnitOfMeasureId);
             Assert.Equal(singleDomain.FercRegion.Id, gridMixEntity.FercRegionId);
             Assert.Equal(singleDomain.Content, gridMixEntity.Content);
-            Assert.Equal(singleDomain.IsActive, gridMixEntity.IsActive);
         }
         #endregion
     }

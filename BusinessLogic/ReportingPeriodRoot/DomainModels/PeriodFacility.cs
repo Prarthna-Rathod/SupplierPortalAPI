@@ -8,8 +8,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
     public class PeriodFacility
     {
-        private HashSet<PeriodFacilityElectricityGridMix> _periodFacilityElectricityGridMix;
-
+        private HashSet<PeriodFacilityElectricityGridMix> _periodFacilityElectricityGridMixes;
+        private HashSet<PeriodFacilityGasSupplyBreakdown> _periodSupplierGasSupplyBreakdowns;
         public int Id { get; private set; }
         public FacilityVO FacilityVO { get; private set; }
         public FacilityReportingPeriodDataStatus FacilityReportingPeriodDataStatus { get; private set; }
@@ -21,11 +21,23 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         {
             get
             {
-                if (_periodFacilityElectricityGridMix == null)
+                if (_periodFacilityElectricityGridMixes == null)
                 {
                     return new List<PeriodFacilityElectricityGridMix>();
                 }
-                return _periodFacilityElectricityGridMix;
+                return _periodFacilityElectricityGridMixes;
+            }
+        }
+
+        public IEnumerable<PeriodFacilityGasSupplyBreakdown> periodFacilityGasSupplyBreakdowns
+        {
+            get
+            {
+                if (_periodSupplierGasSupplyBreakdowns == null)
+                {
+                    return new List<PeriodFacilityGasSupplyBreakdown>();
+                }
+                return _periodSupplierGasSupplyBreakdowns;
             }
         }
 
@@ -38,7 +50,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             ReportingPeriodId = reportingPeriodId;
             ReportingPeriodSupplierId = reportingPeriodSupplierId;
             IsActive = isActive;
-            _periodFacilityElectricityGridMix = new HashSet<PeriodFacilityElectricityGridMix>();
+            _periodFacilityElectricityGridMixes = new HashSet<PeriodFacilityElectricityGridMix>();
+            _periodSupplierGasSupplyBreakdowns = new HashSet<PeriodFacilityGasSupplyBreakdown>();
         }
 
         internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, bool isActive) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId, isActive)
@@ -49,71 +62,102 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
         {
 
-            switch(fercRegion.Name)
+            switch (fercRegion.Name)
             {
                 case FercRegionValues.Custom_Mix:
                     {
-                        if(gridMixComponentPercents.Count() == 0)
+                        if (gridMixComponentPercents.Count() == 0)
                             throw new BadRequestException("Please add gridMixComponents !!");
 
-                        _periodFacilityElectricityGridMix.Clear();
+                        _periodFacilityElectricityGridMixes.Clear();
 
                         foreach (var facilityGridMix in gridMixComponentPercents)
                         {
-                            var periodFacilityGridMixDomain = new PeriodFacilityElectricityGridMix(Id, facilityGridMix.ElectricityGridMixComponent, unitOfMeasure, fercRegion, facilityGridMix.Content, true);
+                            var periodFacilityGridMixDomain = new PeriodFacilityElectricityGridMix(Id, facilityGridMix.ElectricityGridMixComponent, unitOfMeasure, fercRegion, facilityGridMix.Content);
 
-                            var checkExistsComponent = _periodFacilityElectricityGridMix.Any(x => x.ElectricityGridMixComponent.Id == facilityGridMix.ElectricityGridMixComponent.Id);
+                            var checkExistsComponent = _periodFacilityElectricityGridMixes.Any(x => x.ElectricityGridMixComponent.Id == facilityGridMix.ElectricityGridMixComponent.Id);
 
                             if (checkExistsComponent)
                                 throw new BadRequestException($"{facilityGridMix.ElectricityGridMixComponent.Name} component is already exists in this periodFacility !!");
 
-                            _periodFacilityElectricityGridMix.Add(periodFacilityGridMixDomain);
+                            _periodFacilityElectricityGridMixes.Add(periodFacilityGridMixDomain);
                         }
 
-                        var totalContentValues = _periodFacilityElectricityGridMix.Sum(x => x.Content);
+                        var totalContentValues = _periodFacilityElectricityGridMixes.Sum(x => x.Content);
                         if (totalContentValues != 100)
                             throw new BadRequestException("Please adjust ContentValues because total should be 100 !!");
                     }
                     break;
                 default:
                     {
-                        if(gridMixComponentPercents.Count() > 0)
+                        if (gridMixComponentPercents.Count() > 0)
                             throw new BadRequestException("FercRegion should be CustomMix for add electricityGridMix components !!");
 
                         //If user want to update only fercRegion then need to update that region and clear the gridMix data
-                        if (_periodFacilityElectricityGridMix.Count() != 0)
+                        if (_periodFacilityElectricityGridMixes.Count() != 0)
                         {
-                            var oldFercRegionId = _periodFacilityElectricityGridMix.FirstOrDefault().FercRegion.Id;
+                            var oldFercRegionId = _periodFacilityElectricityGridMixes.FirstOrDefault().FercRegion.Id;
 
                             if (oldFercRegionId != fercRegion.Id && fercRegion.Name != FercRegionValues.Custom_Mix)
                             {
-                                foreach(var i in _periodFacilityElectricityGridMix)
+                                foreach (var i in _periodFacilityElectricityGridMixes)
                                 {
                                     i.FercRegion.Id = fercRegion.Id;
                                     i.FercRegion.Name = fercRegion.Name;
-                                }                                
+                                }
                             }
                         }
                     }
                     break;
             }
-            
-           
-            return _periodFacilityElectricityGridMix;
+
+            return _periodFacilityElectricityGridMixes;
         }
 
         internal bool LoadElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
         {
             foreach (var facilityGridMix in gridMixComponentPercents)
             {
-                var periodFacilityGridMixDomain = new PeriodFacilityElectricityGridMix(facilityGridMix.Id, Id, facilityGridMix.ElectricityGridMixComponent, unitOfMeasure, fercRegion, facilityGridMix.Content, true);
+                var periodFacilityGridMixDomain = new PeriodFacilityElectricityGridMix(facilityGridMix.Id, Id, facilityGridMix.ElectricityGridMixComponent, unitOfMeasure, fercRegion, facilityGridMix.Content);
 
-                _periodFacilityElectricityGridMix.Add(periodFacilityGridMixDomain);
+                _periodFacilityElectricityGridMixes.Add(periodFacilityGridMixDomain);
             }
 
             return true;
         }
 
+        #region GasSupplyBreakdown
 
+        internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+        {
+            _periodSupplierGasSupplyBreakdowns.Clear();
+
+            if (FacilityVO.SupplyChainStage.Name != SupplyChainStagesValues.Production)
+                throw new BadRequestException("Facility SupplyChainStage is not Production !!");
+
+            foreach (var singleVo in gasSupplyBreakdownVOs)
+            {
+                if (singleVo.PeriodFacilityId == Id)
+                {
+                    var periodSupplierGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, singleVo.Site, singleVo.UnitOfMeasure, singleVo.Content);
+
+                    _periodSupplierGasSupplyBreakdowns.Add(periodSupplierGasSupplyBreakdown);
+                }
+            }
+
+            return _periodSupplierGasSupplyBreakdowns;
+        }
+
+        internal PeriodFacilityGasSupplyBreakdown LoadPeriodFacilityGasSupplyBreakdowns(Site site, UnitOfMeasure unitOfMeasure, decimal content)
+        {
+            var periodSupplierGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, site, unitOfMeasure, content);
+
+            _periodSupplierGasSupplyBreakdowns.Add(periodSupplierGasSupplyBreakdown);
+
+            return periodSupplierGasSupplyBreakdown;
+        }
+
+
+        #endregion
     }
 }

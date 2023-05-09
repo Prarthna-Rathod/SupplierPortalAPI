@@ -11,9 +11,8 @@
         public int FercRegionId { get; set; }
         public string FercRegionName { get; set; }
         public IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> ReportingPeriodFacilityElectricityGridMixDtos { get; set; } = new List<ReportingPeriodFacilityElectricityGridMixDto>();
-        public bool IsActive { get; set; }
 
-        public AddMultiplePeriodFacilityElectricityGridMixDto(int id, int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int unitOfMeasureId, string unitOfMeasureName, int fercRegionId, string fercRegionName, IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos,bool isActive)
+        public AddMultiplePeriodFacilityElectricityGridMixDto(int id, int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int unitOfMeasureId, string unitOfMeasureName, int fercRegionId, string fercRegionName, IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos)
         {
             Id = id;
             ReportingPeriodFacilityId = reportingPeriodFacilityId;
@@ -24,7 +23,6 @@
             FercRegionId = fercRegionId;
             FercRegionName = fercRegionName;
             ReportingPeriodFacilityElectricityGridMixDtos = reportingPeriodFacilityElectricityGridMixDtos;
-            IsActive = isActive;
         }
     }
 }

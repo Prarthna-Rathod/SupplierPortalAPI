@@ -46,6 +46,14 @@ public interface IReportingPeriodEntityDomainMapper
 
     ElectricityGridMixComponentPercent ConvertPeriodFacilityElectricityGridMixEntityToValueObject(int id, decimal content, ElectricityGridMixComponent electricityGridMixLookUp);
 
+    IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(IEnumerable<PeriodFacilityGasSupplyBreakdown> facilityGasSupplyBreakdowns);
+
+    ReportingPeriodFacilityGasSupplyBreakDownEntity ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity(PeriodFacilityGasSupplyBreakdown facilityGasSupplyBreakdown);
+
+    IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> gasSupplyEntities, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures);
+
+    GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(ReportingPeriodFacilityGasSupplyBreakDownEntity gasSupplyEntity, Site site, UnitOfMeasure unitOfMeasure);
+
     #endregion
 
     #region PeriodDocument

@@ -96,6 +96,8 @@ public interface IReportingPeriodServices
 
     string AddRemovePeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
 
+    string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto);
+
     #endregion
 
     #region ReportingPeriodDocuments

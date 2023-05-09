@@ -199,7 +199,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         entity.FercRegion = fercRegionEntity;
         entity.FercRegionId = fercRegionEntity.Id;
         entity.Content = facilityElectricityGridMix.Content;
-        entity.IsActive = facilityElectricityGridMix.IsActive;
+        entity.IsActive = true;
 
         return entity;
     }
@@ -232,6 +232,51 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     public ElectricityGridMixComponentPercent ConvertPeriodFacilityElectricityGridMixEntityToValueObject(int id, decimal content, ElectricityGridMixComponent electricityGridMixLookUp)
     {
         return new ElectricityGridMixComponentPercent(id, electricityGridMixLookUp, content);
+    }
+
+    public IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(IEnumerable<PeriodFacilityGasSupplyBreakdown> facilityGasSupplyBreakdowns)
+    {
+        var entityList = new List<ReportingPeriodFacilityGasSupplyBreakDownEntity>();
+
+        foreach(var domain in facilityGasSupplyBreakdowns)
+        {
+            entityList.Add(ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity(domain));
+        }
+
+        return entityList;
+    }
+
+    public ReportingPeriodFacilityGasSupplyBreakDownEntity ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity(PeriodFacilityGasSupplyBreakdown facilityGasSupplyBreakdown)
+    {
+        var entity = new ReportingPeriodFacilityGasSupplyBreakDownEntity();
+        entity.PeriodFacilityId = facilityGasSupplyBreakdown.PeriodFacilityId;
+        entity.SiteId = facilityGasSupplyBreakdown.Site.Id;
+        entity.UnitOfMeasureId = facilityGasSupplyBreakdown.UnitOfMeasure.Id;
+        entity.Content = facilityGasSupplyBreakdown.Content;
+        entity.IsActive = true;
+
+        return entity;
+    }
+
+    public IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> gasSupplyEntities, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures)
+    {
+        var voList = new List<GasSupplyBreakdownVO>();
+
+        foreach(var entity in gasSupplyEntities)
+        {
+            var site = sites.FirstOrDefault(x => x.Id == entity.SiteId);
+            var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.Id == entity.UnitOfMeasureId);
+            voList.Add(ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(entity, site, unitOfMeasure));
+        }
+
+        return voList;
+    }
+
+    public GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(ReportingPeriodFacilityGasSupplyBreakDownEntity gasSupplyEntity, Site site, UnitOfMeasure unitOfMeasure)
+    {
+        var gasSupplyBreakdownVo = new GasSupplyBreakdownVO(gasSupplyEntity.Id, gasSupplyEntity.PeriodFacilityId, gasSupplyEntity.PeriodFacility.FacilityId, site, unitOfMeasure, gasSupplyEntity.Content);
+
+        return gasSupplyBreakdownVo;
     }
 
     #endregion

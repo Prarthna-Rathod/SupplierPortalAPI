@@ -113,6 +113,12 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return _referenceLookUpMapper.GetFercRegionsLookUp(fercRegions);
     }
 
+    private IEnumerable<Site> GetAndConvertSites()
+    {
+        var sites = _reportingPeriodDataActions.GetSiteEntities();
+        return _referenceLookUpMapper.GetSiteLookUp(sites);
+    }
+
     /// <summary>
     /// Retrieve ReportingPeriod Entity and Convert it to DomainModel
     /// </summary>
@@ -147,10 +153,8 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
             reportingPeriodDomain.LoadPeriodFacility(periodFacility.Id, facilityVO, facilityReportingPeriodStatus, periodFacility.ReportingPeriodSupplierId, periodFacility.IsActive);
 
-
             //Load PeriodFacilityElectricityGridMixes
             var gridMixEntities = periodFacility.ReportingPeriodFacilityElectricityGridMixEntities;
-
 
             if (gridMixEntities.Count() != 0)
             {
@@ -164,6 +168,18 @@ public class ReportingPeriodServices : IReportingPeriodServices
                 var fercRegion = GetAndConvertFercRegions().FirstOrDefault(x => x.Id == fercRegionId);
 
                 reportingPeriodDomain.LoadElectricityGridMixComponents(periodFacility.Id, periodFacility.ReportingPeriodSupplierId, unitOfMeasure, fercRegion, gridMixValueObjectList);
+            }
+
+            //Load PeriodFacilityGasSupplyBreakdowns
+            var gasSupplyEntities = periodFacility.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+            if (gasSupplyEntities.Count() != 0)
+            {
+                var sites = GetAndConvertSites();
+                var unitOfMeasures = GetAndConvertUnitOfMeasures();
+                var gasSupplyValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(gasSupplyEntities, sites, unitOfMeasures);
+            
+                reportingPeriodDomain.LoadPeriodFacilityGasSupplyBreakdown(periodFacility.ReportingPeriodSupplierId, gasSupplyValueObjectList);
             }
         }
 
@@ -399,6 +415,24 @@ public class ReportingPeriodServices : IReportingPeriodServices
         _reportingPeriodDataActions.AddPeriodFacilityElectricityGridMix(entities, periodFacilityElectricityGridMixDto.ReportingPeriodFacilityId);
 
         return "ReportingPeriodFacility ElectricityGridMix Components added successfully !!";
+    }
+
+    public string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(multiplePeriodSupplierGasSupplyBreakdownDto.ReporingPeriodId);
+
+        var sites = GetAndConvertSites();
+        var unitOfMeasures = GetAndConvertUnitOfMeasures();
+
+        var valueObjectList = _reportingPeriodDomainDtoMapper.ConvertPeriodSupplierGasSupplyBreakdownDtosToValueObjectList(multiplePeriodSupplierGasSupplyBreakdownDto.PeriodSupplierGasSupplyBreakdowns, sites, unitOfMeasures);
+
+        var domainList = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(multiplePeriodSupplierGasSupplyBreakdownDto.ReportingPeriodSupplierId, valueObjectList);
+
+        var entities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(domainList);
+
+        _reportingPeriodDataActions.AddRemovePeriodFacilityGasSupplyBreakdown(entities);
+
+        return "ReportingPeriodSupplier GasSupplyBreakdown added successfully !!";
     }
 
     #endregion

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 namespace DataAccess.Entities
 {
-    public partial class UnitOfMeasureEntity
+    public partial class SiteEntity
     {
-        public UnitOfMeasureEntity()
+        public SiteEntity()
         {
-            ReportingPeriodFacilityElectricityGridMixEntities = new HashSet<ReportingPeriodFacilityElectricityGridMixEntity>();
             ReportingPeriodFacilityGasSupplyBreakDownEntities = new HashSet<ReportingPeriodFacilityGasSupplyBreakDownEntity>();
         }
 
@@ -16,7 +15,6 @@ namespace DataAccess.Entities
         public string Description { get; set; } = null!;
         public bool IsActive { get; set; }
 
-        public virtual ICollection<ReportingPeriodFacilityElectricityGridMixEntity> ReportingPeriodFacilityElectricityGridMixEntities { get; set; }
         public virtual ICollection<ReportingPeriodFacilityGasSupplyBreakDownEntity> ReportingPeriodFacilityGasSupplyBreakDownEntities { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
+using System;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 
@@ -20,7 +21,7 @@ public class PeriodSupplier
         _periodfacilities = new HashSet<PeriodFacility>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus,DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
     {
         Id = id;
     }
@@ -51,9 +52,9 @@ public class PeriodSupplier
     internal void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
     {
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
-
     }
 
+    
     #region Period Facility
 
     internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
@@ -132,6 +133,65 @@ public class PeriodSupplier
 
         return periodFacility.LoadElectricityGridMixComponents(unitOfMeasure, fercRegion, gridMixComponentPercents);
     }
+
+    #region GasSupplyBreakdown
+
+    internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new BadRequestException("SupplierReportingPeriodStatus should be UnLocked !!");
+
+        var list = new List<PeriodFacilityGasSupplyBreakdown>();
+        
+        //Check total content values 100 and repeated facility in same site or not
+        var groupBySiteData = gasSupplyBreakdownVOs.GroupBy(x => x.Site.Id);
+        foreach (var singleSiteData in groupBySiteData)
+        {
+            var siteName = singleSiteData.Select(x => x.Site.Name);
+            var totalContent = singleSiteData.Sum(x => x.Content);
+
+            var distinctCount = singleSiteData.Select(x => x.PeriodFacilityId).Distinct().Count();
+            var count = singleSiteData.Select(x => x.PeriodFacilityId).Count();
+            var isRepeatedFacility = distinctCount < count;
+
+            if (isRepeatedFacility)
+                throw new Exception($"Duplicate Site '{siteName}' exists in same facility !!");
+
+            if (totalContent != 100)
+                throw new Exception($"Please add more values in site {siteName}!! ");
+        }
+
+        //Add GasSupplyBreakdown data in periodFacility
+        var groupByFacility = gasSupplyBreakdownVOs.GroupBy(x => x.PeriodFacilityId);
+
+        foreach(var facility in groupByFacility)
+        {
+            var id = facility.First().PeriodFacilityId;
+            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == id);
+
+            if (periodFacility is null)
+                throw new NotFoundException("ReportingPeriodFacility is not found !!");
+
+            list.AddRange(periodFacility.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs));
+
+        }
+
+        return list;
+    }
+
+    internal bool LoadPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> periodFacilityGasSupplyBreakdowns)
+    {
+        //var list = new List<PeriodFacilityGasSupplyBreakdown>();
+        foreach (var item in periodFacilityGasSupplyBreakdowns)
+        {
+            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == item.PeriodFacilityId);
+            periodFacility.LoadPeriodFacilityGasSupplyBreakdowns(item.Site, item.UnitOfMeasure, item.Content);
+        }
+        return true;
+    }
+
+    #endregion
+
 
     #endregion
 

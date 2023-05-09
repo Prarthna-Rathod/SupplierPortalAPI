@@ -91,15 +91,26 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(gridMixEntity);
             }
         }
-       /* else
-        {
-            var oldFercRegion = periodFacilityGridMixes.First().FercRegion;
-            if(oldFercRegion.Id != newFercRegion.Id && newFercRegion.Name != FERC_REGION_CUSTOM_MIX)
-                RemovePeriodFacilityElectricityGridMix(periodFacilityId);
-        }*/
         _context.SaveChanges();
         return true;
     }
+
+    public bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities)
+    {
+        var allFacilityIds = facilityGasSupplyBreakDownEntities.Select(x => x.PeriodFacilityId).Distinct();
+
+        RemovePeriodFacilityGasSupplyBreakdown(allFacilityIds);
+
+        foreach (var entity in facilityGasSupplyBreakDownEntities)
+        {
+            entity.CreatedBy = "System";
+            entity.CreatedOn = DateTime.UtcNow;
+            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(entity);
+        }
+        _context.SaveChanges();
+        return true;
+    }
+
 
     public async Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
     {
@@ -290,6 +301,20 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
+    public bool RemovePeriodFacilityGasSupplyBreakdown(IEnumerable<int> periodFacilityIds)
+    {
+        foreach (var id in periodFacilityIds)
+        {
+
+            var entities = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Where(x => x.PeriodFacilityId == id).ToList();
+
+            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(entities);
+        }
+
+        _context.SaveChanges();
+        return true;
+    }
+
     #endregion
 
     #region GetAll Methods
@@ -380,6 +405,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return _context.FercRegionEntities;
     }
 
+    public IEnumerable<SiteEntity> GetSiteEntities()
+    {
+        return _context.SiteEntities;
+    }
 
     #endregion
 
@@ -393,6 +422,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodSupplierEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;

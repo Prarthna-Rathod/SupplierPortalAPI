@@ -86,6 +86,29 @@ namespace Services.Mappers.ReportingPeriodMappers
             return new ReportingPeriodRelevantSupplierDto(null,supplierEntity.Id, supplierEntity.Name, null,null,null,activeForCurrentPeriod,null,null);
         }
 
+        public IEnumerable<GasSupplyBreakdownVO> ConvertPeriodSupplierGasSupplyBreakdownDtosToValueObjectList(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> gasSupplyBreakDownDtos, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures)
+        {
+            var voList = new List<GasSupplyBreakdownVO>();
+
+            foreach(var dto in gasSupplyBreakDownDtos)
+            {
+                var site = sites.FirstOrDefault(x => x.Id == dto.SiteId);
+                var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.Id == dto.UnitOfMeasureId);
+
+                if (site == null || unitOfMeasure == null)
+                    throw new NotFoundException("Site or UnitOfMeasure is not found !!");
+
+                voList.Add(ConvertPeriodSupplierGasSupplyBreakdownDtoToValueObject(dto, site, unitOfMeasure));
+            }
+
+            return voList;
+        }
+
+        public GasSupplyBreakdownVO ConvertPeriodSupplierGasSupplyBreakdownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto gasSupplyBreakDownDto, Site site, UnitOfMeasure unitOfMeasure)
+        {
+            return new GasSupplyBreakdownVO(0, gasSupplyBreakDownDto.ReportingPeriodFacilityId, gasSupplyBreakDownDto.FacilityId, site, unitOfMeasure, gasSupplyBreakDownDto.Content);
+        }
+
         #endregion
 
         #region PeriodFacility

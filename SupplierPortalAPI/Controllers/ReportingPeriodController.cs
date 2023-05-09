@@ -36,10 +36,16 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
         }
 
-        [HttpPost("AddRemoveReportingPeriodFacilityElectricityGridMixComponents")]
+        [HttpPost("AddRemoveReportingPeriodFacility_ElectricityGridMixComponents")]
         public string AddRemoveReportingPeriodFacilityElectricityGridMixComponents(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDto)
         {
             return _services.AddRemovePeriodFacilityElectricityGridMix(addMultiplePeriodFacilityElectricityGridMixDto);
+        }
+
+        [HttpPost("AddReportingPeriodSupplier_GasSupplyBreakdowns")]
+        public string AddRemoveReportingPeriodSupplierGasSupplyBreakdowns(AddMultiplePeriodFacilityGasSupplyBreakdownDto addMultiplePeriodSupplierGasSupplyBreakdownDto)
+        {
+            return _services.AddRemovePeriodFacilityGasSupplyBreakdown(addMultiplePeriodSupplierGasSupplyBreakdownDto);
         }
 
         [HttpPut("LockUnlockPeriodSupplierStatus")]

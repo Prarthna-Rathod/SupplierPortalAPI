@@ -24,6 +24,8 @@ public interface IReferenceLookUpMapper
 
     IEnumerable<FercRegion> GetFercRegionsLookUp(IEnumerable<FercRegionEntity> fercRegionsEntities);
 
+    IEnumerable<Site> GetSiteLookUp(IEnumerable<SiteEntity> siteEntities);
+
     //Supplier
     IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities);
     IEnumerable<ReportingType> GetReportingTypeLookUp(IEnumerable<ReportingTypeEntity> reportingTypeEntities);

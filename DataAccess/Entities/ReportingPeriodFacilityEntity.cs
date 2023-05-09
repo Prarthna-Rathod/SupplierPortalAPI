@@ -9,6 +9,7 @@ namespace DataAccess.Entities
         {
             ReportingPeriodFacilityDocumentEntities = new HashSet<ReportingPeriodFacilityDocumentEntity>();
             ReportingPeriodFacilityElectricityGridMixEntities = new HashSet<ReportingPeriodFacilityElectricityGridMixEntity>();
+            ReportingPeriodFacilityGasSupplyBreakDownEntities = new HashSet<ReportingPeriodFacilityGasSupplyBreakDownEntity>();
         }
 
         public int Id { get; set; }
@@ -29,5 +30,6 @@ namespace DataAccess.Entities
         public virtual SupplyChainStageEntity SupplyChainStage { get; set; } = null!;
         public virtual ICollection<ReportingPeriodFacilityDocumentEntity> ReportingPeriodFacilityDocumentEntities { get; set; }
         public virtual ICollection<ReportingPeriodFacilityElectricityGridMixEntity> ReportingPeriodFacilityElectricityGridMixEntities { get; set; }
+        public virtual ICollection<ReportingPeriodFacilityGasSupplyBreakDownEntity> ReportingPeriodFacilityGasSupplyBreakDownEntities { get; set; }
     }
 }
