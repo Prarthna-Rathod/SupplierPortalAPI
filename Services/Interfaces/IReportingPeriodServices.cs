@@ -84,15 +84,31 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="periodFacilityElectricityGridMixDto"></param>
     /// <returns></returns>
-    string AddRemovePeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
+    string AddRemovePeriodFacilityElectricityGridMix(MultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
 
     /// <summary>
     /// Add or Replace ReportingPeriodSupplierFacility GasSupplyBreakdown sites
     /// </summary>
     /// <param name="multiplePeriodSupplierGasSupplyBreakdownDto"></param>
     /// <returns></returns>
-    string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto);
+    string AddRemovePeriodFacilityGasSupplyBreakdown(MultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto);
 
+    /// <summary>
+    /// Get ReportingPeriodFacility ElectricityGridMixComponents data
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="reportingPeriodId"></param>
+    /// <returns></returns>
+    MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId, int reportingPeriodId);
+
+
+    /// <summary>
+    /// Get ReportingPeriodSupplierFacility GasSupplyBreakdown data
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="reportingPeriodId"></param>
+    /// <returns></returns>
+    MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int periodSupplierId, int reportingPeriodId);
     #endregion
 
     #region ReportingPeriodDocuments

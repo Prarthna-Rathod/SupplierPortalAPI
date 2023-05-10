@@ -34,6 +34,12 @@ public interface IReportingPeriodDomainDtoMapper
 
     GasSupplyBreakdownVO ConvertPeriodSupplierGasSupplyBreakdownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto gasSupplyBreakDownDto, Site site, UnitOfMeasure unitOfMeasure);
 
+    MultiplePeriodFacilityGasSupplyBreakdownDto GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto(IEnumerable<PeriodFacility> periodFacilityList, PeriodSupplier periodSupplier);
+
+    IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(IEnumerable<PeriodFacilityGasSupplyBreakdown> gasSupplyBreakdowns, PeriodFacility periodFacility);
+
+    MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityGridMixList, PeriodSupplier periodSupplier, PeriodFacility periodFacility);
+
     #endregion
 
     #region PeriodFacility

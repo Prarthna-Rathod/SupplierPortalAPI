@@ -109,6 +109,33 @@ namespace Services.Mappers.ReportingPeriodMappers
             return new GasSupplyBreakdownVO(0, gasSupplyBreakDownDto.ReportingPeriodFacilityId, gasSupplyBreakDownDto.FacilityId, site, unitOfMeasure, gasSupplyBreakDownDto.Content);
         }
 
+        public MultiplePeriodFacilityGasSupplyBreakdownDto GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto(IEnumerable<PeriodFacility> periodFacilityList, PeriodSupplier periodSupplier)
+        {
+            var gasSupplyDtos = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+            foreach(var facility in periodFacilityList)
+            {
+                var gasSupplyBreakdowns = facility.periodFacilityGasSupplyBreakdowns;
+                gasSupplyDtos.AddRange(ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(gasSupplyBreakdowns, facility));
+            }
+
+            var periodSupplierFacilityGasSupplyBreakdownDto = new MultiplePeriodFacilityGasSupplyBreakdownDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, gasSupplyDtos);
+            return periodSupplierFacilityGasSupplyBreakdownDto;
+        }
+
+        public IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(IEnumerable<PeriodFacilityGasSupplyBreakdown> gasSupplyBreakdowns, PeriodFacility periodFacility)
+        {
+            var dtoList = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+
+            foreach(var item in gasSupplyBreakdowns)
+            {
+                var dto = new ReportingPeriodFacilityGasSupplyBreakdownDto(item.PeriodFacilityId, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, item.Site.Id, item.Site.Name, item.UnitOfMeasure.Id, item.UnitOfMeasure.Name, item.Content);
+
+                dtoList.Add(dto);
+            }
+
+            return dtoList;
+        }
+
         #endregion
 
         #region PeriodFacility
@@ -172,6 +199,22 @@ namespace Services.Mappers.ReportingPeriodMappers
         public ElectricityGridMixComponentPercent ConvertPeriodFacilityElectricityGridMixDtoToValueObject(ElectricityGridMixComponent electricityGridMix, decimal content)
         {
             return new ElectricityGridMixComponentPercent(0, electricityGridMix, content);
+        }
+
+        public MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityGridMixList, PeriodSupplier periodSupplier, PeriodFacility periodFacility)
+        {
+            var gridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+            foreach (var gridMix in periodFacilityGridMixList)
+            {
+                var gridMixDto = new ReportingPeriodFacilityElectricityGridMixDto(gridMix.ElectricityGridMixComponent.Id, gridMix.ElectricityGridMixComponent.Name, gridMix.Content);
+
+                gridMixDtos.Add(gridMixDto);
+            }
+            var unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
+            var fercRegion = periodFacilityGridMixList.First().FercRegion;
+
+            var periodFacilityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodFacility.ReportingPeriodId, periodSupplier.Supplier.Id, unitOfMeasure.Id, unitOfMeasure.Name, fercRegion.Id, fercRegion.Name, gridMixDtos);
+            return periodFacilityGridMixDto;
         }
 
         #endregion

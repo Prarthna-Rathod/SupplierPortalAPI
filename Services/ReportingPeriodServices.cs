@@ -178,7 +178,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
                 var sites = GetAndConvertSites();
                 var unitOfMeasures = GetAndConvertUnitOfMeasures();
                 var gasSupplyValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(gasSupplyEntities, sites, unitOfMeasures);
-            
+
                 reportingPeriodDomain.LoadPeriodFacilityGasSupplyBreakdown(periodFacility.ReportingPeriodSupplierId, gasSupplyValueObjectList);
             }
         }
@@ -389,7 +389,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     /// </summary>
     /// <param name="periodFacilityElectricityGridMixDto"></param>
     /// <returns></returns>
-    public string AddRemovePeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto)
+    public string AddRemovePeriodFacilityElectricityGridMix(MultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto)
     {
         var electricityGridMixComponents = GetAndConvertElectricityGridMixComponents();
         var unitOfMeasure = GetAndConvertUnitOfMeasures().FirstOrDefault(x => x.Id == periodFacilityElectricityGridMixDto.UnitOfMeasureId);
@@ -424,7 +424,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     /// </summary>
     /// <param name="multiplePeriodSupplierGasSupplyBreakdownDto"></param>
     /// <returns></returns>
-    public string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto)
+    public string AddRemovePeriodFacilityGasSupplyBreakdown(MultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(multiplePeriodSupplierGasSupplyBreakdownDto.ReporingPeriodId);
 
@@ -527,6 +527,54 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var periodsuppliersDtos = _reportingPeriodDomainDtoMapper.ConvertReleventPeriodSupplierDomainToDto(periodSupplierDomainlist, supplierList, reportingPeriod);
 
         return periodsuppliersDtos;
+    }
+
+
+    public MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId, int reportingPeriodId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+        var periodSuppliers = reportingPeriod.PeriodSuppliers;
+        var gridMixData = new List<PeriodFacilityElectricityGridMix>();
+        PeriodFacility? periodFacilityDomain = null;
+        PeriodSupplier? periodSupplierDomain = null;
+
+        foreach(var periodSupplier in periodSuppliers)
+        {
+            var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+            gridMixData.AddRange(periodFacility.periodFacilityElectricityGridMixes);
+            periodFacilityDomain = periodFacility;
+            periodSupplierDomain = periodSupplier;
+            break;
+        }
+
+        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(gridMixData, periodSupplierDomain, periodFacilityDomain);
+
+        return dto;
+    }
+
+
+    /// <summary>
+    /// Get all site data for ReportingPeriodSupplierFacilities
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="reportingPeriodId"></param>
+    /// <returns></returns>
+    public MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int periodSupplierId, int reportingPeriodId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierId);
+        var periodFacilities = periodSupplier.PeriodFacilities;
+        var facilityData = new List<PeriodFacility>();
+        foreach (var periodFacility in periodFacilities)
+        {
+            var gasSupplyBreakdowns = periodFacility.periodFacilityGasSupplyBreakdowns;
+            if (gasSupplyBreakdowns.Count() != 0)
+                facilityData.Add(periodFacility);
+        }
+
+        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto(facilityData, periodSupplier);
+
+        return dto;
     }
 
 }
