@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
+using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -54,7 +55,22 @@ public class PeriodSupplier
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
     }
 
-    
+    private void CheckSupplierReportingPeriodStatus()
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new BadRequestException("SupplierReportingPeriodStatus should be UnLocked !!");
+    }
+
+    private PeriodFacility FindPeriodFacility(int periodFacilityId)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility is null)
+            throw new NotFoundException("ReportingPeriodFacility is not found !!");
+
+        return periodFacility;
+    }
+
     #region Period Facility
 
     internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
@@ -116,20 +132,15 @@ public class PeriodSupplier
 
     internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
     {
-        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
-
-        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
-            throw new BadRequestException("SupplierReportingPeriodStatus should be UnLocked !!");
-
-        if (periodFacility is null)
-            throw new NotFoundException("ReportingPeriodFacility is not found !!");
+        CheckSupplierReportingPeriodStatus();
+        var periodFacility = FindPeriodFacility(periodFacilityId);
 
         return periodFacility.AddRemoveElectricityGridMixComponents(unitOfMeasure, fercRegion, gridMixComponentPercents);
     }
 
     internal bool LoadElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
     {
-        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+        var periodFacility = FindPeriodFacility(periodFacilityId);
 
         return periodFacility.LoadElectricityGridMixComponents(unitOfMeasure, fercRegion, gridMixComponentPercents);
     }
@@ -138,25 +149,15 @@ public class PeriodSupplier
 
     internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
     {
-        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
-            throw new BadRequestException("SupplierReportingPeriodStatus should be UnLocked !!");
-
-        var list = new List<PeriodFacilityGasSupplyBreakdown>();
+        CheckSupplierReportingPeriodStatus();
+         var list = new List<PeriodFacilityGasSupplyBreakdown>();
         
-        //Check total content values 100 and repeated facility in same site or not
+        //Check total content values 100
         var groupBySiteData = gasSupplyBreakdownVOs.GroupBy(x => x.Site.Id);
         foreach (var singleSiteData in groupBySiteData)
         {
-            var siteName = singleSiteData.Select(x => x.Site.Name);
+            var siteName = singleSiteData.First().Site.Name;
             var totalContent = singleSiteData.Sum(x => x.Content);
-
-            var distinctCount = singleSiteData.Select(x => x.PeriodFacilityId).Distinct().Count();
-            var count = singleSiteData.Select(x => x.PeriodFacilityId).Count();
-            var isRepeatedFacility = distinctCount < count;
-
-            if (isRepeatedFacility)
-                throw new Exception($"Duplicate Site '{siteName}' exists in same facility !!");
-
             if (totalContent != 100)
                 throw new Exception($"Please add more values in site {siteName}!! ");
         }
@@ -164,16 +165,11 @@ public class PeriodSupplier
         //Add GasSupplyBreakdown data in periodFacility
         var groupByFacility = gasSupplyBreakdownVOs.GroupBy(x => x.PeriodFacilityId);
 
-        foreach(var facility in groupByFacility)
+        foreach(var facilityData in groupByFacility)
         {
-            var id = facility.First().PeriodFacilityId;
-            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == id);
+            var periodFacility = FindPeriodFacility(facilityData.Key);
 
-            if (periodFacility is null)
-                throw new NotFoundException("ReportingPeriodFacility is not found !!");
-
-            list.AddRange(periodFacility.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs));
-
+            list.AddRange(periodFacility.AddPeriodFacilityGasSupplyBreakdown(facilityData));
         }
 
         return list;
@@ -184,7 +180,7 @@ public class PeriodSupplier
         //var list = new List<PeriodFacilityGasSupplyBreakdown>();
         foreach (var item in periodFacilityGasSupplyBreakdowns)
         {
-            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == item.PeriodFacilityId);
+            var periodFacility = FindPeriodFacility(item.PeriodFacilityId);
             periodFacility.LoadPeriodFacilityGasSupplyBreakdowns(item.Site, item.UnitOfMeasure, item.Content);
         }
         return true;

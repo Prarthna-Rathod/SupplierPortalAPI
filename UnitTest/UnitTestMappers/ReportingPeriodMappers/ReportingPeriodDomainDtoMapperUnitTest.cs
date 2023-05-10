@@ -86,5 +86,45 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodFacility.FacilityReportingPeriodDataStatus.Name, periodFacilityDto.FacilityReportingPeriodDataStatusName);
 
         }
+
+        [Fact]
+        public void ConvertPeriodFacilityGasSupplyBreakdownDtoToValueObject()
+        {
+            var dto = CreatePeriodFacilityGasSupplyBreakdownDto();
+            var site = GetSites().FirstOrDefault(x => x.Id == dto.SiteId);
+            var uom = GetUnitOfMeasures().FirstOrDefault(x => x.Id == dto.UnitOfMeasureId);
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+
+            //Act
+            var vo = mapper.ConvertPeriodSupplierGasSupplyBreakdownDtoToValueObject(dto, site, uom);
+
+            //Assert
+            Assert.NotNull(vo);
+            Assert.Equal(dto.ReportingPeriodFacilityId, vo.PeriodFacilityId);
+            Assert.Equal(dto.FacilityId, vo.FacilityId);
+            Assert.Equal(dto.SiteId, vo.Site.Id);
+            Assert.Equal(dto.UnitOfMeasureId, vo.UnitOfMeasure.Id);
+            Assert.Equal(dto.Content, vo.Content);
+        }
+
+        [Fact]
+        public void ConvertPeriodFacilityElectricityGridMixDtosToValueObjectList()
+        {
+            var dtos = PeriodFacilityElectricityGridMixDtos();
+            var gridMixComponents = GetElectricityGridMixComponents();
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+
+            var voList = mapper.ConvertPeriodFacilityElectricityGridMixDtosToValueObjectList(dtos, gridMixComponents);
+
+            Assert.NotNull(voList);
+            Assert.Equal(dtos.Count(), voList.Count());
+
+            for (int i = 0; i < dtos.Count(); i++)
+            {
+                var entityComponent = dtos.ToList()[i].ElectricityGridMixComponentId;
+                var addedComponent = voList.ToList()[i].ElectricityGridMixComponent.Id;
+                Assert.Equal(entityComponent, addedComponent);
+            }
+        }
     }
 }

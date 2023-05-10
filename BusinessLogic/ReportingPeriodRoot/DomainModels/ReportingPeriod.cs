@@ -128,6 +128,22 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         }
 
+        private void CheckReportingPeriodStatus()
+        {
+            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+                throw new BadRequestException("ReportingPeriod is not open or close !!");
+        }
+
+        private PeriodSupplier FindPeriodSupplier(int periodSupplierId)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            if (periodSupplier == null)
+                throw new NotFoundException("ReportingPeriodSupplier is not found !!");
+
+            return periodSupplier;
+        }
+
         #endregion
 
         #region Update ReportingPeriod
@@ -264,7 +280,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         public PeriodSupplier UpdateLockUnlockPeriodSupplierStatus(int periodSupplierId, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
         {
-            var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
             if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
                 throw new BadRequestException("You can't update PeriodSupplierStatus because reportingPeriodStatus is InActive or Complete !!");
@@ -288,37 +304,34 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #endregion
 
-
-
         #region Period Facility
 
         public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
             return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, isActive);
         }
 
 
         public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
             return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
         }
 
         public IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, int periodSupplierId,UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            CheckReportingPeriodStatus();
 
-            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
-                throw new BadRequestException("ReportingPeriod is not open or close !!");
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
            return periodSupplier.AddRemoveElectricityGridMixComponents(periodFacilityId, unitOfMeasure, fercRegion, gridMixComponentPercents);
         }
 
         public bool LoadElectricityGridMixComponents(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
             return periodSupplier.LoadElectricityGridMixComponents(periodFacilityId, unitOfMeasure, fercRegion, gridMixComponentPercents);
         }
@@ -329,20 +342,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         public IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
         {
-            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
-                throw new BadRequestException("ReportingPeriod is not open or close !!");
-
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-
-            if (periodSupplier == null)
-                throw new NotFoundException("ReportingPeriodSupplier is not found !!");
-
+            CheckReportingPeriodStatus();
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
             return periodSupplier.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
         }
 
         public bool LoadPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
             return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
         }

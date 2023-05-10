@@ -34,13 +34,6 @@ public interface IReportingPeriodServices
     #region PeriodSuppliers
 
     /// <summary>
-    /// Add PeriodSupplier
-    /// </summary>
-    /// <param name="reportingPeriodSupplierDto"></param>
-    /// <returns></returns>
-    /*string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);*/
-
-    /// <summary>
     /// Add Multiple PeriodSuppliers
     /// </summary>
     /// <param name="multiplePeriodSuppliersDto"></param>
@@ -55,17 +48,9 @@ public interface IReportingPeriodServices
     string LockUnlockPeriodSupplierStatus(int periodSupplierId);
 
     /// <summary>
-    /// Get ReportingPeriodSuppliers
-    /// </summary>
-    /// <returns></returns>
-    /// 
-    IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
-
-    /// <summary>
     /// Get Relevant PeriodSuppliers
     /// </summary>
     /// <returns></returns>
-
     IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId);
 
     /// <summary>
@@ -94,8 +79,18 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId);
 
+    /// <summary>
+    /// Add or Replace ReportingPeriodFacility ElectricityGridMix Components
+    /// </summary>
+    /// <param name="periodFacilityElectricityGridMixDto"></param>
+    /// <returns></returns>
     string AddRemovePeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
 
+    /// <summary>
+    /// Add or Replace ReportingPeriodSupplierFacility GasSupplyBreakdown sites
+    /// </summary>
+    /// <param name="multiplePeriodSupplierGasSupplyBreakdownDto"></param>
+    /// <returns></returns>
     string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto);
 
     #endregion

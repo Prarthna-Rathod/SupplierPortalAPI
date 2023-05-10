@@ -95,11 +95,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities)
+    public bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities, int periodSupplierId)
     {
-        var allFacilityIds = facilityGasSupplyBreakDownEntities.Select(x => x.PeriodFacilityId).Distinct();
-
-        RemovePeriodFacilityGasSupplyBreakdown(allFacilityIds);
+        RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
 
         foreach (var entity in facilityGasSupplyBreakDownEntities)
         {
@@ -301,14 +299,19 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool RemovePeriodFacilityGasSupplyBreakdown(IEnumerable<int> periodFacilityIds)
+    public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
     {
-        foreach (var id in periodFacilityIds)
+        var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
+        var periodFacilityEntities = periodSupplierEntity.ReportingPeriodFacilityEntities;
+        var gasSupplyBreakdownEntities = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+        foreach (var periodFacilityEntity in periodFacilityEntities)
         {
+            var entities = gasSupplyBreakdownEntities.Where(x => x.PeriodFacilityId == periodFacilityEntity.Id).ToList();
 
-            var entities = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Where(x => x.PeriodFacilityId == id).ToList();
+            if(entities.Count() != 0)
+                _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(entities);
 
-            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(entities);
         }
 
         _context.SaveChanges();

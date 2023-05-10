@@ -417,6 +417,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "ReportingPeriodFacility ElectricityGridMix Components added successfully !!";
     }
 
+    /// <summary>
+    /// AddRemove ReportingPeriodSupplierFacility GasSupplyBreakdown sites.
+    /// In this, Per PeriodSupplier per site Content should be 100
+    /// Per PeriodSupplier per facility site could not be repeated
+    /// </summary>
+    /// <param name="multiplePeriodSupplierGasSupplyBreakdownDto"></param>
+    /// <returns></returns>
     public string AddRemovePeriodFacilityGasSupplyBreakdown(AddMultiplePeriodFacilityGasSupplyBreakdownDto multiplePeriodSupplierGasSupplyBreakdownDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(multiplePeriodSupplierGasSupplyBreakdownDto.ReporingPeriodId);
@@ -430,7 +437,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         var entities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(domainList);
 
-        _reportingPeriodDataActions.AddRemovePeriodFacilityGasSupplyBreakdown(entities);
+        _reportingPeriodDataActions.AddRemovePeriodFacilityGasSupplyBreakdown(entities, multiplePeriodSupplierGasSupplyBreakdownDto.ReportingPeriodSupplierId);
 
         return "ReportingPeriodSupplier GasSupplyBreakdown added successfully !!";
     }
@@ -455,20 +462,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodDomainListToDtos(reportingPeriodDomainList);
 
         return reportingPeriodDtos;
-    }
-
-    /// <summary>
-    /// GetReportingPeriodSuppliers
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId)
-    {
-        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-        var periodSuppliers = reportingPeriod.PeriodSuppliers;
-
-        var supplierReportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodSupplierDomainListToDtos(periodSuppliers, reportingPeriod);
-
-        return supplierReportingPeriodDtos;
     }
 
     /// <summary>

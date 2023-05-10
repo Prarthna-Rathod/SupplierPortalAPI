@@ -128,21 +128,23 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region GasSupplyBreakdown
 
-        internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
+        internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> facilityDataVos)
         {
             _periodSupplierGasSupplyBreakdowns.Clear();
 
             if (FacilityVO.SupplyChainStage.Name != SupplyChainStagesValues.Production)
                 throw new BadRequestException("Facility SupplyChainStage is not Production !!");
 
-            foreach (var singleVo in gasSupplyBreakdownVOs)
+            foreach (var singleVo in facilityDataVos)
             {
-                if (singleVo.PeriodFacilityId == Id)
-                {
-                    var periodSupplierGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, singleVo.Site, singleVo.UnitOfMeasure, singleVo.Content);
+                var periodSupplierGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, singleVo.Site, singleVo.UnitOfMeasure, singleVo.Content);
 
-                    _periodSupplierGasSupplyBreakdowns.Add(periodSupplierGasSupplyBreakdown);
-                }
+                var isSiteExists = _periodSupplierGasSupplyBreakdowns.Any(x => x.Site.Id == singleVo.Site.Id);
+
+                if (isSiteExists)
+                    throw new Exception($"Duplicate Site '{singleVo.Site.Name}' exists in same facility !!");
+
+                _periodSupplierGasSupplyBreakdowns.Add(periodSupplierGasSupplyBreakdown);
             }
 
             return _periodSupplierGasSupplyBreakdowns;

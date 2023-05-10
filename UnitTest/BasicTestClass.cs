@@ -1,16 +1,13 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
-using BusinessLogic.ValueConstants;
 using BusinessLogic.SupplierRoot.ValueObjects;
-using DataAccess.DataActions.Interfaces;
+using BusinessLogic.ValueConstants;
 using DataAccess.Entities;
-using Services.Mappers.Interfaces;
+using Services.DTOs;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
-using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 
 namespace UnitTest
 {
@@ -27,7 +24,7 @@ namespace UnitTest
         private int reportingPeriodId = 1;
         private string displayName = "Reporting Period Data Year 2022";
         private string collectionTimePeriod = "2022";
-        private DateTime startDate = new DateTime(2023,04,12);
+        private DateTime startDate = new DateTime(2023, 04, 12);
         private DateTime? endDate = null;
         private bool isActive = true;
 
@@ -105,7 +102,7 @@ namespace UnitTest
                     Email = "abc@gmail.com",
                     ContactNo = "+85940494",
                     RoleId = 2,
-                    IsActive= true,
+                    IsActive = true,
                     CreatedOn = DateTime.UtcNow,
                     CreatedBy = "System"
                 }
@@ -143,11 +140,11 @@ namespace UnitTest
                 SupplierId = supplierId,
                 GhgrpfacilityId = "123",
                 ReportingTypeId = 1,
-                AssociatePipelineId = 1,
-                SupplyChainStageId = 3,
+                AssociatePipelineId = null,
+                SupplyChainStageId = 1,
                 IsActive = true,
                 CreatedOn = DateTime.UtcNow,
-                CreatedBy= "System",
+                CreatedBy = "System",
             });
             facilityEntities.Add(new FacilityEntity()
             {
@@ -168,7 +165,7 @@ namespace UnitTest
             return facilityEntities;
         }
 
-       
+
         protected SupplierEntityDomainMapper CreateInstanceOfSupplierEntityToDomain()
         {
             return new SupplierEntityDomainMapper();
@@ -258,7 +255,39 @@ namespace UnitTest
             return components;
         }
 
+        protected IEnumerable<Site> GetSites()
+        {
+            var sites = new List<Site>();
+            sites.Add(new Site(1, "SPL"));
+            sites.Add(new Site(2, "CCL"));
+
+            return sites;
+        }
+
         #region ReportingPeriod methods
+
+        public ReportingPeriod AddPeriodSupplierAndPeriodFacilityForPeriod()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+
+            //Add PeriodSupplier
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2023, 5, 5), new DateTime(2023, 5, 6));
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+
+            //Update ReportingPeriodStatus InActive To Open
+            var updatePeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = updatePeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = updatePeriodStatus.Name;
+
+            return reportingPeriod;
+        }
+
 
         protected ReportingPeriod GetReportingPeriodDomain()
         {
@@ -310,10 +339,59 @@ namespace UnitTest
             periodFacilityEntity.Id = 1;
             periodFacilityEntity.FacilityId = 1;
             periodFacilityEntity.ReportingPeriodId = 1;
-            periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetSupplierReportingPeriodStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
+            periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
             periodFacilityEntity.ReportingPeriodSupplierId = 1;
 
             return periodFacilityEntity;
+        }
+
+        protected ReportingPeriodFacilityGasSupplyBreakDownEntity CreatePeriodFacilityGasSupplyBreakdownEntity()
+        {
+            var periodFacilityEntity = CreateReportingPeriodFacilityEntity();
+            var entity = new ReportingPeriodFacilityGasSupplyBreakDownEntity();
+            entity.Id = 1;
+            entity.PeriodFacilityId = periodFacilityEntity.Id;
+            entity.PeriodFacility = periodFacilityEntity;
+            entity.SiteId = 1;
+            entity.UnitOfMeasureId = 1;
+            entity.Content = (decimal)100.00;
+            entity.IsActive = true;
+            entity.CreatedOn = DateTime.UtcNow;
+            entity.CreatedBy = "System";
+
+            return entity;
+
+        }
+
+        protected IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> CreatePeriodFacilityElectricityGridMixEntities()
+        {
+            var entityList = new List<ReportingPeriodFacilityElectricityGridMixEntity>();
+            entityList.Add(new ReportingPeriodFacilityElectricityGridMixEntity()
+            {
+                Id = 1,
+                ReportingPeriodFacilityId = 1,
+                FercRegionId = 12,
+                UnitOfMeasureId = 1,
+                ElectricityGridMixComponentId = 1,
+                Content = (decimal)50.00,
+                IsActive = true,
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = "System"
+            });
+            entityList.Add(new ReportingPeriodFacilityElectricityGridMixEntity()
+            {
+                Id = 2,
+                ReportingPeriodFacilityId = 1,
+                FercRegionId = 12,
+                UnitOfMeasureId = 1,
+                ElectricityGridMixComponentId = 2,
+                Content = (decimal)50.00,
+                IsActive = true,
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = "System"
+            });
+
+            return entityList;
         }
 
         #endregion
@@ -352,7 +430,7 @@ namespace UnitTest
             list.Add(new ElectricityGridMixComponentPercent(3, electricityGridMixComponents.FirstOrDefault(x => x.Id == 3), (decimal)20.00));
             list.Add(new ElectricityGridMixComponentPercent(4, electricityGridMixComponents.FirstOrDefault(x => x.Id == 4), (decimal)20.00));
             list.Add(new ElectricityGridMixComponentPercent(5, electricityGridMixComponents.FirstOrDefault(x => x.Id == 5), (decimal)20.00));
-            
+
             return list;
         }
 
@@ -368,9 +446,50 @@ namespace UnitTest
             return list;
         }
 
+        protected IEnumerable<GasSupplyBreakdownVO> GetGasSupplyBreakdownVOs()
+        {
+            var list = new List<GasSupplyBreakdownVO>();
+            var sites = GetSites();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+
+            list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.First(), unitOfMeasure, (decimal)100.00));
+            list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.FirstOrDefault(x => x.Id == 2), unitOfMeasure, (decimal)100.00));
+
+            return list;
+        }
+
+        protected IEnumerable<GasSupplyBreakdownVO> GetGasSupplyBreakdownVOsList2()
+        {
+            var list = new List<GasSupplyBreakdownVO>();
+            var sites = GetSites();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+
+            list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.First(), unitOfMeasure, (decimal)100.00));
+
+            return list;
+        }
 
         #endregion
 
+        #region Created Dto for mapper testing
+
+        protected IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> PeriodFacilityElectricityGridMixDtos()
+        {
+            var electricityGridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+            electricityGridMixDtos.Add(new ReportingPeriodFacilityElectricityGridMixDto(1, "string", (decimal)50.00));
+            electricityGridMixDtos.Add(new ReportingPeriodFacilityElectricityGridMixDto(2, "string", (decimal)50.00));
+
+            return electricityGridMixDtos;
+
+        }
+
+
+        protected ReportingPeriodFacilityGasSupplyBreakdownDto CreatePeriodFacilityGasSupplyBreakdownDto()
+        {
+            return new ReportingPeriodFacilityGasSupplyBreakdownDto(1, 1, "FacilityName", 1, "siteName", 1, "UnitOfMeasureName", (decimal)100.00);
+        }
+
+        #endregion
 
         protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
         {
