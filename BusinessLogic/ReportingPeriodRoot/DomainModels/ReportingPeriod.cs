@@ -253,7 +253,7 @@ public class ReportingPeriod : IReportingPeriod
 
         foreach (var periodSupplier in reportingPeriodActiveSuppliers)
         {
-            var isExist = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == periodSupplier.Supplier.Id && x.IsActive && x.ReportingPeriodId == periodSupplier.PeriodId);
+            var isExist = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == periodSupplier.Supplier.Id && x.IsActive /*&& x.ReportingPeriodId == periodSupplier.PeriodId*/);
             //Check existing PeriodSupplier
             if (periodSupplier.IsActive)
             {
@@ -363,3 +363,36 @@ public class ReportingPeriod : IReportingPeriod
 
 
 }
+
+//public IEnumerable<ReportingPeriodSupplier> AddDeleteReportingPeriodSupplier(IEnumerable<ReportingPeriodSupplierActiveVO> reportingPeriodSupplierActiveVOs)
+//{
+//    if (ReportingPeriodStatus.Name != GetReportingPeriodStatusEnum(ReportingPeriodStatusEnum.Open))
+//        throw new Exception("ReportingPeriodStatus is not Open...");
+
+//    foreach (var activeSupplier in reportingPeriodSupplierActiveVOs)
+//    {
+//        var isExist = _reportingPeriodSuppliers.FirstOrDefault(x => x.SupplierVo.SupplierId == activeSupplier.SupplierVo.SupplierId && x.PeriodId == activeSupplier.PeriodId);
+
+//        if (activeSupplier.IsActive)
+//        {
+//            if (isExist is null)
+//            {
+
+//                var reportingPeriodSupplier = new ReportingPeriodSupplier(Id, activeSupplier.SupplierPeriodStatus, activeSupplier.IsActive, null, null, activeSupplier.SupplierVo);
+//                _reportingPeriodSuppliers.Add(reportingPeriodSupplier);
+//            }
+
+//            else throw new Exception("Period supplier already exist");
+//        }
+
+//        if (isExist is not null && !activeSupplier.IsActive)
+//        {
+//            if (activeSupplier.ReportingPeriodSupplierId == 0 || activeSupplier.ReportingPeriodSupplierId == null)
+//                throw new Exception("ReportingPeriodSupplierId is compulsory for delete...");
+
+//            _reportingPeriodSuppliers.Remove(isExist);
+//        }
+//    }
+//    return _reportingPeriodSuppliers;
+
+//}

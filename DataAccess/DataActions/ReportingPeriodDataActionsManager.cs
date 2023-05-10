@@ -39,38 +39,39 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity)
+    public bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity,int id)
     {
-        var allSuppliers = _context.ReportingPeriodSupplierEntities;
+        var allSuppliers = _context.ReportingPeriodSupplierEntities.Where(x=>x.ReportingPeriodId==id);
 
         foreach (var entity in reportingPeriodSupplierEntity)
         {
-            var isExist = allSuppliers.FirstOrDefault(x => x.SupplierId == entity.SupplierId &&
-            x.ReportingPeriodId == entity.ReportingPeriodId);
+            var isExist =allSuppliers.FirstOrDefault(x=>x.SupplierId== entity.SupplierId);
 
-            if (isExist is null)
-            {
-                _context.ReportingPeriodSupplierEntities.Add(entity);
+            if(isExist is null) {
+                if (entity.Id == 0)
+                {
+                    _context.ReportingPeriodSupplierEntities.Add(entity);
+                }
             }
 
+            
+
         }
-        _context.SaveChanges();
+
 
         foreach (var entity in allSuppliers)
-        {
-            var isExist = reportingPeriodSupplierEntity.Where(x => x.SupplierId
-            == entity.SupplierId && x.ReportingPeriodId == entity.ReportingPeriodId && !entity.IsActive).FirstOrDefault();
+        {       var isExist = reportingPeriodSupplierEntity.Where(x => x.SupplierId
+                == entity.SupplierId /*&& x.ReportingPeriodId == entity.ReportingPeriodId*/ ).FirstOrDefault();
 
-            //var removeEntity = allSuppliers.FirstOrDefault(x => x.Id == entity.Id);
-
-            if (isExist is not null)
-            {
-                _context.ReportingPeriodSupplierEntities.Remove(entity);
-            }
+                if (isExist is null)
+                {
+                    _context.ReportingPeriodSupplierEntities.Remove(entity);
+                }
+            
         }
 
-        
-        
+
+
 
         _context.SaveChanges();
         return true;

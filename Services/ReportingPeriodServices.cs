@@ -288,9 +288,9 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
 
         var periodSupplierEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSuppliersDomainToEntity(periodSupplierDomain);
-        _reportingPeriodDataActions.AddRemovePeriodSupplier(periodSupplierEntity);
+        _reportingPeriodDataActions.AddRemovePeriodSupplier(periodSupplierEntity,reportingPeriod.Id);
 
-        return "Multiple PeriodSupplier added successfully...";
+        return "Multiple PeriodSupplier Added or removed successfully...";
 
     }
 

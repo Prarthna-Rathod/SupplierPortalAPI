@@ -14,7 +14,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddReportingPeriod(ReportingPeriodEntity reportingPeriodEntity);
 
-        bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity);
+        bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity,int id);
 
         bool AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, bool facilityIsRelaventForPeriod);
 
