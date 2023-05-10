@@ -15,7 +15,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities);
 
-        bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities);
+        bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId);
 
         Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 
@@ -39,7 +39,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool RemovePeriodSupplier(int periodSupplierId);
         bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId);
-        bool RemovePeriodFacilityGasSupplyBreakdown(IEnumerable<int> periodFacilityIds);
+        bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId);
 
         #endregion
 

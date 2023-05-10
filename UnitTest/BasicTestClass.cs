@@ -5,6 +5,7 @@ using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using DataAccess.Entities;
+using Services.DTOs;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
 
@@ -139,8 +140,8 @@ namespace UnitTest
                 SupplierId = supplierId,
                 GhgrpfacilityId = "123",
                 ReportingTypeId = 1,
-                AssociatePipelineId = 1,
-                SupplyChainStageId = 3,
+                AssociatePipelineId = null,
+                SupplyChainStageId = 1,
                 IsActive = true,
                 CreatedOn = DateTime.UtcNow,
                 CreatedBy = "System",
@@ -258,6 +259,40 @@ namespace UnitTest
             return electricityGridMixComponent;
         }
 
+        protected IEnumerable<Site> GetSites()
+        {
+            var site = new List<Site>();
+            site.Add(new Site(1, "SPL"));
+            site.Add(new Site(2, "CCL"));
+            return site;
+        }
+
+        #region protected method
+
+        protected ReportingPeriod AddPeriodSupplierAndPeriodFacilityForReportingPeriod()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+
+            //Update reportingPeriodStatus InActive to Open
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            return reportingPeriod;
+        }
+
+        #endregion
+
         #region ReportingPeriod methods
 
         protected ReportingPeriod GetReportingPeriodDomain()
@@ -310,7 +345,7 @@ namespace UnitTest
             periodFacilityEntity.Id = 1;
             periodFacilityEntity.FacilityId = 1;
             periodFacilityEntity.ReportingPeriodId = 1;
-            periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetSupplierReportingPeriodStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
+            periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
             periodFacilityEntity.ReportingPeriodSupplierId = 1;
 
             return periodFacilityEntity;
@@ -318,7 +353,59 @@ namespace UnitTest
 
         #endregion
 
-        #region PeriodFacilityElectricityGridMix
+        #region ElectricityGridMix methods
+
+        protected IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> CreatePeriodFacilityElectricityGridMixEntity()
+        {
+            var list = new List<ReportingPeriodFacilityElectricityGridMixEntity>();
+            list.Add(new ReportingPeriodFacilityElectricityGridMixEntity()
+            {
+                Id = 1,
+                ReportingPeriodFacilityId = 1,
+                ElectricityGridMixComponentId = 1,
+                UnitOfMeasureId = 1,
+                FercRegionId = 12,
+                Content = (decimal)50.00,
+                IsActive = true,
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = "System",
+            });
+            list.Add(new ReportingPeriodFacilityElectricityGridMixEntity()
+            {
+                Id = 2,
+                ReportingPeriodFacilityId = 1,
+                ElectricityGridMixComponentId = 2,
+                UnitOfMeasureId = 1,
+                FercRegionId = 12,
+                Content = (decimal)50.00,
+                IsActive = true,
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = "System",
+            });
+            return list;
+        }
+
+        #endregion
+
+        #region GasSupplyBreakdown methods
+
+        protected ReportingPeriodFacilityGasSupplyBreakDownEntity CreatePeriodFacilityGasSupplyBreakdownEntity()
+        {
+            var periodFacilityEntity = CreateReportingPeriodFacilityEntity();
+            var gasSupplyBreakdownEntity = new ReportingPeriodFacilityGasSupplyBreakDownEntity();
+            gasSupplyBreakdownEntity.Id = 1;
+            gasSupplyBreakdownEntity.PeriodFacilityId = 1;
+            gasSupplyBreakdownEntity.PeriodFacility = periodFacilityEntity;
+            gasSupplyBreakdownEntity.SiteId = 1;
+            gasSupplyBreakdownEntity.UnitOfMeasureId = 1;
+            gasSupplyBreakdownEntity.Content = (decimal)100.00;
+
+            return gasSupplyBreakdownEntity;
+        }
+
+        #endregion
+
+        #region PeriodFacilityElectricityGridMix VO
         protected IEnumerable<ElectricityGridMixComponentPercent> GetElectricityGridMixComponentPercents()
         {
             var list = new List<ElectricityGridMixComponentPercent>();
@@ -338,6 +425,30 @@ namespace UnitTest
             var electricityGridMIxComponent = GetElectricityGridMixComponents();
             list.Add(new ElectricityGridMixComponentPercent(1, electricityGridMIxComponent.First(), (decimal)50.00));
             list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMIxComponent.FirstOrDefault(x => x.Id == 2), (decimal)50.00));
+            return list;
+        }
+
+        #endregion
+
+        #region PeriodFacilityGasSupplyBreakdown VO
+
+        protected IEnumerable<GasSupplyBreakdownVO> GetGasSupplyBreakdowns()
+        {
+            var list = new List<GasSupplyBreakdownVO>();
+            var site = GetSites();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+            list.Add(new GasSupplyBreakdownVO(1, 1, 1, site.First(), unitOfMeasure, (decimal)100.00));
+            list.Add(new GasSupplyBreakdownVO(2, 1, 1, site.FirstOrDefault(x => x.Id == 2), unitOfMeasure, (decimal)100.00));
+            //list.Add(new GasSupplyBreakdownVO(2, 1, 1, site.FirstOrDefault(x => x.Id == 2), unitOfMeasure, (decimal)50.00));
+            return list;
+        }
+
+        protected IEnumerable<GasSupplyBreakdownVO> GetGasSupplyBreakdowns2()
+        {
+            var list = new List<GasSupplyBreakdownVO>();
+            var site = GetSites();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+            list.Add(new GasSupplyBreakdownVO(1, 1, 1, site.First(), unitOfMeasure, (decimal)100.00));
             return list;
         }
 
@@ -367,6 +478,24 @@ namespace UnitTest
             return facilityVO;
         }
 
+
+        #endregion
+
+        #region All Dto mappers methods
+
+        protected ReportingPeriodFacilityGasSupplyBreakdownDto PeriodFacilityGasSupplyBreakdownDto()
+        {
+            return new ReportingPeriodFacilityGasSupplyBreakdownDto(1, 1, "Test facility 1", 1, "abc", 1, "Biomass", (decimal)100.00);
+        }
+
+        protected IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> PeriodFacilityElectricityGridMixDto()
+        {
+            var list = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+            list.Add(new ReportingPeriodFacilityElectricityGridMixDto(1, "string", (decimal)50.00));
+            list.Add(new ReportingPeriodFacilityElectricityGridMixDto(2, "string", (decimal)50.00));
+
+            return list;
+        }
 
         #endregion
 

@@ -141,12 +141,13 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
             foreach (var gasSupplyBreakdown in gasSupplyBreakdownVOs)
             {
-                if (gasSupplyBreakdown.PeriodFacilityId == Id)
-                {
-                    var periodFacilityGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, gasSupplyBreakdown.Site, gasSupplyBreakdown.UnitOfMeasure, gasSupplyBreakdown.Content);
+                var periodFacilityGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, gasSupplyBreakdown.Site, gasSupplyBreakdown.UnitOfMeasure, gasSupplyBreakdown.Content);
 
-                    _periodFacilityGasSupplyBreakdowns.Add(periodFacilityGasSupplyBreakdown);
-                }
+                var existingSite = _periodFacilityGasSupplyBreakdowns.Any(x => x.Site.Id == gasSupplyBreakdown.Site.Id);
+                if (existingSite)
+                    throw new BadRequestException($"Site '{gasSupplyBreakdown.Site.Name}' is already exists in same PeriodFacility !!");
+
+                _periodFacilityGasSupplyBreakdowns.Add(periodFacilityGasSupplyBreakdown);
             }
 
             return _periodFacilityGasSupplyBreakdowns;

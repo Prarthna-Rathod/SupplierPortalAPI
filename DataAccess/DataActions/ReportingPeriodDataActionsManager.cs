@@ -98,12 +98,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities)
+    public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId)
     {
-        var periodFacilityIds = periodFacilityGasSupplyBreakDownEntities.Select(x => x.PeriodFacilityId).Distinct();
-        RemovePeriodFacilityGasSupplyBreakdown(periodFacilityIds);
-        
-        foreach(var gasSupplyBreakdown in periodFacilityGasSupplyBreakDownEntities)
+        RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
+
+        foreach (var gasSupplyBreakdown in periodFacilityGasSupplyBreakDownEntities)
         {
             gasSupplyBreakdown.CreatedOn = DateTime.UtcNow;
             gasSupplyBreakdown.CreatedBy = "System";
@@ -292,12 +291,19 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool RemovePeriodFacilityGasSupplyBreakdown(IEnumerable<int> periodFacilityIds)
+    public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
     {
-        foreach(var periodFacilityId in periodFacilityIds)
+        var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
+        var periodFacilityEntities = periodSupplierEntity.ReportingPeriodFacilityEntities;
+        var periodFacilityGasSupplyBreakdownEntities = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+        foreach (var periodFacility in periodFacilityEntities)
         {
-            var existingPeriodFacility = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Where(x => x.PeriodFacilityId == periodFacilityId).ToList();
-            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingPeriodFacility);
+            var existingEntity = periodFacilityGasSupplyBreakdownEntities.Where(x => x.PeriodFacilityId == periodFacility.Id).ToList();
+
+            if (existingEntity.Count() != 0)
+                _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
+
         }
 
         _context.SaveChanges();

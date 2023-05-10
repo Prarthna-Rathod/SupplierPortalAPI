@@ -247,7 +247,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     public GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(ReportingPeriodFacilityGasSupplyBreakDownEntity entity, Site site,UnitOfMeasure unitOfMeasure)
     {
-        var gasSupplyBreakdownVo = new GasSupplyBreakdownVO(entity.Id, entity.PeriodFacilityId, 1, site, unitOfMeasure, entity.Content);
+        var gasSupplyBreakdownVo = new GasSupplyBreakdownVO(entity.Id, entity.PeriodFacilityId, entity.PeriodFacility.FacilityId, site, unitOfMeasure, entity.Content);
         return gasSupplyBreakdownVo;
     }
 

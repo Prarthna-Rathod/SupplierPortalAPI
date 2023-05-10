@@ -53,7 +53,7 @@ public interface IReportingPeriodDomainDtoMapper
 
     IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakDownDtosToValueObjects(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> periodFacilityGasSupplyBreakdownDtos, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures);
 
-    GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto, Site site, UnitOfMeasure unitOfMeasure, decimal content);
+    GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto, Site site, UnitOfMeasure unitOfMeasure);
 
     #endregion
 

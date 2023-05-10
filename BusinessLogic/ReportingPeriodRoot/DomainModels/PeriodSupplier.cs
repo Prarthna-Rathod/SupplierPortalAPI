@@ -54,6 +54,17 @@ public class PeriodSupplier
 
     }
 
+    #region private methods
+
+    private void CheckPeriodSupplierStatus()
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new BadRequestException("SupplierReportingPeriodStatus should be Unlocked !!");
+    }
+
+    #endregion
+
+
     #region Period Facility
 
     internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
@@ -125,8 +136,7 @@ public class PeriodSupplier
         if (periodFacility is null)
             throw new NotFoundException("PeriodFacility is not found !!");
 
-        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
-            throw new BadRequestException("SupplierReportingPeriodStatus should be Unlocked !!");
+        CheckPeriodSupplierStatus();
 
         return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
     }
@@ -143,8 +153,7 @@ public class PeriodSupplier
 
     internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
     {
-        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
-            throw new BadRequestException("SupplierReportingPeriodStatus should be Unlocked !!");
+        CheckPeriodSupplierStatus();
 
         var list = new List<PeriodFacilityGasSupplyBreakdown>();
 
@@ -155,12 +164,6 @@ public class PeriodSupplier
             var siteName = singleSiteData.Select(x => x.Site.Name);
             var totalContentValue = singleSiteData.Sum(x => x.Content);
 
-            var newCount = singleSiteData.Select(x => x.PeriodFacilityId).Distinct().Count();
-            var count = singleSiteData.Select(x => x.PeriodFacilityId).Count();
-            var facilityIsExists = newCount < count;
-            if (facilityIsExists)
-                throw new BadRequestException($"Site '{siteName}' is already exists in same PeriodFacility !!");
-
             if (totalContentValue != 100)
                 throw new Exception($"Please add more content values in site {siteName}");
         }
@@ -168,13 +171,12 @@ public class PeriodSupplier
         var periodFacility = gasSupplyBreakdownVOs.GroupBy(x => x.PeriodFacilityId);
         foreach (var facility in periodFacility)
         {
-            var periodFacilityId = facility.First().PeriodFacilityId;
-            var periodFacilityDomain = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+            var periodFacilityDomain = _periodfacilities.FirstOrDefault(x => x.Id == facility.Key);
 
             if (periodFacilityDomain is null)
                 throw new NotFoundException("PeriodFacility is not found !!");
 
-            list.AddRange(periodFacilityDomain.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs));
+            list.AddRange(periodFacilityDomain.AddPeriodFacilityGasSupplyBreakdown(facility));
 
         }
 

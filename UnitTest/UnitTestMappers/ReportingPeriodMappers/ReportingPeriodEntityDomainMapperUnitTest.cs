@@ -86,27 +86,6 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierDomain.ResendDataRequestDate, periodSupplierEntity.ResendDataRequestDate);
         }
 
-       /* [Fact]
-        public void ConertPeriodSupplierEntityToDomain()
-        {
-            var periodSupplierEntity = CreateReportingPeriodSupplierEntity();
-            var supplierReportingPeriodStatuses = GetSupplierReportingPeriodStatuses();
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
-
-            var periodSupplierDomain = mapper.ConvertPeriodSupplierEntityToDomain(periodSupplierEntity, supplierReportingPeriodStatuses, supplierVO);
-
-            Assert.NotNull(periodSupplierDomain);
-            Assert.Equal(periodSupplierEntity.Id, periodSupplierDomain.Id);
-            Assert.Equal(periodSupplierEntity.SupplierId, periodSupplierDomain.Supplier.Id);
-            Assert.Equal(periodSupplierEntity.ReportingPeriodId, periodSupplierDomain.ReportingPeriodId);
-            Assert.Equal(periodSupplierEntity.SupplierReportingPeriodStatusId, periodSupplierDomain.SupplierReportingPeriodStatus.Id);
-            Assert.Equal(periodSupplierEntity.ActiveForCurrentPeriod, periodSupplierDomain.ActiveForCurrentPeriod);
-            Assert.Equal(periodSupplierEntity.InitialDataRequest, periodSupplierDomain.InitialDataRequest);
-            Assert.Equal(periodSupplierEntity.ResendInitialDataRequest, periodSupplierDomain.ResendInitialDataRequest);
-        }
-*/
-
         [Fact]
         public void ConvertSupplierEntityToSupplierVO()
         {
@@ -180,23 +159,13 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         [Fact]
         public void ConvertPeriodFacilityElectricityGridMixDomainToEntity()
         {
-            var reportingPeriod = GetReportingPeriodDomain();
-
-            //Add PeriodSupplier
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPeriodStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, periodSupplier.Id, true, true);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
 
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
             var percent = GetElectricityGridMixComponentPercents();
 
-            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacility.Id,periodSupplier.Id,unitOfMeasure,fercRegion,percent);
+            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,unitOfMeasure,fercRegion,percent);
 
             var gridMixDomain = facilityElectricityGridMixDomain.First();
 
@@ -210,6 +179,64 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(gridMixDomain.UnitOfMeasure.Id, periodFacilityElectricityGridMixEntity.UnitOfMeasureId);
             Assert.Equal(gridMixDomain.FercRegion.Id, periodFacilityElectricityGridMixEntity.FercRegionId);
             Assert.Equal(gridMixDomain.Content, periodFacilityElectricityGridMixEntity.Content);
+        }
+
+        [Fact]
+        public void ConvertPeriodFacilityElectricityGridMixEntitiesToValueObjects()
+        {
+            var electricityGridMixComponent = GetElectricityGridMixComponents();
+            var gridMixEntity = CreatePeriodFacilityElectricityGridMixEntity();
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var gridMixVo = mapper.ConvertPeriodFacilityElectricityGridMixEntitiesToValueObjects(gridMixEntity,electricityGridMixComponent);
+
+            Assert.NotNull(gridMixVo);
+            Assert.Equal(gridMixEntity.Count(), gridMixVo.Count());
+        }
+
+        #endregion
+
+        #region PeriodFacilityGasSupplyBreakdown
+
+        [Fact]
+        public void ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+
+            var gasSupplyBreakdownDomain = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1,gasSupplyBreakdownVos);
+
+            var periodFacilityGasSupplyBreakdownDomain = gasSupplyBreakdownDomain.First();
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var gasSupplyBreakdownEntity = mapper.ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity(periodFacilityGasSupplyBreakdownDomain);
+
+            Assert.NotNull(gasSupplyBreakdownEntity);
+            Assert.Equal(periodFacilityGasSupplyBreakdownDomain.Id, gasSupplyBreakdownEntity.Id);
+            Assert.Equal(periodFacilityGasSupplyBreakdownDomain.PeriodFacilityId, gasSupplyBreakdownEntity.PeriodFacilityId);
+            Assert.Equal(periodFacilityGasSupplyBreakdownDomain.Site.Id, gasSupplyBreakdownEntity.SiteId);
+            Assert.Equal(periodFacilityGasSupplyBreakdownDomain.UnitOfMeasure.Id, gasSupplyBreakdownEntity.UnitOfMeasureId);
+            Assert.Equal(periodFacilityGasSupplyBreakdownDomain.Content,gasSupplyBreakdownEntity.Content);
+        }
+
+        [Fact]
+        public void ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject()
+        {
+            var gasSupplyBreakdownEntity = CreatePeriodFacilityGasSupplyBreakdownEntity();
+            var site = GetSites().First();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var gasSupplyBreakdownVo = mapper.ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(gasSupplyBreakdownEntity,site,unitOfMeasure);
+
+            Assert.NotNull(gasSupplyBreakdownVo);
+            Assert.Equal(gasSupplyBreakdownEntity.Id, gasSupplyBreakdownVo.Id);
+            Assert.Equal(gasSupplyBreakdownEntity.PeriodFacilityId,gasSupplyBreakdownVo.PeriodFacilityId);
+            Assert.Equal(gasSupplyBreakdownEntity.PeriodFacility.FacilityId, gasSupplyBreakdownVo.FacilityId);
+            Assert.Equal(gasSupplyBreakdownEntity.SiteId, gasSupplyBreakdownVo.Site.Id);
+            Assert.Equal(gasSupplyBreakdownEntity.UnitOfMeasureId, gasSupplyBreakdownVo.UnitOfMeasure.Id);
+            Assert.Equal(gasSupplyBreakdownEntity.Content,gasSupplyBreakdownVo.Content);
         }
 
         #endregion

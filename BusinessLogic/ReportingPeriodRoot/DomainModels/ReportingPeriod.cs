@@ -127,6 +127,12 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         }
 
+        private void CheckReportingPeriodStatus()
+        {
+            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+                throw new BadRequestException("ReportingPeriodStatus should be open or close !!");
+        }
+
         #endregion
 
         #region Update ReportingPeriod
@@ -315,8 +321,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             if (periodSupplier == null)
                 throw new NotFoundException("PeriodSupplier is not found !!");
 
-            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
-                throw new BadRequestException("ReportingPeriodStatus should be open Or close !!");
+            CheckReportingPeriodStatus();
 
             return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
         }
@@ -338,8 +343,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             if (periodSupplier is null)
                 throw new NotFoundException("PeriodSupplier is not found !!");
 
-            if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
-                throw new BadRequestException("ReportingPeriodStatus should be open or close !!");
+            CheckReportingPeriodStatus();
 
             return periodSupplier.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
         }

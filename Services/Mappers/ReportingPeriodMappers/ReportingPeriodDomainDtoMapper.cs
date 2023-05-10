@@ -159,14 +159,14 @@ namespace Services.Mappers.ReportingPeriodMappers
                 if (site is null || unitOfMeasure is null)
                     throw new NotFoundException("Site or UnitOfMeasure is not found !!");
 
-                list.Add(ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(dto,site,unitOfMeasure,dto.Content));
+                list.Add(ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(dto,site,unitOfMeasure));
             }
             return list;
         }
 
-        public GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto,Site site,UnitOfMeasure unitOfMeasure, decimal content)
+        public GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto,Site site,UnitOfMeasure unitOfMeasure)
         {
-            return new GasSupplyBreakdownVO(0, periodFacilityGasSupplyBreakdownDto.PeriodFacilityId, periodFacilityGasSupplyBreakdownDto.FacilityId, site,unitOfMeasure, content);
+            return new GasSupplyBreakdownVO(0, periodFacilityGasSupplyBreakdownDto.PeriodFacilityId, periodFacilityGasSupplyBreakdownDto.FacilityId, site,unitOfMeasure, periodFacilityGasSupplyBreakdownDto.Content);
         }
 
         #endregion

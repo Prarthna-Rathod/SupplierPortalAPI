@@ -432,7 +432,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         var gasSupplyBreakdownEntities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(gasSupplyDomainList);
 
-        _reportingPeriodDataActions.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownEntities);
+        _reportingPeriodDataActions.AddPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownEntities,periodFacilityGasSupplyBreakdownDto.ReportingPeriodSupplierId);
 
         return "PeriodFacilityGasSupplyBreakdown is added successfully...";
     }
@@ -457,20 +457,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodDomainListToDtos(reportingPeriodDomainList);
 
         return reportingPeriodDtos;
-    }
-
-    /// <summary>
-    /// GetReportingPeriodSuppliers
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId)
-    {
-        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-        var periodSuppliers = reportingPeriod.PeriodSuppliers;
-
-        var supplierReportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodSupplierDomainListToDtos(periodSuppliers, reportingPeriod);
-
-        return supplierReportingPeriodDtos;
     }
 
     /// <summary>

@@ -26,13 +26,6 @@ public interface IReportingPeriodServices
     #region PeriodSuppliers
 
     /// <summary>
-    /// Add PeriodSupplier
-    /// </summary>
-    /// <param name="reportingPeriodSupplierDto"></param>
-    /// <returns></returns>
-    /*string SetPeriodSupplier(ReportingPeriodSupplierDto reportingPeriodSupplierDto);*/
-
-    /// <summary>
     /// Add Multiple PeriodSuppliers
     /// </summary>
     /// <param name="multiplePeriodSuppliersDto"></param>
@@ -45,13 +38,6 @@ public interface IReportingPeriodServices
     /// <param name="periodSupplierId"></param>
     /// <returns></returns>
     string LockUnlockPeriodSupplierStatus(int periodSupplierId);
-
-    /// <summary>
-    /// Get ReportingPeriodSuppliers
-    /// </summary>
-    /// <returns></returns>
-    /// 
-    IEnumerable<ReportingPeriodSupplierDto> GetReportingPeriodSuppliers(int reportingPeriodId);
 
     /// <summary>
     /// Get Relevant PeriodSuppliers

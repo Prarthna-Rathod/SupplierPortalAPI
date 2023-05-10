@@ -1,20 +1,15 @@
 ﻿using BusinessLogic.ValueConstants;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
 {
-    public class ReportingPeriodDomainDtoMapperUnitTest: BasicTestClass
+    public class ReportingPeriodDomainDtoMapperUnitTest : BasicTestClass
     {
         [Fact]
         public void ConvertReportingPeriodDomainToDto()
         {
             var reportingPeriod = GetReportingPeriodDomain();
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
-            
+
             var reportingPeriodDto = mapper.ConvertReportingPeriodDomainToDto(reportingPeriod);
 
             Assert.NotNull(reportingPeriodDto);
@@ -29,15 +24,15 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         }
 
         [Fact]
-        public void ConvertPeriodSupplierDomainToDto() 
+        public void ConvertPeriodSupplierDomainToDto()
         {
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVo = GetAndConvertSupplierValueObject();
             var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplierDomain = reportingPeriod.AddPeriodSupplier(1, supplierVo, supplierReportingPeriodStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
-            var mapper= CreateInstanceOfReportingPeriodDomainDtoMapper();
-            var periodSupplierDto = mapper.ConvertPeriodSupplierDomainToDto(periodSupplierDomain,reportingPeriod.DisplayName);
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var periodSupplierDto = mapper.ConvertPeriodSupplierDomainToDto(periodSupplierDomain, reportingPeriod.DisplayName);
 
             Assert.NotNull(periodSupplierDto);
             Assert.Equal(periodSupplierDomain.Id, periodSupplierDto.Id);
@@ -45,10 +40,10 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSupplierDomain.Supplier.Name, periodSupplierDto.SupplierName);
             Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Id, periodSupplierDto.SupplierReportingPeriodStatusId);
             Assert.Equal(periodSupplierDomain.SupplierReportingPeriodStatus.Name, periodSupplierDto.SupplierReportingPeriodStatusName);
-            Assert.Equal(periodSupplierDomain.ReportingPeriodId, periodSupplierDto.ReportingPeriodId);          
+            Assert.Equal(periodSupplierDomain.ReportingPeriodId, periodSupplierDto.ReportingPeriodId);
             Assert.Equal(periodSupplierDomain.InitialDataRequestDate, periodSupplierDto.InitialDataRequestDate);
             Assert.Equal(periodSupplierDomain.ResendDataRequestDate, periodSupplierDto.ResendDataRequestDate);
-     
+
         }
 
         [Fact]
@@ -62,14 +57,14 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             //Add PeriodFacility
             var facilityVo = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1,facilityVo,facilityReportingPeriodDataStatus,periodSupplier.Id,true,true);
+            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1, facilityVo, facilityReportingPeriodDataStatus, periodSupplier.Id, true, true);
 
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
             var periodFacilityDto = mapper.ConvertPeriodFacilityDomainToDto(periodFacilityDomain, true);
 
             Assert.NotNull(periodFacilityDto);
             Assert.Equal(periodFacilityDomain.Id, periodFacilityDto.Id);
-            Assert.Equal(periodFacilityDomain.FacilityVO.Id,periodFacilityDto.FacilityId);
+            Assert.Equal(periodFacilityDomain.FacilityVO.Id, periodFacilityDto.FacilityId);
             Assert.Equal(periodFacilityDomain.FacilityVO.FacilityName, periodFacilityDto.FacilityName);
             Assert.Equal(periodFacilityDomain.FacilityVO.GHGRPFacilityId, periodFacilityDto.GhgrpFacilityId);
             Assert.Equal(periodFacilityDomain.FacilityVO.ReportingType.Id, periodFacilityDto.ReportingTypeId);
@@ -81,6 +76,37 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodFacilityDomain.FacilityReportingPeriodDataStatus.Id, periodFacilityDto.FacilityReportingPeriodDataStatusId);
             Assert.Equal(periodFacilityDomain.FacilityReportingPeriodDataStatus.Name, periodFacilityDto.FacilityReportingPeriodDataStatusName);
 
+        }
+
+        [Fact]
+        public void ConvertPeriodElectricityGridMixDtosToValueObjects()
+        {
+            var electricityGridMixComponents = GetElectricityGridMixComponents();
+            var gridMixDto = PeriodFacilityElectricityGridMixDto();
+
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var gridMixVo = mapper.ConvertPeriodElectricityGridMixDtosToValueObjects(gridMixDto, electricityGridMixComponents);
+
+            Assert.NotNull(gridMixVo);
+            Assert.Equal(gridMixDto.Count(), gridMixVo.Count());
+        }
+
+        [Fact]
+        public void ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject()
+        {
+            var gasSupplyBreakdownDto = PeriodFacilityGasSupplyBreakdownDto();
+            var site = GetSites().First();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var gasSupplyBreakdownVo = mapper.ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(gasSupplyBreakdownDto, site, unitOfMeasure);
+
+            Assert.NotNull(gasSupplyBreakdownVo);
+            Assert.Equal(gasSupplyBreakdownDto.PeriodFacilityId, gasSupplyBreakdownVo.PeriodFacilityId);
+            Assert.Equal(gasSupplyBreakdownDto.FacilityId, gasSupplyBreakdownVo.FacilityId);
+            Assert.Equal(gasSupplyBreakdownDto.SiteId, gasSupplyBreakdownVo.Site.Id);
+            Assert.Equal(gasSupplyBreakdownDto.UnitOfMeasureId, gasSupplyBreakdownVo.UnitOfMeasure.Id);
+            Assert.Equal(gasSupplyBreakdownDto.Content, gasSupplyBreakdownVo.Content);
         }
     }
 }

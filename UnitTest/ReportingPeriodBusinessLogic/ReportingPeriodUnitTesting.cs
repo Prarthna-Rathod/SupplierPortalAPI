@@ -7,31 +7,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 {
     public class ReportingPeriodUnitTesting : BasicTestClass
     {
-        #region private method
-
-        private ReportingPeriod AddPeriodSupplierAndPeriodFacilityForReportingPeriod()
-        {
-            var reportingPeriod = GetReportingPeriodDomain();
-
-            //Get PeriodSupplier Domain
-            var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
-
-            //Add PeriodFacility
-            var facilityVO = GetAndConvertFacilityValueObject();
-            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
-
-            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
-            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
-            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
-
-            return reportingPeriod;
-        }
-
-        #endregion
-
         #region Update ReportingPeriod
 
         /// <summary>
@@ -569,6 +544,14 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             Assert.NotNull(list);
             Assert.Equal(electricityGridMixComponentPercents.Count(), list.Count());
+
+            for (int i = 0; i < electricityGridMixComponentPercents.Count(); i++)
+            {
+                var originalElectricityGridMix = electricityGridMixComponentPercents.ToList()[i].ElectricityGridMixComponent;
+                var addedElectricityGridMix = list.ToList()[i].ElectricityGridMixComponent;
+                Assert.Equal(addedElectricityGridMix, originalElectricityGridMix);
+            }
+
             Assert.Equal(0, exceptionCounter);
             Assert.Null(exceptionMessage);
         }
@@ -663,7 +646,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -752,7 +735,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             int exceptionCounter = 0;
             string? exceptionMessage = null;
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
-          
+
             //ElecetricityGridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
@@ -818,6 +801,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             string? exceptionMessage = null;
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
 
+            //Update SupplierReportingPeriodStatus Unlocked to Locked
             var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
             var unlockedPeriodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
             unlockedPeriodSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPerionStatus.Id;
@@ -832,6 +816,255 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             try
             {
                 list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        #endregion
+
+        #region PeriodFacilityGasSupplyBreakdown
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Success case1
+        /// Per periodSupplier per site ContentValues should be 100
+        /// For all test cases set ReportingPeriodStatus should be "Open" , SupplierReportingPeriodStatus should be "Unlocked" and SupplyChainStage should be "Production"
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(list);
+            Assert.Equal(gasSupplyBreakdownVos.Count(), list.Count());
+
+            for(int i = 0;i < gasSupplyBreakdownVos.Count(); i++)
+            {
+                var originalGasSupply = gasSupplyBreakdownVos.ToList()[i].Site;
+                var addedGasSupply = list.ToList()[i].Site;
+                Assert.Equal(addedGasSupply, originalGasSupply);
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Success case2
+        /// If per PeriodSupplier periodFacilityGasSupplyBreakdown is already exists than replace old GasSupplyBreakdown
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+            reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+            var gasSupplyBreakdownVos2 = GetGasSupplyBreakdowns2();
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos2);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(list);
+            Assert.NotEqual(gasSupplyBreakdownVos.Count(), list.Count());
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Fail case1
+        /// If ReportingPeriodStatus is InActive than throw exception
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownFailCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //Update reportingPeriodStatus Open to InActive
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.InActive);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Fail case2
+        /// If SupplierReportingPeriodStatus is Locked than throw exception
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownFailCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //Update SupplierReportingPeriodStatus Unlocked to Locked
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+            var unlockedPeriodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            unlockedPeriodSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPerionStatus.Id;
+            unlockedPeriodSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPerionStatus.Name;
+
+            //Add GasSupplyBreakdownVo
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Fail case3
+        /// If SupplyChainStage is not Production than throw exception
+        /// For this test case - Changed SupplyChainStage is Production to Others in method GenerateFacilityEntitiesForSupplier()
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownFailCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //Add GasSupplyBreakdownVo
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Fail case4
+        /// If per PeriodSupplier per site content values is not 100 than throw exception
+        /// For this test case - Changed the content values
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownFailCase4()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //Add GasSupplyBreakdownVo
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(list);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// Add PeriodFacilityGasSupplyBreakdown Fail case5
+        /// If Per periodSupplier per PeriodFacility site is repeated than throw exception
+        /// For this test case - Add repeated data for different content values and site is same in GetGasSupplyBreakdowns() method
+        /// </summary>
+        [Fact]
+        public void AddPeriodFacilityGasSupplyBreakdownFailCase5()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            //Add GasSupplyBreakdownVo
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+
+            try
+            {
+                list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
             }
             catch (Exception ex)
             {
