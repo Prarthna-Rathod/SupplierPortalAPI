@@ -115,8 +115,12 @@ namespace Services.Mappers.ReportingPeriodMappers
             foreach(var facility in periodFacilityList)
             {
                 var gasSupplyBreakdowns = facility.periodFacilityGasSupplyBreakdowns;
-                gasSupplyDtos.AddRange(ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(gasSupplyBreakdowns, facility));
+                if (gasSupplyBreakdowns.Count() != 0)
+                    gasSupplyDtos.AddRange(ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(gasSupplyBreakdowns, facility));
             }
+
+            if (gasSupplyDtos.Count() == 0)
+                throw new NotFoundException("GasSupplyBreakdown are not available in this Supplier !!");
 
             var periodSupplierFacilityGasSupplyBreakdownDto = new MultiplePeriodFacilityGasSupplyBreakdownDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, gasSupplyDtos);
             return periodSupplierFacilityGasSupplyBreakdownDto;
@@ -201,8 +205,10 @@ namespace Services.Mappers.ReportingPeriodMappers
             return new ElectricityGridMixComponentPercent(0, electricityGridMix, content);
         }
 
-        public MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityGridMixList, PeriodSupplier periodSupplier, PeriodFacility periodFacility)
+        public MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(PeriodFacility periodFacility, int supplierId)
         {
+            var periodFacilityGridMixList = periodFacility.periodFacilityElectricityGridMixes;
+
             var gridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
             foreach (var gridMix in periodFacilityGridMixList)
             {
@@ -213,7 +219,7 @@ namespace Services.Mappers.ReportingPeriodMappers
             var unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
             var fercRegion = periodFacilityGridMixList.First().FercRegion;
 
-            var periodFacilityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodFacility.ReportingPeriodId, periodSupplier.Supplier.Id, unitOfMeasure.Id, unitOfMeasure.Name, fercRegion.Id, fercRegion.Name, gridMixDtos);
+            var periodFacilityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodFacility.ReportingPeriodId, supplierId, unitOfMeasure.Id, unitOfMeasure.Name, fercRegion.Id, fercRegion.Name, gridMixDtos);
             return periodFacilityGridMixDto;
         }
 

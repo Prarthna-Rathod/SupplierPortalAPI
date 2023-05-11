@@ -15,37 +15,21 @@ public class ReportingPeriodRelevantFacility
     public string SupplierName { get; set; }
 
     public int PeriodId { get; set; }
-
     public string PeriodName { get; set; }
-
     public int FacilityId { get; set; }
-
     public string FacilityName { get;set; }
-
     public string? GHGRPFacilityId { get; set; }
-
     public string ReportingType { get; set; }
-
     public string SupplyChainStage { get;set; }
-
     public bool FacilityIsRelevantForPeriod { get; set; }
-
     public bool FacilityPeriodIsActive { get; set; }
-
     public int SupplierPeriodStatusId { get; set; }
-
     public string SupplierPeriodStatus { get; set; }    
-
     public bool SupplierActiveForperiod { get; set; }
-
     public bool IsFacilityHasDocumentForPeriod { get; set; }
-
     public int FacilityDataSourceId { get; set; }
-
     public string? FacilityDataSourceName { get;set; }
-
     public string FacilityReportingPeriodDataStatus { get; set; }
-
     public int FacilityReportingPeriodDataStatusId { get; set; }
 
     public ReportingPeriodRelevantFacility(int? reportingPeriodFacilityId, int supplierId, string supplierName, int periodId, string periodName, int facilityId, string facilityName, string? gHGRPFacilityId, string reportingType, string supplyChainStage, bool facilityIsRelevantForPeriod, bool facilityPeriodIsActive, int supplierPeriodStatusId, string supplierPeriodStatus, bool supplierActiveForperiod, bool isFacilityHasDocumentForPeriod, int facilityDataSourceId, string? facilityDataSourceName, string facilityReportingPeriodDataStatus, int facilityReportingPeriodDataStatusId)

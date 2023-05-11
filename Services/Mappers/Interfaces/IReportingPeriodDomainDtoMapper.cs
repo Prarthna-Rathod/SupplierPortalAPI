@@ -38,7 +38,7 @@ public interface IReportingPeriodDomainDtoMapper
 
     IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(IEnumerable<PeriodFacilityGasSupplyBreakdown> gasSupplyBreakdowns, PeriodFacility periodFacility);
 
-    MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityGridMixList, PeriodSupplier periodSupplier, PeriodFacility periodFacility);
+    MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(PeriodFacility periodFacility, int supplierId);
 
     #endregion
 

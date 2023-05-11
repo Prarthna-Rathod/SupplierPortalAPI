@@ -128,11 +128,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private ReportingPeriod RetrieveAndConvertReportingPeriod(int reportingPeriodId)
     {
         var reportingPeriodEntity = _reportingPeriodDataActions.GetReportingPeriodById(reportingPeriodId);
+
+        if (reportingPeriodEntity is null)
+            throw new NotFoundException("ReportingPeriodEntity not found !!");
+
         var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
         var reportingPeriodStatus = GetAndConvertReportingPeriodStatuses();
 
-        if (reportingPeriodEntity is null)
-            throw new ArgumentNullException("ReportingPeriodEntity not found !!");
 
         var reportingPeriodDomain = ConfigureReportingPeriod(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatus);
 
@@ -146,30 +148,9 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         foreach (var periodFacility in reportingPeriodEntity.ReportingPeriodFacilityEntities)
         {
-            var facilityVO = GetAndConvertFacilityValueObject(periodFacility.FacilityId);
-            var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacility.FacilityReportingPeriodDataStatusId);
 
-            var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacility.ReportingPeriodSupplierId);
-
-            reportingPeriodDomain.LoadPeriodFacility(periodFacility.Id, facilityVO, facilityReportingPeriodStatus, periodFacility.ReportingPeriodSupplierId, periodFacility.IsActive);
-
-            //Load PeriodFacilityElectricityGridMixes
-            var gridMixEntities = periodFacility.ReportingPeriodFacilityElectricityGridMixEntities;
-
-            if (gridMixEntities.Count() != 0)
-            {
-                var gridMixComponents = GetAndConvertElectricityGridMixComponents();
-
-                var gridMixValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityElectricityGridMixEntityListToValueObjectList(gridMixEntities, gridMixComponents);
-                var unitOfMeasureId = gridMixEntities.First().UnitOfMeasureId;
-                var fercRegionId = gridMixEntities.First().FercRegionId;
-
-                var unitOfMeasure = GetAndConvertUnitOfMeasures().FirstOrDefault(x => x.Id == unitOfMeasureId);
-                var fercRegion = GetAndConvertFercRegions().FirstOrDefault(x => x.Id == fercRegionId);
-
-                reportingPeriodDomain.LoadElectricityGridMixComponents(periodFacility.Id, periodFacility.ReportingPeriodSupplierId, unitOfMeasure, fercRegion, gridMixValueObjectList);
-            }
-
+            GetAndLoadPeriodFacilityWithElectricityGridMixes(periodFacility, reportingPeriodDomain);
+           
             //Load PeriodFacilityGasSupplyBreakdowns
             var gasSupplyEntities = periodFacility.ReportingPeriodFacilityGasSupplyBreakDownEntities;
 
@@ -185,6 +166,34 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         return reportingPeriodDomain;
 
+    }
+
+    private PeriodSupplier RetrieveAndConvertReportingPeriodSupplierFacility(int periodFacilityId)
+    {
+        var periodFacilityEntity = _reportingPeriodDataActions.GetPeriodFacilityById(periodFacilityId);
+        var reportingPeriodEntity = periodFacilityEntity.ReportingPeriod;
+
+        if (periodFacilityEntity is null)
+            throw new NotFoundException("ReportingPeriodFacilityEntity not found !!");
+
+        var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
+        var reportingPeriodStatus = GetAndConvertReportingPeriodStatuses();
+
+        var reportingPeriodDomain = ConfigureReportingPeriod(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatus);
+
+        //Load PeriodSupplier
+        var supplierVO = GetAndConvertSupplierValueObject(periodFacilityEntity.ReportingPeriodSupplier.SupplierId);
+        var supplierReportingPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplier.SupplierReportingPeriodStatusId);
+        reportingPeriodDomain.LoadPeriodSupplier(periodFacilityEntity.ReportingPeriodSupplierId, supplierVO, supplierReportingPeriodStatus, periodFacilityEntity.ReportingPeriodSupplier.InitialDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.ResendDataRequestDate);
+
+        if (periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities.Count() == 0)
+            throw new NotFoundException("ElectricityGridMixes not available in this ReportingPeriodFacility !!");
+
+        GetAndLoadPeriodFacilityWithElectricityGridMixes(periodFacilityEntity, reportingPeriodDomain);
+
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+
+        return periodSupplier;
     }
 
     /// <summary>
@@ -234,6 +243,35 @@ public class ReportingPeriodServices : IReportingPeriodServices
         //Convert entity to domain
         var reportingPeriodDomain = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodEntityToDomain(reportingPeriodEntity, reportingPeriodType, reportingPeriodStatus);
         return reportingPeriodDomain;
+
+    }
+
+    private void GetAndLoadPeriodFacilityWithElectricityGridMixes(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
+    {
+        var facilityVO = GetAndConvertFacilityValueObject(periodFacilityEntity.FacilityId);
+        var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.FacilityReportingPeriodDataStatusId);
+
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+
+        reportingPeriodDomain.LoadPeriodFacility(periodFacilityEntity.Id, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, periodFacilityEntity.IsActive);
+
+        //Load PeriodFacilityElectricityGridMixes
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityEntity.Id);
+        var gridMixEntities = periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities;
+
+        if (gridMixEntities.Count() != 0)
+        {
+            var gridMixComponents = GetAndConvertElectricityGridMixComponents();
+
+            var gridMixValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityElectricityGridMixEntityListToValueObjectList(gridMixEntities, gridMixComponents);
+            var unitOfMeasureId = gridMixEntities.First().UnitOfMeasureId;
+            var fercRegionId = gridMixEntities.First().FercRegionId;
+
+            var unitOfMeasure = GetAndConvertUnitOfMeasures().FirstOrDefault(x => x.Id == unitOfMeasureId);
+            var fercRegion = GetAndConvertFercRegions().FirstOrDefault(x => x.Id == fercRegionId);
+
+            reportingPeriodDomain.LoadElectricityGridMixComponents(periodFacility.Id, periodFacility.ReportingPeriodSupplierId, unitOfMeasure, fercRegion, gridMixValueObjectList);
+        }
 
     }
 
@@ -529,29 +567,19 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return periodsuppliersDtos;
     }
 
-
-    public MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId, int reportingPeriodId)
+    /// <summary>
+    /// Get ReportingPeriodFacility ElectricityGridMixes data
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    public MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId)
     {
-        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-        var periodSuppliers = reportingPeriod.PeriodSuppliers;
-        var gridMixData = new List<PeriodFacilityElectricityGridMix>();
-        PeriodFacility? periodFacilityDomain = null;
-        PeriodSupplier? periodSupplierDomain = null;
-
-        foreach(var periodSupplier in periodSuppliers)
-        {
-            var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
-            gridMixData.AddRange(periodFacility.periodFacilityElectricityGridMixes);
-            periodFacilityDomain = periodFacility;
-            periodSupplierDomain = periodSupplier;
-            break;
-        }
-
-        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(gridMixData, periodSupplierDomain, periodFacilityDomain);
+        var periodSupplier = RetrieveAndConvertReportingPeriodSupplierFacility(periodFacilityId);
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(periodFacility, periodSupplier.Supplier.Id);
 
         return dto;
     }
-
 
     /// <summary>
     /// Get all site data for ReportingPeriodSupplierFacilities
@@ -559,20 +587,16 @@ public class ReportingPeriodServices : IReportingPeriodServices
     /// <param name="periodSupplierId"></param>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    public MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int periodSupplierId, int reportingPeriodId)
+    public MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int reportingPeriodId, int supplierId)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierId);
-        var periodFacilities = periodSupplier.PeriodFacilities;
-        var facilityData = new List<PeriodFacility>();
-        foreach (var periodFacility in periodFacilities)
-        {
-            var gasSupplyBreakdowns = periodFacility.periodFacilityGasSupplyBreakdowns;
-            if (gasSupplyBreakdowns.Count() != 0)
-                facilityData.Add(periodFacility);
-        }
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Supplier.Id == supplierId);
+        if (periodSupplier == null)
+            throw new NotFoundException("ReportingPeriodSupplier not found !!");
 
-        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto(facilityData, periodSupplier);
+        var periodFacilities = periodSupplier.PeriodFacilities;
+
+        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto(periodFacilities, periodSupplier);
 
         return dto;
     }

@@ -99,7 +99,7 @@ public interface IReportingPeriodServices
     /// <param name="periodSupplierId"></param>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId, int reportingPeriodId);
+    MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId);
 
 
     /// <summary>
@@ -108,7 +108,7 @@ public interface IReportingPeriodServices
     /// <param name="periodSupplierId"></param>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int periodSupplierId, int reportingPeriodId);
+    MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int reportingPeriodId, int supplierId);
     #endregion
 
     #region ReportingPeriodDocuments

@@ -126,5 +126,52 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
                 Assert.Equal(entityComponent, addedComponent);
             }
         }
+
+        [Fact]
+        public void GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var periodSupplier = reportingPeriod.PeriodSuppliers.First();
+            var periodFacilities = periodSupplier.PeriodFacilities;
+
+            //First add new data for GasSupplyBreakdown
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdownVOs();
+            reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(periodSupplier.Id, gasSupplyBreakdownVos);
+            var facilities = new List<PeriodFacility>();
+
+            foreach(var periodFacility in periodFacilities)
+            {
+                var gasSupplyData = periodFacility.periodFacilityGasSupplyBreakdowns;
+                if (gasSupplyData.Count() != 0)
+                    facilities.Add(periodFacility);
+            }
+
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var dto = mapper.GetAndConvertPeriodFacilityGasSupplyBreakdownDomainListToDto(facilities, periodSupplier);
+
+            Assert.NotNull(dto);
+
+        }
+
+        [Fact]
+        public void ConvertElectricityGridMixesDomainListToDto()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == 1);
+
+            //Add new data for gridMix
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            var domainList = reportingPeriod.AddRemoveElectricityGridMixComponents(periodSupplier.Id, periodFacility.Id, unitOfMeasure, fercRegion, gridMixComponentPercents);
+             
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var dto = mapper.GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(periodFacility, periodSupplier.Supplier.Id);
+
+            Assert.NotNull(dto);
+            Assert.Equal(domainList.Count(), dto.ReportingPeriodFacilityElectricityGridMixDtos.Count());
+        }
+
     }
 }
