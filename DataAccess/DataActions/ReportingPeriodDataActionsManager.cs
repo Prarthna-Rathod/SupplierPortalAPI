@@ -67,8 +67,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     }
 
 
-    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities,int periodFacilityId)
+    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities,int periodFacilityId,int fercRegionId)
     {
+        UpdatePeriodFacilityFercRegion(periodFacilityId, fercRegionId);
+
         var periodFacility = GetPeriodFacilityById(periodFacilityId);
 
         var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacility.Id).ToList();
@@ -82,6 +84,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         {
             foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
             {
+                if (gridMixEntity == null)
+                    throw new Exception("ElectricityGridMixEntity is not found !!");
+
                 var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
                 entity.ReportingPeriodFacilityId = gridMixEntity.ReportingPeriodFacilityId;
                 entity.ElectricityGridMixComponentId = gridMixEntity.ElectricityGridMixComponentId;
@@ -103,6 +108,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         foreach (var gasSupplyBreakdown in periodFacilityGasSupplyBreakDownEntities)
         {
+            if (gasSupplyBreakdown == null)
+                throw new Exception("GasSupplyBreakdownEntity is not found !!");
+
             gasSupplyBreakdown.CreatedOn = DateTime.UtcNow;
             gasSupplyBreakdown.CreatedBy = "System";
             _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(gasSupplyBreakdown);
@@ -164,7 +172,25 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
+    public bool UpdatePeriodFacilityFercRegion(int periodFacilityId, int fercRegionId)
+    {
+        var fercRegionEntity = _context.FercRegionEntities.FirstOrDefault(x => x.Id == fercRegionId);
+        if (fercRegionEntity == null)
+            throw new Exception("FercRegion is not found !!");
 
+        var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.FirstOrDefault(x => x.Id == periodFacilityId);
+        if (periodFacilityEntity == null)
+            throw new Exception("PeriodFacilityEntity is not found !!");
+
+        periodFacilityEntity.FercRegion = fercRegionEntity;
+        periodFacilityEntity.FercRegion.Id = fercRegionEntity.Id;
+        periodFacilityEntity.FercRegion.Name = fercRegionEntity.Name;
+
+        _context.ReportingPeriodFacilityEntities.Update(periodFacilityEntity);
+        _context.SaveChanges();
+
+        return true;
+    }
 
     public async Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
     {
@@ -284,6 +310,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
         foreach (var facility in existingFacility)
         {
+            if (facility == null)
+                throw new Exception("PeriodFacility is not found !!");
+
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
         }
         _context.SaveChanges();

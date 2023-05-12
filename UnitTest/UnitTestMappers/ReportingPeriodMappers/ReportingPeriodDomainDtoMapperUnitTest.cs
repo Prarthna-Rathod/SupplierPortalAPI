@@ -57,11 +57,11 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVo, supplierReportingPeriodStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
             //Add PeriodFacility
             var facilityVo = GetAndConvertFacilityValueObject();
-            
+
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
             var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
 
-            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1, facilityVo, facilityReportingPeriodDataStatus, periodSupplier.Id, true,fercRegion, true);
+            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1, facilityVo, facilityReportingPeriodDataStatus, periodSupplier.Id, true, fercRegion, true);
 
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
             var periodFacilityDto = mapper.ConvertPeriodFacilityDomainToDto(periodFacilityDomain, true);
@@ -110,19 +110,20 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             //Add PeriodFacility
             var facilityVo = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
-            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1, facilityVo, facilityReportingPeriodDataStatus, periodSupplier.Id, true,fercRegion, true);
+            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1, facilityVo, facilityReportingPeriodDataStatus, periodSupplier.Id, true, fercRegion, true);
 
             var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
             reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
             reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
 
             var unitOfMeasure = GetUnitOfMeasures().First();
+            var changedFercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
             var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
 
             IEnumerable<PeriodFacilityElectricityGridMix> list = null;
-            list = reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacilityDomain.Id, periodSupplier.Id, unitOfMeasure, electricityGridMixComponentPercents);
+            list = reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacilityDomain.Id, periodSupplier.Id, unitOfMeasure, changedFercRegion, electricityGridMixComponentPercents);
 
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
             var dto = mapper.ConvertPeriodFacilityElectricityGridMixDomainListToDto(list, periodFacilityDomain, periodSupplier);
@@ -170,7 +171,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(periodSupplier.Id, gasSupplyVos);
 
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
-            var dto = mapper.ConvertPeriodFacilityGasSupplyBreakdownDoaminListToDto(periodFacilities,periodSupplier);
+            var dto = mapper.ConvertPeriodFacilityGasSupplyBreakdownDoaminListToDto(periodFacilities, periodSupplier);
 
             Assert.NotNull(dto);
 

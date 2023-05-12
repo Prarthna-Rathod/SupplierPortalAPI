@@ -314,7 +314,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region PeriodFacilityElectricityGridMix
 
-        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure,FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
@@ -323,7 +323,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
             CheckReportingPeriodStatus();
 
-            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, electricityGridMixComponentPercents);
+            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
         }
 
         public bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)

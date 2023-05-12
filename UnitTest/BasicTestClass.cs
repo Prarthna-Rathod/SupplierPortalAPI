@@ -304,7 +304,7 @@ namespace UnitTest
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
             var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, fercRegion, true);
 
             //Update reportingPeriodStatus InActive to Open

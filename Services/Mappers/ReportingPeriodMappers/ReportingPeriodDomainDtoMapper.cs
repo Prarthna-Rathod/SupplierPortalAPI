@@ -159,7 +159,7 @@ namespace Services.Mappers.ReportingPeriodMappers
 
             var unitOfMeasure = periodFacilityElectricityGridMixes.First().UnitOfMeasure;
 
-            var periodFacilityElectricityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, unitOfMeasure.Id, unitOfMeasure.Name, gridMixDtos);
+            var periodFacilityElectricityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, unitOfMeasure.Id, unitOfMeasure.Name,periodFacility.FercRegion.Id,periodFacility.FercRegion.Name, gridMixDtos);
             return periodFacilityElectricityGridMixDto;
 
         }

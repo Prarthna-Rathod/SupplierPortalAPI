@@ -129,12 +129,15 @@ public class PeriodSupplier
 
     #region PeriodFacilityElectricityGridMix
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure,FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
     {
         var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
 
         if (periodFacility is null)
             throw new NotFoundException("PeriodFacility is not found !!");
+
+        periodFacility.FercRegion.Id = fercRegion.Id;
+        periodFacility.FercRegion.Name = fercRegion.Name;
 
         CheckPeriodSupplierStatus();
 

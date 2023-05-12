@@ -166,7 +166,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
             var percent = GetElectricityGridMixComponentPercents();
 
-            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,unitOfMeasure,percent);
+            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,unitOfMeasure,fercRegion,percent);
 
             var gridMixDomain = facilityElectricityGridMixDomain.First();
 
