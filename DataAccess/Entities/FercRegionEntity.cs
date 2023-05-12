@@ -7,7 +7,7 @@ namespace DataAccess.Entities
     {
         public FercRegionEntity()
         {
-            ReportingPeriodFacilityElectricityGridMixEntities = new HashSet<ReportingPeriodFacilityElectricityGridMixEntity>();
+            ReportingPeriodFacilityEntities = new HashSet<ReportingPeriodFacilityEntity>();
         }
 
         public int Id { get; set; }
@@ -15,6 +15,6 @@ namespace DataAccess.Entities
         public string Description { get; set; } = null!;
         public bool IsActive { get; set; }
 
-        public virtual ICollection<ReportingPeriodFacilityElectricityGridMixEntity> ReportingPeriodFacilityElectricityGridMixEntities { get; set; }
+        public virtual ICollection<ReportingPeriodFacilityEntity> ReportingPeriodFacilityEntities { get; set; }
     }
 }

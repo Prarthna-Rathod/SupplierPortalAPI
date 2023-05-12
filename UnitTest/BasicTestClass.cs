@@ -278,7 +278,8 @@ namespace UnitTest
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, fercRegion, true);
 
             //Update ReportingPeriodStatus InActive To Open
             var updatePeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
@@ -341,6 +342,7 @@ namespace UnitTest
             periodFacilityEntity.ReportingPeriodId = 1;
             periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
             periodFacilityEntity.ReportingPeriodSupplierId = 1;
+            periodFacilityEntity.FercRegionId = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix).Id;
 
             return periodFacilityEntity;
         }
@@ -370,7 +372,6 @@ namespace UnitTest
             {
                 Id = 1,
                 ReportingPeriodFacilityId = 1,
-                FercRegionId = 12,
                 UnitOfMeasureId = 1,
                 ElectricityGridMixComponentId = 1,
                 Content = (decimal)50.00,
@@ -382,7 +383,6 @@ namespace UnitTest
             {
                 Id = 2,
                 ReportingPeriodFacilityId = 1,
-                FercRegionId = 12,
                 UnitOfMeasureId = 1,
                 ElectricityGridMixComponentId = 2,
                 Content = (decimal)50.00,
@@ -482,7 +482,6 @@ namespace UnitTest
             return electricityGridMixDtos;
 
         }
-
 
         protected ReportingPeriodFacilityGasSupplyBreakdownDto CreatePeriodFacilityGasSupplyBreakdownDto()
         {

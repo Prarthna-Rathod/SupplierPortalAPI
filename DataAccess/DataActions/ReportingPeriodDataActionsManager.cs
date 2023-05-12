@@ -68,14 +68,16 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId)
     {
+        var periodFacility = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).FirstOrDefault();
+
         var periodFacilityGridMixes = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
 
-        var newFercRegion = periodFacilityElectricityGridMixEntities.First().FercRegion;
+        var fercRegion = periodFacility.FercRegion;
 
         if (periodFacilityGridMixes.Count() != 0)
             RemovePeriodFacilityElectricityGridMix(periodFacilityId);
 
-        if (newFercRegion.Name == FERC_REGION_CUSTOM_MIX)
+        if (fercRegion.Name == FERC_REGION_CUSTOM_MIX)
         {
             foreach (var entity in periodFacilityElectricityGridMixEntities)
             {
@@ -83,7 +85,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 gridMixEntity.ReportingPeriodFacilityId = entity.ReportingPeriodFacilityId;
                 gridMixEntity.ElectricityGridMixComponentId = entity.ElectricityGridMixComponentId;
                 gridMixEntity.UnitOfMeasureId = entity.UnitOfMeasureId;
-                gridMixEntity.FercRegionId = entity.FercRegionId;
                 gridMixEntity.Content = entity.Content;
                 gridMixEntity.IsActive = entity.IsActive;
                 gridMixEntity.CreatedOn = DateTime.UtcNow;

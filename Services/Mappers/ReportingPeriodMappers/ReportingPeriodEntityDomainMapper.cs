@@ -73,7 +73,6 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     #region PeriodSupplier
 
-
     public ReportingPeriodSupplierEntity ConvertReportingPeriodSupplierDomainToEntity(PeriodSupplier periodSupplier)
     {
         return new ReportingPeriodSupplierEntity()
@@ -97,7 +96,6 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         }
         return suppliers;
     }
-
 
     public SupplierVO ConvertSupplierEntityToSupplierValueObject(SupplierEntity supplierEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
     {
@@ -152,11 +150,15 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityEntity.GhgrpfacilityId = periodFacility.FacilityVO.GHGRPFacilityId;
         periodFacilityEntity.SupplyChainStageId = periodFacility.FacilityVO.SupplyChainStage.Id;
         periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
+        periodFacilityEntity.FercRegionId = periodFacility.FercRegion.Id;
         periodFacilityEntity.IsActive = periodFacility.IsActive;
 
         return periodFacilityEntity;
     }
 
+    #endregion
+
+    #region PeriodFacility ElectricityGridMixes
     public ReportingPeriodFacilityElectricityGridMixEntity ConvertPeriodFacilityElectricityGridMixDomainToEntity(PeriodFacilityElectricityGridMix facilityElectricityGridMix)
     {
         var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
@@ -167,14 +169,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         unitOfMeasureEntity.Id = facilityElectricityGridMix.UnitOfMeasure.Id;
         unitOfMeasureEntity.Name = facilityElectricityGridMix.UnitOfMeasure.Name;
 
-        var fercRegionEntity = new FercRegionEntity();
-        fercRegionEntity.Id = facilityElectricityGridMix.FercRegion.Id;
-        fercRegionEntity.Name = facilityElectricityGridMix.FercRegion.Name;
-
         entity.UnitOfMeasure = unitOfMeasureEntity;
         entity.UnitOfMeasureId = unitOfMeasureEntity.Id;
-        entity.FercRegion = fercRegionEntity;
-        entity.FercRegionId = fercRegionEntity.Id;
         entity.Content = facilityElectricityGridMix.Content;
         entity.IsActive = true;
 
@@ -211,11 +207,15 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         return new ElectricityGridMixComponentPercent(id, electricityGridMixLookUp, content);
     }
 
+    #endregion
+
+    #region PeriodSupplierFacility GasSupplyBreakdown
+
     public IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(IEnumerable<PeriodFacilityGasSupplyBreakdown> facilityGasSupplyBreakdowns)
     {
         var entityList = new List<ReportingPeriodFacilityGasSupplyBreakDownEntity>();
 
-        foreach(var domain in facilityGasSupplyBreakdowns)
+        foreach (var domain in facilityGasSupplyBreakdowns)
         {
             entityList.Add(ConvertPeriodFacilityGasSupplyBreakdownDomainToEntity(domain));
         }
@@ -239,7 +239,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     {
         var voList = new List<GasSupplyBreakdownVO>();
 
-        foreach(var entity in gasSupplyEntities)
+        foreach (var entity in gasSupplyEntities)
         {
             var site = sites.FirstOrDefault(x => x.Id == entity.SiteId);
             var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.Id == entity.UnitOfMeasureId);
@@ -255,6 +255,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         return gasSupplyBreakdownVo;
     }
+
 
     #endregion
 

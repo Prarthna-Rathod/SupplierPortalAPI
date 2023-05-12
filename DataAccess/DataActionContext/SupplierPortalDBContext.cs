@@ -308,12 +308,6 @@ public partial class SupplierPortalDBContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_ElectricityGridMixComponentEntity");
 
-            entity.HasOne(d => d.FercRegion)
-                .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
-                .HasForeignKey(d => d.FercRegionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_FercRegionEntity");
-
             entity.HasOne(d => d.ReportingPeriodFacility)
                 .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
                 .HasForeignKey(d => d.ReportingPeriodFacilityId)
@@ -346,6 +340,12 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasForeignKey(d => d.FacilityReportingPeriodDataStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacility_FacilityReportingPeriodDataStatus");
+
+            entity.HasOne(d => d.FercRegion)
+                .WithMany(p => p.ReportingPeriodFacilityEntities)
+                .HasForeignKey(d => d.FercRegionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityEntity_FercRegion");
 
             entity.HasOne(d => d.ReportingPeriod)
                 .WithMany(p => p.ReportingPeriodFacilityEntities)

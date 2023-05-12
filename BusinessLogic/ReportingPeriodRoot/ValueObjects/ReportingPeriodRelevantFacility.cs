@@ -9,11 +9,8 @@ namespace BusinessLogic.ReportingPeriodRoot.ValueObjects;
 public class ReportingPeriodRelevantFacility
 {
     public int? ReportingPeriodFacilityId { get; set; }
-
     public int SupplierId { get; set; }
-
     public string SupplierName { get; set; }
-
     public int PeriodId { get; set; }
     public string PeriodName { get; set; }
     public int FacilityId { get; set; }
