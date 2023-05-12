@@ -29,6 +29,7 @@ namespace UnitTest
         private bool isActive = true;
 
         #region Supplier
+
         protected IEnumerable<ReportingType> GenerateReportingType()
         {
             var reportingTypes = new List<ReportingType>();
@@ -54,7 +55,6 @@ namespace UnitTest
             associatePipelines.Add(new AssociatePipeline(2, "Pipeline 2"));
             return associatePipelines;
         }
-
 
         protected Supplier GetSupplierDomain()
         {
@@ -165,7 +165,6 @@ namespace UnitTest
             return facilityEntities;
         }
 
-
         protected SupplierEntityDomainMapper CreateInstanceOfSupplierEntityToDomain()
         {
             return new SupplierEntityDomainMapper();
@@ -176,9 +175,31 @@ namespace UnitTest
             return new SupplierDomainDtoMapper();
         }
 
+        protected SupplierVO GetAndConvertSupplierValueObject()
+        {
+            var supplierEntity = CreateSupplierEntity();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var supplierVO = mapper.ConvertSupplierEntityToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
+            return supplierVO;
+        }
+
+        protected FacilityVO GetAndConvertFacilityValueObject()
+        {
+            var supplierEntity = CreateSupplierEntity();
+            var facilityEntity = GenerateFacilityEntitiesForSupplier(supplierEntity.Id).First();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var facilityVO = mapper.ConvertFacilityEntityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
+
+            return facilityVO;
+        }
+
         #endregion
 
-        #region ReportingPeriod
+        #region GetAndConvert methods
 
         protected IEnumerable<ReportingPeriodType> GetAndConvertReportingPeriodTypes()
         {
@@ -267,7 +288,9 @@ namespace UnitTest
             return site;
         }
 
-        #region protected method
+        #endregion
+
+        #region AddPeriodSupplierAndPeriodFacility method
 
         protected ReportingPeriod AddPeriodSupplierAndPeriodFacilityForReportingPeriod()
         {
@@ -281,7 +304,8 @@ namespace UnitTest
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, true);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, fercRegion, true);
 
             //Update reportingPeriodStatus InActive to Open
             var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
@@ -293,7 +317,7 @@ namespace UnitTest
 
         #endregion
 
-        #region ReportingPeriod methods
+        #region ReportingPeriod
 
         protected ReportingPeriod GetReportingPeriodDomain()
         {
@@ -319,9 +343,19 @@ namespace UnitTest
             return reportingPeriodEntity;
         }
 
+        protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
+        {
+            return new ReportingPeriodEntityDomainMapper();
+        }
+
+        protected ReportingPeriodDomainDtoMapper CreateInstanceOfReportingPeriodDomainDtoMapper()
+        {
+            return new ReportingPeriodDomainDtoMapper();
+        }
+
         #endregion
 
-        #region PeriodSupplier methods
+        #region PeriodSupplier
 
         protected ReportingPeriodSupplierEntity CreateReportingPeriodSupplierEntity()
         {
@@ -337,7 +371,7 @@ namespace UnitTest
 
         #endregion
 
-        #region PeriodFacility methods
+        #region PeriodFacility
 
         protected ReportingPeriodFacilityEntity CreateReportingPeriodFacilityEntity()
         {
@@ -353,7 +387,7 @@ namespace UnitTest
 
         #endregion
 
-        #region ElectricityGridMix methods
+        #region PeriodFacilityElectricityGridMix
 
         protected IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> CreatePeriodFacilityElectricityGridMixEntity()
         {
@@ -364,7 +398,6 @@ namespace UnitTest
                 ReportingPeriodFacilityId = 1,
                 ElectricityGridMixComponentId = 1,
                 UnitOfMeasureId = 1,
-                FercRegionId = 12,
                 Content = (decimal)50.00,
                 IsActive = true,
                 CreatedOn = DateTime.UtcNow,
@@ -376,7 +409,6 @@ namespace UnitTest
                 ReportingPeriodFacilityId = 1,
                 ElectricityGridMixComponentId = 2,
                 UnitOfMeasureId = 1,
-                FercRegionId = 12,
                 Content = (decimal)50.00,
                 IsActive = true,
                 CreatedOn = DateTime.UtcNow,
@@ -385,27 +417,6 @@ namespace UnitTest
             return list;
         }
 
-        #endregion
-
-        #region GasSupplyBreakdown methods
-
-        protected ReportingPeriodFacilityGasSupplyBreakDownEntity CreatePeriodFacilityGasSupplyBreakdownEntity()
-        {
-            var periodFacilityEntity = CreateReportingPeriodFacilityEntity();
-            var gasSupplyBreakdownEntity = new ReportingPeriodFacilityGasSupplyBreakDownEntity();
-            gasSupplyBreakdownEntity.Id = 1;
-            gasSupplyBreakdownEntity.PeriodFacilityId = 1;
-            gasSupplyBreakdownEntity.PeriodFacility = periodFacilityEntity;
-            gasSupplyBreakdownEntity.SiteId = 1;
-            gasSupplyBreakdownEntity.UnitOfMeasureId = 1;
-            gasSupplyBreakdownEntity.Content = (decimal)100.00;
-
-            return gasSupplyBreakdownEntity;
-        }
-
-        #endregion
-
-        #region PeriodFacilityElectricityGridMix VO
         protected IEnumerable<ElectricityGridMixComponentPercent> GetElectricityGridMixComponentPercents()
         {
             var list = new List<ElectricityGridMixComponentPercent>();
@@ -428,9 +439,32 @@ namespace UnitTest
             return list;
         }
 
+        protected IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> PeriodFacilityElectricityGridMixDto()
+        {
+            var list = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+            list.Add(new ReportingPeriodFacilityElectricityGridMixDto(1, "string", (decimal)50.00));
+            list.Add(new ReportingPeriodFacilityElectricityGridMixDto(2, "string", (decimal)50.00));
+
+            return list;
+        }
+
         #endregion
 
-        #region PeriodFacilityGasSupplyBreakdown VO
+        #region PeriodFacilityGasSupplyBreakdown
+
+        protected ReportingPeriodFacilityGasSupplyBreakDownEntity CreatePeriodFacilityGasSupplyBreakdownEntity()
+        {
+            var periodFacilityEntity = CreateReportingPeriodFacilityEntity();
+            var gasSupplyBreakdownEntity = new ReportingPeriodFacilityGasSupplyBreakDownEntity();
+            gasSupplyBreakdownEntity.Id = 1;
+            gasSupplyBreakdownEntity.PeriodFacilityId = 1;
+            gasSupplyBreakdownEntity.PeriodFacility = periodFacilityEntity;
+            gasSupplyBreakdownEntity.SiteId = 1;
+            gasSupplyBreakdownEntity.UnitOfMeasureId = 1;
+            gasSupplyBreakdownEntity.Content = (decimal)100.00;
+
+            return gasSupplyBreakdownEntity;
+        }
 
         protected IEnumerable<GasSupplyBreakdownVO> GetGasSupplyBreakdowns()
         {
@@ -452,62 +486,9 @@ namespace UnitTest
             return list;
         }
 
-        #endregion
-
-        #region All ValueObjects methods
-
-        protected SupplierVO GetAndConvertSupplierValueObject()
-        {
-            var supplierEntity = CreateSupplierEntity();
-            var reportingTypes = GenerateReportingType();
-            var supplyChainStages = GenerateSupplyChainStage();
-            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
-            var supplierVO = mapper.ConvertSupplierEntityToSupplierValueObject(supplierEntity, supplyChainStages, reportingTypes);
-            return supplierVO;
-        }
-
-        protected FacilityVO GetAndConvertFacilityValueObject()
-        {
-            var supplierEntity = CreateSupplierEntity();
-            var facilityEntity = GenerateFacilityEntitiesForSupplier(supplierEntity.Id).First();
-            var reportingTypes = GenerateReportingType();
-            var supplyChainStages = GenerateSupplyChainStage();
-            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
-            var facilityVO = mapper.ConvertFacilityEntityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
-
-            return facilityVO;
-        }
-
-
-        #endregion
-
-        #region All Dto mappers methods
-
         protected ReportingPeriodFacilityGasSupplyBreakdownDto PeriodFacilityGasSupplyBreakdownDto()
         {
             return new ReportingPeriodFacilityGasSupplyBreakdownDto(1, 1, "Test facility 1", 1, "abc", 1, "Biomass", (decimal)100.00);
-        }
-
-        protected IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> PeriodFacilityElectricityGridMixDto()
-        {
-            var list = new List<ReportingPeriodFacilityElectricityGridMixDto>();
-            list.Add(new ReportingPeriodFacilityElectricityGridMixDto(1, "string", (decimal)50.00));
-            list.Add(new ReportingPeriodFacilityElectricityGridMixDto(2, "string", (decimal)50.00));
-
-            return list;
-        }
-
-        #endregion
-
-
-        protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
-        {
-            return new ReportingPeriodEntityDomainMapper();
-        }
-
-        protected ReportingPeriodDomainDtoMapper CreateInstanceOfReportingPeriodDomainDtoMapper()
-        {
-            return new ReportingPeriodDomainDtoMapper();
         }
 
         #endregion

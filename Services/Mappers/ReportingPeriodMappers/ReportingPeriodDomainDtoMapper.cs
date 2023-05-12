@@ -103,14 +103,14 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         public ReportingPeriodSupplierRelaventFacilityDto ConvertPeriodFacilityDomainToDto(PeriodFacility periodFacility, bool isRelaventForPeriodStatus)
         {
-            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(periodFacility.Id, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, periodFacility.FacilityVO.GHGRPFacilityId, periodFacility.FacilityVO.ReportingType.Id, periodFacility.FacilityVO.ReportingType.Name, periodFacility.FacilityVO.SupplyChainStage.Id, periodFacility.FacilityVO.SupplyChainStage.Name, periodFacility.FacilityVO.IsActive, periodFacility.ReportingPeriodId, periodFacility.FacilityReportingPeriodDataStatus?.Id, periodFacility.FacilityReportingPeriodDataStatus?.Name, isRelaventForPeriodStatus);
+            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(periodFacility.Id, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, periodFacility.FacilityVO.GHGRPFacilityId, periodFacility.FacilityVO.ReportingType.Id, periodFacility.FacilityVO.ReportingType.Name, periodFacility.FacilityVO.SupplyChainStage.Id, periodFacility.FacilityVO.SupplyChainStage.Name, periodFacility.FacilityVO.IsActive, periodFacility.ReportingPeriodId, periodFacility.FacilityReportingPeriodDataStatus?.Id, periodFacility.FacilityReportingPeriodDataStatus?.Name,periodFacility.FercRegion?.Id,periodFacility.FercRegion?.Name, isRelaventForPeriodStatus);
 
             return periodFacilityDto;
         }
 
         private ReportingPeriodSupplierRelaventFacilityDto ConvertFacilityEntityToDto(FacilityEntity facilityEntity, bool isRelaventForPeriodStatus)
         {
-            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(null, facilityEntity.Id, facilityEntity.Name, facilityEntity.GhgrpfacilityId, facilityEntity.ReportingTypeId, facilityEntity.ReportingType.Name, facilityEntity.SupplyChainStageId, facilityEntity.SupplyChainStage.Name, facilityEntity.IsActive, null, null, null, isRelaventForPeriodStatus);
+            var periodFacilityDto = new ReportingPeriodSupplierRelaventFacilityDto(null, facilityEntity.Id, facilityEntity.Name, facilityEntity.GhgrpfacilityId, facilityEntity.ReportingTypeId, facilityEntity.ReportingType.Name, facilityEntity.SupplyChainStageId, facilityEntity.SupplyChainStage.Name, facilityEntity.IsActive, null, null, null,null,null, isRelaventForPeriodStatus);
 
             return periodFacilityDto;
         }
@@ -144,6 +144,26 @@ namespace Services.Mappers.ReportingPeriodMappers
             return gridMixDomain;
         }
 
+        public MultiplePeriodFacilityElectricityGridMixDto ConvertPeriodFacilityElectricityGridMixDomainListToDto(IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityElectricityGridMixes,PeriodFacility periodFacility,PeriodSupplier periodSupplier)
+        {
+            var gridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+
+            if (periodFacilityElectricityGridMixes.Count() == 0)
+                throw new Exception("PeriodFacilityElectricityGridMix is not connetcted !!");
+
+            foreach(var electricityGridMix in periodFacilityElectricityGridMixes)
+            {
+                var electricityGridMixDto = new ReportingPeriodFacilityElectricityGridMixDto(electricityGridMix.ElectricityGridMixComponent.Id,electricityGridMix.ElectricityGridMixComponent.Name,electricityGridMix.Content);
+                gridMixDtos.Add(electricityGridMixDto);
+            }
+
+            var unitOfMeasure = periodFacilityElectricityGridMixes.First().UnitOfMeasure;
+
+            var periodFacilityElectricityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, unitOfMeasure.Id, unitOfMeasure.Name, gridMixDtos);
+            return periodFacilityElectricityGridMixDto;
+
+        }
+
         #endregion
 
         #region PeriodFacilityGasSupplyBreakdown
@@ -169,9 +189,35 @@ namespace Services.Mappers.ReportingPeriodMappers
             return new GasSupplyBreakdownVO(0, periodFacilityGasSupplyBreakdownDto.PeriodFacilityId, periodFacilityGasSupplyBreakdownDto.FacilityId, site,unitOfMeasure, periodFacilityGasSupplyBreakdownDto.Content);
         }
 
-        #endregion
+        public MultiplePeriodFacilityGasSupplyBreakdownDto ConvertPeriodFacilityGasSupplyBreakdownDoaminListToDto(IEnumerable<PeriodFacility> periodFacilities, PeriodSupplier periodSupplier)
+        {
+            var gasSupplyDomainList = new List<PeriodFacilityGasSupplyBreakdown>();
+            var gasSupplyDtos = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
 
-        #region PeriodDocument
+            foreach(var periodFacility in periodFacilities)
+            {
+                var gasSupplyList = periodFacility.PeriodFacilityGasSupplyBreakdowns;
+                gasSupplyDomainList.AddRange(gasSupplyList);
+
+                gasSupplyDtos.AddRange(ConvertPeriodFacilityGasSupplyDomainToDto(gasSupplyList, periodFacility));
+
+            }
+
+            var periodFacilityGasSupplyBreakdownDto = new MultiplePeriodFacilityGasSupplyBreakdownDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, gasSupplyDtos);
+            return periodFacilityGasSupplyBreakdownDto;
+        }
+
+        private IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> ConvertPeriodFacilityGasSupplyDomainToDto(IEnumerable<PeriodFacilityGasSupplyBreakdown> facilityGasSupplyBreakdowns, PeriodFacility periodFacility)
+        {
+            var gasSupplyDto = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+            foreach(var gasSupplyBreakdown in facilityGasSupplyBreakdowns)
+            {
+                var gasSupplyBreakdownDto = new ReportingPeriodFacilityGasSupplyBreakdownDto(gasSupplyBreakdown.PeriodFacilityId,periodFacility.FacilityVO.Id,periodFacility.FacilityVO.FacilityName,gasSupplyBreakdown.Site.Id,gasSupplyBreakdown.Site.Name,gasSupplyBreakdown.UnitOfMeasure.Id,gasSupplyBreakdown.UnitOfMeasure.Name,gasSupplyBreakdown.Content);
+                gasSupplyDto.Add(gasSupplyBreakdownDto);
+            }
+            return gasSupplyDto;
+        }
+
         #endregion
 
     }

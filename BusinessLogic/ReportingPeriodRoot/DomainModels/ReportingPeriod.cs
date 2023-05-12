@@ -295,26 +295,26 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region Period Facility
 
-        public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive)
+        public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, FercRegion fercRegion, bool isActive)
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-            return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, isActive);
+            return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, fercRegion, isActive);
         }
 
 
-        public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive)
+        public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, FercRegion fercRegion, bool isActive)
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
             return periodSupplier.
-                LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+                LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId,fercRegion, isActive);
         }
 
         #endregion
 
         #region PeriodFacilityElectricityGridMix
 
-        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
@@ -323,13 +323,13 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
             CheckReportingPeriodStatus();
 
-            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, electricityGridMixComponentPercents);
         }
 
-        public bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+        public bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-            return periodSupplier.LoadPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+            return periodSupplier.LoadPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, electricityGridMixComponentPercents);
         }
 
         #endregion

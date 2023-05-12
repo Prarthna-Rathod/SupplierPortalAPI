@@ -149,6 +149,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityEntity.GhgrpfacilityId = periodFacility.FacilityVO.GHGRPFacilityId;
         periodFacilityEntity.SupplyChainStageId = periodFacility.FacilityVO.SupplyChainStage.Id;
         periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
+        periodFacilityEntity.FercRegionId = periodFacility.FercRegion.Id;
         periodFacilityEntity.IsActive = periodFacility.IsActive;
 
         return periodFacilityEntity;
@@ -168,14 +169,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         unitOfMeasureEntity.Id = facilityElectricityGridMix.UnitOfMeasure.Id;
         unitOfMeasureEntity.Name = facilityElectricityGridMix.UnitOfMeasure.Name;
 
-        var fercRegionEntity = new FercRegionEntity();
-        fercRegionEntity.Id = facilityElectricityGridMix.FercRegion.Id;
-        fercRegionEntity.Name = facilityElectricityGridMix.FercRegion.Name;
-
         entity.UnitOfMeasure = unitOfMeasureEntity;
         entity.UnitOfMeasureId = unitOfMeasureEntity.Id;
-        entity.FercRegion = fercRegionEntity;
-        entity.FercRegionId = fercRegionEntity.Id;
         entity.Content = facilityElectricityGridMix.Content;
         entity.IsActive = true;
 

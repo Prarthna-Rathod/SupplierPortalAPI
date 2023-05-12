@@ -47,6 +47,9 @@ public interface IReportingPeriodDomainDtoMapper
 
     ElectricityGridMixComponentPercent ConvertPeriodElectricityGridMixDtoToValueObject(ElectricityGridMixComponent electricityGridMixComponent, decimal content);
 
+    //Get electricityGridMix API Conversion
+    MultiplePeriodFacilityElectricityGridMixDto ConvertPeriodFacilityElectricityGridMixDomainListToDto(IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityElectricityGridMixes, PeriodFacility periodFacility, PeriodSupplier periodSupplier);
+
     #endregion
 
     #region PeriodFacilityGasSupplyBreakDown
@@ -54,6 +57,9 @@ public interface IReportingPeriodDomainDtoMapper
     IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakDownDtosToValueObjects(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> periodFacilityGasSupplyBreakdownDtos, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures);
 
     GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(ReportingPeriodFacilityGasSupplyBreakdownDto periodFacilityGasSupplyBreakdownDto, Site site, UnitOfMeasure unitOfMeasure);
+
+    //Get gasSupplyBreakdown API Conversion
+    MultiplePeriodFacilityGasSupplyBreakdownDto ConvertPeriodFacilityGasSupplyBreakdownDoaminListToDto(IEnumerable<PeriodFacility> periodFacilities, PeriodSupplier periodSupplier);
 
     #endregion
 

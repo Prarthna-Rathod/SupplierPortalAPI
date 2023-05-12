@@ -20,11 +20,13 @@ namespace Services.DTOs.ReadOnlyDTOs
         public int? ReportingPeriodId { get; set; }
         public int? FacilityReportingPeriodDataStatusId { get; set; }
         public string? FacilityReportingPeriodDataStatusName { get; set; }
+        public int? FercRegionId { get; set; }
+        public string? FercRegionName { get; set; }
         public bool FacilityIsRelevantForPeriod { get; set; }
 
         public ReportingPeriodSupplierRelaventFacilityDto(int? id,
             int facilityId, string facilityName, string? ghgrpFacilityId, int reportingTypeId, string reportingTypeName, int supplyChainStageId, string supplyChainStageName, bool isActive, int? reportingPeriodId, 
-            int? facilityReportingPeriodDataStatusId, string? facilityReportingPeriodDataStatusName, bool facilityIsRelaventForPeriod )
+            int? facilityReportingPeriodDataStatusId, string? facilityReportingPeriodDataStatusName,int? fercRegionId,string? fercRegionName, bool facilityIsRelaventForPeriod )
         {
             Id = id;
             FacilityId = facilityId;
@@ -38,6 +40,8 @@ namespace Services.DTOs.ReadOnlyDTOs
             ReportingPeriodId = reportingPeriodId;
             FacilityReportingPeriodDataStatusId = facilityReportingPeriodDataStatusId;
             FacilityReportingPeriodDataStatusName = facilityReportingPeriodDataStatusName;
+            FercRegionId = fercRegionId;
+            FercRegionName = fercRegionName;
             FacilityIsRelevantForPeriod = facilityIsRelaventForPeriod;
         }
     }

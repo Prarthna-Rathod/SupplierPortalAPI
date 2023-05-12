@@ -136,7 +136,8 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true, true);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
+            var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodDataStatus, 1, true,fercRegion, true);
             
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 
@@ -165,7 +166,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.CustomMix);
             var percent = GetElectricityGridMixComponentPercents();
 
-            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,unitOfMeasure,fercRegion,percent);
+            var facilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,unitOfMeasure,percent);
 
             var gridMixDomain = facilityElectricityGridMixDomain.First();
 
@@ -177,7 +178,6 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(gridMixDomain.PeriodFacilityId, periodFacilityElectricityGridMixEntity.ReportingPeriodFacilityId);
             Assert.Equal(gridMixDomain.ElectricityGridMixComponent.Id, periodFacilityElectricityGridMixEntity.ElectricityGridMixComponentId);
             Assert.Equal(gridMixDomain.UnitOfMeasure.Id, periodFacilityElectricityGridMixEntity.UnitOfMeasureId);
-            Assert.Equal(gridMixDomain.FercRegion.Id, periodFacilityElectricityGridMixEntity.FercRegionId);
             Assert.Equal(gridMixDomain.Content, periodFacilityElectricityGridMixEntity.Content);
         }
 

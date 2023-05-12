@@ -16,6 +16,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         public FacilityReportingPeriodDataStatus FacilityReportingPeriodDataStatus { get; private set; }
         public int ReportingPeriodId { get; private set; }
         public int ReportingPeriodSupplierId { get; private set; }
+        public FercRegion FercRegion { get; private set; }
         public bool IsActive { get; private set; }
 
         public IEnumerable<PeriodFacilityElectricityGridMix> periodFacilityElectricityGridMixes
@@ -44,27 +45,28 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         internal PeriodFacility() { }
 
-        internal PeriodFacility(FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, bool isActive)
+        internal PeriodFacility(FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId,FercRegion fercRegion, bool isActive)
         {
             FacilityVO = facilityVO;
             FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
             ReportingPeriodId = reportingPeriodId;
             ReportingPeriodSupplierId = reportingPeriodSupplierId;
+            FercRegion = fercRegion;
             IsActive = isActive;
             _periodFacilityElectricityGridMixes = new HashSet<PeriodFacilityElectricityGridMix>();
             _periodFacilityGasSupplyBreakdowns = new HashSet<PeriodFacilityGasSupplyBreakdown>();
         }
 
-        internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, bool isActive) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId, isActive)
+        internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId,FercRegion fercRegion, bool isActive) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId,fercRegion, isActive)
         {
             Id = id;
         }
 
         #region PeriodFacilityElecetricityGridMix
 
-        internal IEnumerable<PeriodFacilityElectricityGridMix> AddElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+        internal IEnumerable<PeriodFacilityElectricityGridMix> AddElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
-            switch (fercRegion.Name)
+            switch (FercRegion.Name)
             {
                 case FercRegionValues.CustomMix:
                     {
@@ -75,7 +77,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                         foreach (var gridMixComponent in electricityGridMixComponentPercents)
                         {
-                            var periodFacilityElectricityGridMixDomain = new PeriodFacilityElectricityGridMix(Id, gridMixComponent.ElectricityGridMixComponent, unitOfMeasure, fercRegion, gridMixComponent.Content);
+                            var periodFacilityElectricityGridMixDomain = new PeriodFacilityElectricityGridMix(Id, gridMixComponent.ElectricityGridMixComponent, unitOfMeasure, gridMixComponent.Content);
 
                             var existingGridMixComponent = _periodFacilityElectricityGridMixes.Any(x => x.ElectricityGridMixComponent.Id == gridMixComponent.ElectricityGridMixComponent.Id);
 
@@ -97,19 +99,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                             throw new BadRequestException("FercRegion is not Custom Mix. Please select fercRegion is Custom Mix then add PeriodFacilityElectricityGridMix.");
 
                         if (_periodFacilityElectricityGridMixes.Count() != 0)
-                        {
-                            var existingFercRegion = _periodFacilityElectricityGridMixes.FirstOrDefault().FercRegion.Id;
-
-                            //If user want to update only fercRegion then need to update that region and clear the periodFacilityElectricityGridMix data
-                            if (existingFercRegion != fercRegion.Id && _periodFacilityElectricityGridMixes.Count() != 0)
-                            {
-                                foreach (var item in _periodFacilityElectricityGridMixes)
-                                {
-                                    item.FercRegion.Id = fercRegion.Id;
-                                    item.FercRegion.Name = fercRegion.Name;
-                                }
-                            }
-                        }
+                            _periodFacilityElectricityGridMixes.Clear();
                     }
                     break;
             }
@@ -117,11 +107,11 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return _periodFacilityElectricityGridMixes;
         }
 
-        internal bool LoadPeriodFacilityElectricityGridMix(UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+        internal bool LoadPeriodFacilityElectricityGridMix(UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
             foreach (var gridMixComponent in electricityGridMixComponentPercents)
             {
-                var periodFacilityElectricityGridMixDomain = new PeriodFacilityElectricityGridMix(gridMixComponent.Id, Id, gridMixComponent.ElectricityGridMixComponent, unitOfMeasure, fercRegion, gridMixComponent.Content);
+                var periodFacilityElectricityGridMixDomain = new PeriodFacilityElectricityGridMix(gridMixComponent.Id, Id, gridMixComponent.ElectricityGridMixComponent, unitOfMeasure, gridMixComponent.Content);
 
                 _periodFacilityElectricityGridMixes.Add(periodFacilityElectricityGridMixDomain);
             }

@@ -67,10 +67,10 @@ public class PeriodSupplier
 
     #region Period Facility
 
-    internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
+    internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod,FercRegion fercRegion, bool isActive)
     {
         int counter = 0;
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id,fercRegion, isActive);
 
         if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
         {
@@ -117,9 +117,9 @@ public class PeriodSupplier
     }
 
 
-    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, bool isActive)
+    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId,FercRegion fercRegion, bool isActive)
     {
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId,fercRegion, isActive);
 
         return _periodfacilities.Add(periodFacility);
     }
@@ -129,7 +129,7 @@ public class PeriodSupplier
 
     #region PeriodFacilityElectricityGridMix
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
     {
         var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
 
@@ -138,13 +138,13 @@ public class PeriodSupplier
 
         CheckPeriodSupplierStatus();
 
-        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, electricityGridMixComponentPercents);
     }
 
-    internal bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+    internal bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
     {
         var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
-        return periodFacility.LoadPeriodFacilityElectricityGridMix(unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+        return periodFacility.LoadPeriodFacilityElectricityGridMix(unitOfMeasure, electricityGridMixComponentPercents);
     }
 
     #endregion
