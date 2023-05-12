@@ -18,7 +18,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, bool facilityIsRelaventForPeriod);
 
-        bool AddPeriodFacilityElectricityGridMix(IEnumerable< ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId);
+        bool AddPeriodFacilityElectricityGridMix(IEnumerable< ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId, int fercRegionId);
 
         bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities, int periodSupplierId);
 
@@ -31,6 +31,8 @@ namespace DataAccess.DataActions.Interfaces
         #region Update Methods
 
         bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
+
+        ReportingPeriodFacilityEntity UpdatePeriodFacilityFercRegion(int periodFacilityId, int fercRegionId);
 
         Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 

@@ -163,8 +163,9 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
-            var list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+            var list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             var singleDomain = list.FirstOrDefault();
             var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
 

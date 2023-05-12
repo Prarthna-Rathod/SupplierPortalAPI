@@ -320,13 +320,13 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, fercRegion, isActive);
         }
 
-        public IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, int periodSupplierId,UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
+        public IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, int periodSupplierId,UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
         {
             CheckReportingPeriodStatus();
 
             var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
-           return periodSupplier.AddRemoveElectricityGridMixComponents(periodFacilityId, unitOfMeasure, gridMixComponentPercents);
+           return periodSupplier.AddRemoveElectricityGridMixComponents(periodFacilityId, unitOfMeasure, fercRegion, gridMixComponentPercents);
         }
 
         public bool LoadElectricityGridMixComponents(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)

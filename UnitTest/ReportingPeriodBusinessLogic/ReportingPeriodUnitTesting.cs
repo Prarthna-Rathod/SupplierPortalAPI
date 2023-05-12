@@ -531,12 +531,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -572,14 +573,15 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
-            reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+            reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             var newGridMixList = GetElectricityGridMixComponentPercentsList2();
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, newGridMixList);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, newGridMixList);
             }
             catch (Exception ex)
             {
@@ -615,21 +617,18 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
-            reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+            reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             var percents = new List<ElectricityGridMixComponentPercent>();
 
             //Update FercRegion to None for PeriodFacility
-            var periodFacility = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1).PeriodFacilities.FirstOrDefault(x => x.Id == 1);
-
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
-            periodFacility.FercRegion.Id = fercRegion.Id;
-            periodFacility.FercRegion.Name = fercRegion.Name;
+            var updatedFercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, percents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, updatedFercRegion, percents);
             }
             catch (Exception ex)
             {
@@ -648,7 +647,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         /// <summary>
         /// Add PeriodFacilityElectricityGridMixComponents failure case1.
         /// If FercRegion is not CustomMix for then throw exception.
-        /// For this UnitTesting set periodFacility FercRegion not to 'CustomMix' in AddPeriodSupplierAndPeriodFacilityForPeriod() method
         /// </summary>
         [Fact]
         public void AddPeriodFacilityGridMixFailsCase1()
@@ -659,12 +657,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -673,7 +672,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             }
 
             Assert.Null(list);
-            //Assert.NotEqual(gridMixComponentPercents.Count(), list.Count());
             Assert.NotNull(exceptionMessage);
             Assert.NotEqual(0, exceptionCounter);
 
@@ -692,12 +690,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var percents = new List<ElectricityGridMixComponentPercent>();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, percents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, percents);
             }
             catch (Exception ex)
             {
@@ -726,12 +725,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -759,12 +759,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -792,12 +793,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -830,12 +832,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //GridMix
             var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
             try
             {
-                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, gridMixComponentPercents);
+                list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             }
             catch (Exception ex)
             {

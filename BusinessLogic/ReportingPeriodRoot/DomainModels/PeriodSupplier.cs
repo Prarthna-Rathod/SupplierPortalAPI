@@ -82,7 +82,7 @@ public class PeriodSupplier
         {
             var periodSupplierFacilities = Supplier.Facilities;
 
-            //Check existing PeriodSupplier
+            //Check existing PeriodFacility
             foreach (var existingPeriodFacility in _periodfacilities)
             {
                 if (existingPeriodFacility.FacilityVO.Id == facilityVO.Id && existingPeriodFacility.ReportingPeriodId == Id)
@@ -130,10 +130,13 @@ public class PeriodSupplier
         return _periodfacilities.Add(periodFacility);
     }
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
     {
         CheckSupplierReportingPeriodStatus();
         var periodFacility = FindPeriodFacility(periodFacilityId);
+
+        periodFacility.FercRegion.Id = fercRegion.Id;
+        periodFacility.FercRegion.Name = fercRegion.Name;
 
         return periodFacility.AddRemoveElectricityGridMixComponents(unitOfMeasure, gridMixComponentPercents);
     }
