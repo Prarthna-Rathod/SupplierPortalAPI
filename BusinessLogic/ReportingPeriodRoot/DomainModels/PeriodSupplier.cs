@@ -135,10 +135,7 @@ public class PeriodSupplier
         CheckSupplierReportingPeriodStatus();
         var periodFacility = FindPeriodFacility(periodFacilityId);
 
-        periodFacility.FercRegion.Id = fercRegion.Id;
-        periodFacility.FercRegion.Name = fercRegion.Name;
-
-        return periodFacility.AddRemoveElectricityGridMixComponents(unitOfMeasure, gridMixComponentPercents);
+        return periodFacility.AddRemoveElectricityGridMixComponents(unitOfMeasure, gridMixComponentPercents, fercRegion);
     }
 
     internal bool LoadElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
@@ -147,6 +144,8 @@ public class PeriodSupplier
 
         return periodFacility.LoadElectricityGridMixComponents(unitOfMeasure, gridMixComponentPercents);
     }
+
+    #endregion
 
     #region GasSupplyBreakdown
 
@@ -191,6 +190,20 @@ public class PeriodSupplier
 
     #endregion
 
+    #region PeriodDocument
+
+    internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(int periodFacilityId, string displayName, string? path, IEnumerable< DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod)
+    {
+        CheckSupplierReportingPeriodStatus();
+        var periodFacility = FindPeriodFacility(periodFacilityId);
+        return periodFacility.AddUpdatePeriodFacilityDocument(displayName, path, documentStatuses, documentType, validationError, collectionTimePeriod);
+    }
+
+    internal bool LoadPeriodFacilityDocuments(int documentId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+    {
+        var periodFacility = FindPeriodFacility(periodFacilityId);
+        return periodFacility.LoadPeriodFacilityDocuments(documentId, version, displayName, storedName, path, documentStatus, documentType, validationError);
+    }
 
     #endregion
 

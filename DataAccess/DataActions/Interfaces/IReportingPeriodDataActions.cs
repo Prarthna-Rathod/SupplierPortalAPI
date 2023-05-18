@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities, int periodSupplierId);
 
-        Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
+        int AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 
         Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
 
@@ -31,10 +32,6 @@ namespace DataAccess.DataActions.Interfaces
         #region Update Methods
 
         bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
-
-        ReportingPeriodFacilityEntity UpdatePeriodFacilityFercRegion(int periodFacilityId, int fercRegionId);
-
-        Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 
         Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
 
@@ -67,8 +64,8 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<DocumentRequiredStatusEntity> GetDocumentRequiredStatus();
 
-        IEnumerable<DocumentStatusEntity> GetDocumentStatus();
-        IEnumerable<DocumentTypeEntity> GetDocumentType();
+        IEnumerable<DocumentStatusEntity> GetDocumentStatusEntities();
+        IEnumerable<DocumentTypeEntity> GetDocumentTypeEntities();
         IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType();
         IEnumerable<ReportingTypeEntity> GetReportingTypes();
 
@@ -78,6 +75,8 @@ namespace DataAccess.DataActions.Interfaces
         IEnumerable<FercRegionEntity> GetFercRegionEntities();
 
         IEnumerable<SiteEntity> GetSiteEntities();
+
+        IEnumerable<ReportingPeriodFacilityDocumentEntity> GetReportingPeriodFacilityDocuments();
 
         #endregion
 

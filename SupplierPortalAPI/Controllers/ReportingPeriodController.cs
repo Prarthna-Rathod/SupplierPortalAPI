@@ -48,6 +48,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddRemovePeriodFacilityGasSupplyBreakdown(addMultiplePeriodSupplierGasSupplyBreakdownDto);
         }
 
+        [HttpPost("AddUpdateReportingPeriodDocument")]
+        public string AddUpdateReportingPeriodDocument([FromForm] ReportingPeriodDocumentDto reportingPeriodDocumentDto)
+        {
+            return _services.AddUpdateReportingPeriodDocument(reportingPeriodDocumentDto);
+        }
+
         [HttpPut("LockUnlockPeriodSupplierStatus")]
         public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
         {

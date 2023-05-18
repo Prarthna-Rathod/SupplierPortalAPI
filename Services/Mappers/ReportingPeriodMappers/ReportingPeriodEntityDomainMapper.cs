@@ -169,7 +169,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         unitOfMeasureEntity.Id = facilityElectricityGridMix.UnitOfMeasure.Id;
         unitOfMeasureEntity.Name = facilityElectricityGridMix.UnitOfMeasure.Name;
 
-        entity.UnitOfMeasure = unitOfMeasureEntity;
+        //entity.UnitOfMeasure = unitOfMeasureEntity;
         entity.UnitOfMeasureId = unitOfMeasureEntity.Id;
         entity.Content = facilityElectricityGridMix.Content;
         entity.IsActive = true;
@@ -181,7 +181,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     {
         var list = new List<ReportingPeriodFacilityElectricityGridMixEntity>();
 
-        foreach(var domain in facilityElectricityGridMixes)
+        foreach (var domain in facilityElectricityGridMixes)
         {
             list.Add(ConvertPeriodFacilityElectricityGridMixDomainToEntity(domain));
         }
@@ -193,7 +193,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     {
         var valueObjectList = new List<ElectricityGridMixComponentPercent>();
 
-        foreach(var entity in facilityElectricityGridMixeEntities)
+        foreach (var entity in facilityElectricityGridMixeEntities)
         {
             var gridMixLookUp = electricityGridMixesLookUps.FirstOrDefault(x => x.Id == entity.ElectricityGridMixComponentId);
             valueObjectList.Add(ConvertPeriodFacilityElectricityGridMixEntityToValueObject(entity.Id, entity.Content, gridMixLookUp));
@@ -260,6 +260,35 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     #endregion
 
     #region PeriodDocument
+
+    public ReportingPeriodFacilityDocumentEntity ConvertPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument)
+    {
+        var entity = new ReportingPeriodFacilityDocumentEntity();
+        entity.Id = periodFacilityDocument.Id;
+        entity.ReportingPeriodFacilityId = periodFacilityDocument.ReportingPeriodFacilityId;
+        entity.Version = periodFacilityDocument.Version;
+        entity.DisplayName = periodFacilityDocument.DisplayName;
+        entity.StoredName = periodFacilityDocument.StoredName;
+        entity.Path = periodFacilityDocument.Path;
+        entity.DocumentStatusId = periodFacilityDocument.DocumentStatus.Id;
+        entity.DocumentTypeId = periodFacilityDocument.DocumentType.Id;
+        entity.ValidationError = periodFacilityDocument.ValidationError;
+        entity.IsActive = true;
+
+        return entity;
+
+        /* var documentStatusEntity = new DocumentStatusEntity();
+         documentStatusEntity.Id = periodFacilityDocument.DocumentStatus.Id;
+         documentStatusEntity.Name = periodFacilityDocument.DocumentStatus.Name;
+         //entity.DocumentStatus = documentStatusEntity;
+
+         var documentTypeEntity = new DocumentTypeEntity();
+         documentTypeEntity.Id = periodFacilityDocument.DocumentType.Id;
+         documentTypeEntity.Name = periodFacilityDocument.DocumentType.Name;
+         //entity.DocumentType = documentTypeEntity;*/
+    }
+
+
     #endregion
 
 }

@@ -10,6 +10,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
     {
         private HashSet<PeriodFacilityElectricityGridMix> _periodFacilityElectricityGridMixes;
         private HashSet<PeriodFacilityGasSupplyBreakdown> _periodSupplierGasSupplyBreakdowns;
+        private HashSet<PeriodFacilityDocument> _periodFacilityDocuments;
+
         public int Id { get; private set; }
         public FacilityVO FacilityVO { get; private set; }
         public FacilityReportingPeriodDataStatus FacilityReportingPeriodDataStatus { get; private set; }
@@ -42,6 +44,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             }
         }
 
+        public IEnumerable<PeriodFacilityDocument> periodFacilityDocuments
+        {
+            get
+            {
+                if (_periodFacilityDocuments == null)
+                {
+                    return new List<PeriodFacilityDocument>();
+                }
+                return _periodFacilityDocuments;
+            }
+        }
+
         internal PeriodFacility() { }
 
         internal PeriodFacility(FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, FercRegion fercRegion, bool isActive)
@@ -54,6 +68,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             IsActive = isActive;
             _periodFacilityElectricityGridMixes = new HashSet<PeriodFacilityElectricityGridMix>();
             _periodSupplierGasSupplyBreakdowns = new HashSet<PeriodFacilityGasSupplyBreakdown>();
+            _periodFacilityDocuments = new HashSet<PeriodFacilityDocument>();
         }
 
         internal PeriodFacility(int id, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int reportingPeriodSupplierId, FercRegion fercRegion, bool isActive) : this(facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, reportingPeriodSupplierId, fercRegion, isActive)
@@ -61,8 +76,19 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             Id = id;
         }
 
-        internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
+        private string GeneratedReportingPeriodFacilityDocumentName(string collectionTimePeriod, string documentTypeName, int version, string extension)
         {
+            var facilityName = FacilityVO.FacilityName;
+            var documentName = facilityName + "-" + collectionTimePeriod + "-" + documentTypeName + "-" + version + extension;
+
+            return documentName;
+        }
+
+
+        internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents, FercRegion fercRegion)
+        {
+            FercRegion = fercRegion;
+
             switch (FercRegion.Name)
             {
                 case FercRegionValues.Custom_Mix:
@@ -97,7 +123,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                         //If user want to update only fercRegion then need to update that region and clear the gridMix data
                         if (_periodFacilityElectricityGridMixes.Count() != 0)
                             _periodFacilityElectricityGridMixes.Clear();
-                            
+
                     }
                     break;
             }
@@ -152,5 +178,95 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
 
         #endregion
+
+        #region PeriodFacilityDocuments
+
+        internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod)
+        {
+            var existingData = _periodFacilityDocuments.Where(x => x.DocumentType.Id == documentType.Id).OrderByDescending(x => x.Version).ToList();
+
+            //DocumentStatus -> Processing
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+
+            //Retrieve FileExtension from fileName
+            FileInfo file = new FileInfo(displayName);
+            var extension = file.Extension;
+
+            PeriodFacilityDocument? document = null;
+
+            if (existingData.Count() == 0)
+            {
+                var version = 1;
+                //var documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+                var storedName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, version, extension);
+                document = new PeriodFacilityDocument(Id, version, displayName, storedName, path, documentStatusProcessing, documentType, validationError);
+
+                _periodFacilityDocuments.Add(document);
+            }
+            else
+            {
+                document = existingData.First();
+
+                if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Submitted)
+                {
+                    var versionNumber = document.Version;
+                    var newVersionNumber = versionNumber + 1;
+                    var newStoredName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, newVersionNumber, extension);
+                    //var processingDocumentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+                    var newDocument = new PeriodFacilityDocument(Id, newVersionNumber, displayName, newStoredName, null, documentStatusProcessing, documentType, validationError);
+
+                    _periodFacilityDocuments.Add(newDocument);
+                }
+                else
+                {
+                    //Document cannot be versioned
+                    if (document.Path is not null)
+                        throw new Exception("This file already exists in the system. If you wish to upload a new version of the file, please delete existing file and try the upload again.");
+
+                    //Update existing versioned data record
+                    var version = document.Version;
+                    DocumentStatus? documentStatus = null;
+
+                    if (validationError == null)
+                    {
+                        documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.NotValidated);
+                    }
+                    else
+                    {
+                        documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.HasErrors);
+                        path = null;
+                        validationError = "Unable to save the uploaded file at this time.  Please attempt the upload again later.";
+                    }
+
+                    if(validationError == null && path != null)
+                    {
+                        documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
+                        version += 1;
+                    }
+
+                    var newStoredName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, version, extension);
+                    document.Version = version;
+                    document.DisplayName = file.Name;
+                    document.StoredName = newStoredName;
+                    document.Path = path;
+                    document.DocumentStatus = documentStatus;
+                    document.DocumentType = documentType;
+                    document.ValidationError = validationError;
+                    
+                }
+            }
+
+            return document;
+        }
+
+        public bool LoadPeriodFacilityDocuments(int documentId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+        {
+            var document = new PeriodFacilityDocument(documentId, Id, version, displayName, storedName, path, documentStatus, documentType, validationError);
+            return _periodFacilityDocuments.Add(document);
+        }
+
+
+        #endregion
+
     }
 }

@@ -26,6 +26,9 @@ public interface IReferenceLookUpMapper
 
     IEnumerable<Site> GetSiteLookUp(IEnumerable<SiteEntity> siteEntities);
 
+    IEnumerable<DocumentType> GetDocumentTypesLookUp(IEnumerable<DocumentTypeEntity> documentTypesEntities);
+    IEnumerable<DocumentStatus> GetDocumentStatusesLookUp(IEnumerable<DocumentStatusEntity> documentStatusesEntities);
+
     //Supplier
     IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities);
     IEnumerable<ReportingType> GetReportingTypeLookUp(IEnumerable<ReportingTypeEntity> reportingTypeEntities);

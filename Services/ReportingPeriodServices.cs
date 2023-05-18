@@ -26,13 +26,14 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private IReferenceLookUpMapper _referenceLookUpMapper;
     private IReadOnlyEntityToDtoMapper _readOnlyEntityToDtoMapper;
     private IReportingPeriodDomainDtoMapper _reportingPeriodDomainDtoMapper;
+    private IFileUploadDataActions _fileUploadDataActions;
 
     public ReportingPeriodServices(IReportingPeriodFactory reportingPeriodFactory, ILoggerFactory loggerFactory, IReportingPeriodEntityDomainMapper reportingPeriodEntityDomainMapper,
             ISupplierEntityDomainMapper supplierEntityDomainMapper,
             ISupplierDomainDtoMapper supplierDomainDtoMapper,
            IReportingPeriodDataActions reportingPeriodDataActions, ISupplierDataActions supplierDataActions, IReferenceLookUpMapper referenceLookUpMapper,
            IReadOnlyEntityToDtoMapper readOnlyEntityToDtoMapper,
-           IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper)
+           IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper, IFileUploadDataActions fileUploadDataActions)
     {
         _reportingPeriodFactory = reportingPeriodFactory;
         _logger = loggerFactory.CreateLogger<SupplierServices>();
@@ -44,7 +45,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         _referenceLookUpMapper = referenceLookUpMapper;
         _readOnlyEntityToDtoMapper = readOnlyEntityToDtoMapper;
         _reportingPeriodDomainDtoMapper = reportingPeriodDomainDtoMapper;
-
+        _fileUploadDataActions = fileUploadDataActions;
     }
 
     #region Private Methods
@@ -120,6 +121,18 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return _referenceLookUpMapper.GetSiteLookUp(sites);
     }
 
+    private IEnumerable<DocumentStatus> GetDocumentStatuses()
+    {
+        var documentStatuses = _reportingPeriodDataActions.GetDocumentStatusEntities();
+        return _referenceLookUpMapper.GetDocumentStatusesLookUp(documentStatuses);
+    }
+
+    private IEnumerable<DocumentType> GetDocumentTypes()
+    {
+        var documentTypes = _reportingPeriodDataActions.GetDocumentTypeEntities();
+        return _referenceLookUpMapper.GetDocumentTypesLookUp(documentTypes);
+    }
+
     /// <summary>
     /// Retrieve ReportingPeriod Entity and Convert it to DomainModel
     /// </summary>
@@ -136,7 +149,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
         var reportingPeriodStatus = GetAndConvertReportingPeriodStatuses();
 
-
         var reportingPeriodDomain = ConfigureReportingPeriod(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatus);
 
         //Load existing PeriodSuppliersList in ReportingPeriodDomain
@@ -149,19 +161,9 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         foreach (var periodFacility in reportingPeriodEntity.ReportingPeriodFacilityEntities)
         {
-            GetAndLoadPeriodFacilityWithElectricityGridMixes(periodFacility, reportingPeriodDomain);
-           
-            //Load PeriodFacilityGasSupplyBreakdowns
-            var gasSupplyEntities = periodFacility.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+            GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(periodFacility, reportingPeriodDomain);
 
-            if (gasSupplyEntities.Count() != 0)
-            {
-                var sites = GetAndConvertSites();
-                var unitOfMeasures = GetAndConvertUnitOfMeasures();
-                var gasSupplyValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(gasSupplyEntities, sites, unitOfMeasures);
-
-                reportingPeriodDomain.LoadPeriodFacilityGasSupplyBreakdown(periodFacility.ReportingPeriodSupplierId, gasSupplyValueObjectList);
-            }
+            GetAndLoadPeriodFacilityDocuments(periodFacility, reportingPeriodDomain);
         }
 
         return reportingPeriodDomain;
@@ -189,8 +191,8 @@ public class ReportingPeriodServices : IReportingPeriodServices
         if (periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities.Count() == 0)
             throw new NotFoundException("ElectricityGridMixes not available in this ReportingPeriodFacility !!");
 
-        GetAndLoadPeriodFacilityWithElectricityGridMixes(periodFacilityEntity, reportingPeriodDomain);
-
+        GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(periodFacilityEntity, reportingPeriodDomain);
+        GetAndLoadPeriodFacilityDocuments(periodFacilityEntity, reportingPeriodDomain);
         var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
 
         return periodSupplier;
@@ -246,7 +248,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
     }
 
-    private void GetAndLoadPeriodFacilityWithElectricityGridMixes(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
+    private void GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
     {
         var facilityVO = GetAndConvertFacilityValueObject(periodFacilityEntity.FacilityId);
         var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.FacilityReportingPeriodDataStatusId);
@@ -272,6 +274,132 @@ public class ReportingPeriodServices : IReportingPeriodServices
             reportingPeriodDomain.LoadElectricityGridMixComponents(periodFacility.Id, periodFacility.ReportingPeriodSupplierId, unitOfMeasure, gridMixValueObjectList);
         }
 
+        //Load PeriodFacilityGasSupplyBreakdowns
+        var gasSupplyEntities = periodFacilityEntity.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+        if (gasSupplyEntities.Count() != 0)
+        {
+            var sites = GetAndConvertSites();
+            var unitOfMeasures = GetAndConvertUnitOfMeasures();
+            var gasSupplyValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(gasSupplyEntities, sites, unitOfMeasures);
+
+            reportingPeriodDomain.LoadPeriodFacilityGasSupplyBreakdown(periodFacility.ReportingPeriodSupplierId, gasSupplyValueObjectList);
+        }
+    }
+
+    private void GetAndLoadPeriodFacilityDocuments(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
+    {
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+
+        // Load PeriodFacilityDocuments
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityEntity.Id);
+        var documentEntities = periodFacilityEntity.ReportingPeriodFacilityDocumentEntities;
+
+        if (documentEntities.Count() != 0)
+        {
+            foreach (var documentEntity in documentEntities)
+            {
+                var documentStatus = GetDocumentStatuses().First(x => x.Id == documentEntity.DocumentStatusId);
+                var documentType = GetDocumentTypes().First(x => x.Id == documentEntity.DocumentTypeId);
+
+                reportingPeriodDomain.LoadPeriodFacilityDocuments(documentEntity.Id, periodSupplier.Id, documentEntity.ReportingPeriodFacilityId, documentEntity.Version, documentEntity.DisplayName, documentEntity.StoredName, documentEntity.Path, documentStatus, documentType, documentEntity.ValidationError);
+            }
+        }
+    }
+
+    private static readonly Dictionary<string, List<byte[]>> _excelFileSignature =
+    new Dictionary<string, List<byte[]>>
+    {
+        { ".xlsx", new List<byte[]>
+            {
+                new byte[] { 0x50, 0x4B, 0x03, 0x04 },
+                new byte[] { 0x50, 0x4B, 0x05, 0x06 },
+                new byte[] { 0x50, 0x4B, 0x07, 0x08 },
+            }
+        },
+    };
+
+    private static readonly Dictionary<string, List<byte[]>> _xmlFileSignature =
+    new Dictionary<string, List<byte[]>>
+    {
+        { ".xml", new List<byte[]>
+            {
+                new byte[] { 0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 },
+                new byte[] { 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20 },
+                new byte[] { 0x00, 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20 },
+                new byte[] { 0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 },
+                new byte[] { 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00 },
+                new byte[] { 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x20 },
+            }
+        },
+    };
+
+    private string CheckFileSignature(string path, string extension)
+    {
+        var isExcelFile = false;
+        var isXmlFile = false;
+
+        if (extension == ".xlsx")
+        {
+            using (var reader = new BinaryReader(File.Open(path, FileMode.Open)))
+            {
+                var excelSignatures = _excelFileSignature[extension];
+                var headerByte = reader.ReadBytes(excelSignatures.Max(m => m.Length));
+
+                isExcelFile = excelSignatures.Any(signature =>
+                    headerByte.Take(signature.Length).SequenceEqual(signature));
+
+                reader.Close();
+                reader.Dispose();
+            }
+        }
+
+        if (extension == ".xml")
+        {
+            using (var reader = new BinaryReader(File.Open(path, FileMode.Open)))
+            {
+                var xmlSignatures = _xmlFileSignature[extension];
+                var headerByte = reader.ReadBytes(xmlSignatures.Max(m => m.Length));
+
+                isXmlFile = xmlSignatures.Any(signature =>
+                    headerByte.Take(signature.Length).SequenceEqual(signature));
+
+                reader.Close();
+                reader.Dispose();
+            }
+        }
+
+        string? fileError = null;
+
+        if (!isExcelFile && !isXmlFile)
+            fileError = "File signature is not match with file extension !!";
+
+        return fileError;
+    }
+
+    private string ValidateFile(string fileType, long fileSize, string path)
+    {
+        string? error = null;
+        var fileTypes = new List<string>();
+        fileTypes.Add(".xlsx");
+        fileTypes.Add(".xml");
+
+        var isCorrect = fileTypes.Contains(fileType);
+        if (!isCorrect)
+            error += "FileType is not match.";
+
+        //Check file signature
+        var fileError = CheckFileSignature(path, fileType);
+        if (fileError != null)
+            error += fileError;
+
+        //Check File size (should be 20MB)
+        long sizeInBytes = fileSize;
+        long maxSizeInBytes = 20971520;
+        if (sizeInBytes > maxSizeInBytes)
+            error += "Filesize should be in 20Mb";
+
+        return error;
     }
 
     #endregion
@@ -441,17 +569,15 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         if (unitOfMeasure is null)
             throw new NotFoundException("UnitOfMeasure not found !!");
-        
+
         if (fercRegion is null)
             throw new NotFoundException("FercRegion not found !!");
 
         var reportingPeriod = RetrieveAndConvertReportingPeriod(periodFacilityElectricityGridMixDto.ReportingPeriodId);
 
-        var periodSupplier = reportingPeriod.PeriodSuppliers.Where(x => x.Supplier.Id == periodFacilityElectricityGridMixDto.SupplierId).FirstOrDefault();
-
         var valueObjectList = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityElectricityGridMixDtosToValueObjectList(periodFacilityElectricityGridMixDto.ReportingPeriodFacilityElectricityGridMixDtos, electricityGridMixComponents);
 
-        var facilityElectricityGridMixDomainList = reportingPeriod.AddRemoveElectricityGridMixComponents(periodFacilityElectricityGridMixDto.ReportingPeriodFacilityId, periodSupplier.Id, unitOfMeasure, fercRegion, valueObjectList);
+        var facilityElectricityGridMixDomainList = reportingPeriod.AddRemoveElectricityGridMixComponents(periodFacilityElectricityGridMixDto.ReportingPeriodFacilityId, periodFacilityElectricityGridMixDto.SupplierId, unitOfMeasure, fercRegion, valueObjectList);
 
         var entities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityElectricityGridMixDomainListToEntities(facilityElectricityGridMixDomainList);
 
@@ -484,6 +610,49 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         return "ReportingPeriodSupplier GasSupplyBreakdown added successfully !!";
     }
+
+
+    #region ReportingPeriod Document
+
+    public string AddUpdateReportingPeriodDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodDocumentDto.ReportingPeriodId);
+
+        var documentStatuses = GetDocumentStatuses();
+        var documentType = GetDocumentTypes().FirstOrDefault(x => x.Id == reportingPeriodDocumentDto.DocumentTypeId);
+
+        //First Add new Record with document status "Processing"
+        var periodDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, null, documentStatuses, documentType, null);
+
+        var entity = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityDocumentDomainToEntity(periodDocument);
+
+        if (entity.Id == 0)
+           _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(entity);
+
+        //If no errors then upload file
+        var path = _fileUploadDataActions.UploadReportingPeriodDocument(reportingPeriodDocumentDto.DocumentFile);
+
+        //Check FileSize and FileType before upload
+        FileInfo file = new FileInfo(path);
+        var fileType = file.Extension;
+        long fileSize = file.Length;
+
+        var errors = ValidateFile(fileType, fileSize, path);
+
+        //Add Hashset record with documentStatus "NotValidated or HasErrors"
+        var uploadedPeriodDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, path, documentStatuses, documentType, errors);
+
+        var documentEntity = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityDocumentDomainToEntity(uploadedPeriodDocument);
+
+        _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(documentEntity);
+
+        if (errors != null)
+            throw new Exception(errors);
+
+        return "ReportingPeriodFacilityDocument uploaded successfully....";
+    }
+
+    #endregion
 
     #endregion
 

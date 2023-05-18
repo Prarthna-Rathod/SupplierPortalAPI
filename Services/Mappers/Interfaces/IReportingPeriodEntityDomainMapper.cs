@@ -52,11 +52,14 @@ public interface IReportingPeriodEntityDomainMapper
 
     IEnumerable<GasSupplyBreakdownVO> ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjectList(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> gasSupplyEntities, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures);
 
-    GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(ReportingPeriodFacilityGasSupplyBreakDownEntity gasSupplyEntity, Site site, UnitOfMeasure unitOfMeasure);
 
+    GasSupplyBreakdownVO ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(ReportingPeriodFacilityGasSupplyBreakDownEntity gasSupplyEntity, Site site, UnitOfMeasure unitOfMeasure);
     #endregion
 
     #region PeriodDocument
+
+    ReportingPeriodFacilityDocumentEntity ConvertPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument);
+
     #endregion
 
 }

@@ -7,13 +7,13 @@ namespace DataAccess.Entities
     {
         public int Id { get; set; }
         public int ReportingPeriodFacilityId { get; set; }
-        public string Version { get; set; } = null!;
+        public int Version { get; set; }
         public string DisplayName { get; set; } = null!;
         public string StoredName { get; set; } = null!;
-        public string Path { get; set; } = null!;
+        public string? Path { get; set; }
         public int DocumentStatusId { get; set; }
         public int DocumentTypeId { get; set; }
-        public string ValidationError { get; set; } = null!;
+        public string? ValidationError { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }

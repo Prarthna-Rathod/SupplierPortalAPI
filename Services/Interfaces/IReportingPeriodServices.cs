@@ -112,6 +112,9 @@ public interface IReportingPeriodServices
     #endregion
 
     #region ReportingPeriodDocuments
+
+    string AddUpdateReportingPeriodDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto);
+
     #endregion
 
 

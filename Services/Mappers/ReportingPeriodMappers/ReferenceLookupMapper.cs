@@ -76,6 +76,22 @@ namespace Services.Mappers.ReportingPeriodMappers
             }
         }
 
+        public IEnumerable<DocumentType> GetDocumentTypesLookUp(IEnumerable<DocumentTypeEntity> documentTypesEntities)
+        {
+            foreach (var item in documentTypesEntities)
+            {
+                yield return new DocumentType(item.Id, item.Name);
+            }
+        }
+
+        public IEnumerable<DocumentStatus> GetDocumentStatusesLookUp(IEnumerable<DocumentStatusEntity> documentStatusesEntities)
+        {
+            foreach(var item in documentStatusesEntities)
+            {
+                yield return new DocumentStatus(item.Id, item.Name);
+            }
+        }
+
         //SupplierFacility
         public IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities)
         {
