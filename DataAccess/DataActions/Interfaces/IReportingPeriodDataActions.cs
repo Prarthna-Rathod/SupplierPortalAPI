@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace DataAccess.DataActions.Interfaces
 {
@@ -17,7 +18,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId);
 
-        Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
+        bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity);
 
         Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
 
@@ -26,10 +27,6 @@ namespace DataAccess.DataActions.Interfaces
         #region Update Methods
 
         bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
-
-        bool UpdatePeriodFacilityFercRegion(int periodFacilityId, int fercRegionId);
-
-        Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument);
 
         Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
 
@@ -61,8 +58,8 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<DocumentRequiredStatusEntity> GetDocumentRequiredStatus();
 
-        IEnumerable<DocumentStatusEntity> GetDocumentStatus();
-        IEnumerable<DocumentTypeEntity> GetDocumentType();
+        IEnumerable<DocumentStatusEntity> GetDocumentStatusEntities();
+        IEnumerable<DocumentTypeEntity> GetDocumentTypeEntities();
         IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType();
         IEnumerable<ReportingTypeEntity> GetReportingTypes();
 

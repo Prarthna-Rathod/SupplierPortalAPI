@@ -60,6 +60,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         }
 
         #region Private Methods
+
         private string[] SplitCollectionTimePeriod()
         {
             return CollectionTimePeriod.Split(" ");
@@ -131,6 +132,16 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         {
             if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
                 throw new BadRequestException("ReportingPeriodStatus should be open or close !!");
+        }
+
+        private PeriodSupplier GetPeriodSupplier(int periodSupplierId)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier is not found !!");
+
+            return periodSupplier;
         }
 
         #endregion
@@ -297,38 +308,35 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, FercRegion fercRegion, bool isActive)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
             return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, fercRegion, isActive);
         }
 
 
         public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, FercRegion fercRegion, bool isActive)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
 
             return periodSupplier.
-                LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId,fercRegion, isActive);
+                LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, fercRegion, isActive);
         }
 
         #endregion
 
         #region PeriodFacilityElectricityGridMix
 
-        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure,FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+        public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-
-            if (periodSupplier == null)
-                throw new NotFoundException("PeriodSupplier is not found !!");
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
 
             CheckReportingPeriodStatus();
 
-            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+            return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
         }
 
         public bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
             return periodSupplier.LoadPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, electricityGridMixComponentPercents);
         }
 
@@ -338,10 +346,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         public IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-
-            if (periodSupplier is null)
-                throw new NotFoundException("PeriodSupplier is not found !!");
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
 
             CheckReportingPeriodStatus();
 
@@ -350,7 +355,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         public bool LoadPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
         {
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
 
             return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
         }
@@ -358,6 +363,26 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #endregion
 
         #region Period Document
+
+        public PeriodFacilityDocument AddPeriodFacilityDocument(int periodSupplierId, int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType)
+        {
+            CheckReportingPeriodStatus();
+
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
+
+            return periodSupplier.AddPeriodFacilityDocument(periodFacilityId, displayName, path, validationError, documentStatuses, documentType, CollectionTimePeriod);
+        }
+
+        public bool LoadPeriodFacilityDocument(int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+        {
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
+
+            return periodSupplier.LoadPeriodFacilityDocument(periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
+        }
+
+        #endregion
+
+        #region other
 
         /*
          public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
@@ -389,6 +414,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
 
         */
+
 
         #endregion
 
