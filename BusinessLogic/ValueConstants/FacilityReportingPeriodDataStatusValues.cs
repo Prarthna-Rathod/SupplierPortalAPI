@@ -16,6 +16,6 @@ namespace BusinessLogic.ValueConstants
         };
         public const string InProgress = "In-progress";
         public const string Complete = "Complete";
-        public const string Submitted = "Submitted";
+        public const string Submitted = "Submitted ";
     }
 }

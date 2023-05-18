@@ -9,7 +9,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 {
     private readonly SupplierPortalDBContext _context;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
-    private readonly string FERC_REGION_CUSTOM_MIX = "Custom Mix";
+
     public ReportingPeriodDataActionsManager(SupplierPortalDBContext context)
     {
         _context = context;
@@ -67,37 +67,24 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     }
 
 
-    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities,int periodFacilityId,int fercRegionId)
+    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId, int fercRegionId)
     {
-        UpdatePeriodFacilityFercRegion(periodFacilityId, fercRegionId);
+        var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities).FirstOrDefault();
 
-        var periodFacility = GetPeriodFacilityById(periodFacilityId);
+        periodFacilityEntity.FercRegionId = fercRegionId;
 
-        var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacility.Id).ToList();
+        var electricityGridMix = periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities;
 
-        var newFercRegion = periodFacility.FercRegion;
-
-        if (existingFacility.Count() != 0)
+        if (electricityGridMix.Count() != 0)
             RemovePeriodFacilityElectricityGridMix(periodFacilityId);
 
-        if (newFercRegion.Name == FERC_REGION_CUSTOM_MIX)
+        foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
         {
-            foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
-            {
-                if (gridMixEntity == null)
-                    throw new Exception("ElectricityGridMixEntity is not found !!");
-
-                var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
-                entity.ReportingPeriodFacilityId = gridMixEntity.ReportingPeriodFacilityId;
-                entity.ElectricityGridMixComponentId = gridMixEntity.ElectricityGridMixComponentId;
-                entity.UnitOfMeasureId = gridMixEntity.UnitOfMeasureId;
-                entity.Content = gridMixEntity.Content;
-                entity.IsActive = true;
-                entity.CreatedBy = "System";
-                entity.CreatedOn = DateTime.UtcNow;
-                _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
-            }
+            gridMixEntity.CreatedBy = "System";
+            gridMixEntity.CreatedOn = DateTime.UtcNow;
+            _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(gridMixEntity);
         }
+
         _context.SaveChanges();
         return true;
     }
@@ -119,14 +106,33 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public async Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
+    public bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity)
     {
-        await _context.ReportingPeriodFacilityDocumentEntities.AddAsync(reportingPeriodFacilityDocument);
+        var existingPeriodFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.DocumentTypeId == reportingPeriodFacilityDocumentEntity.DocumentTypeId && x.ReportingPeriodFacilityId == reportingPeriodFacilityDocumentEntity.ReportingPeriodFacilityId).FirstOrDefault();
 
-        reportingPeriodFacilityDocument.CreatedBy = "System";
-        reportingPeriodFacilityDocument.CreatedOn = DateTime.UtcNow;
+        if (existingPeriodFacilityDocument is null)
+        {
+            reportingPeriodFacilityDocumentEntity.CreatedBy = "System";
+            reportingPeriodFacilityDocumentEntity.CreatedOn = DateTime.UtcNow;
+            _context.ReportingPeriodFacilityDocumentEntities.Add(reportingPeriodFacilityDocumentEntity);
+        }
+        else
+        {
+            existingPeriodFacilityDocument.ReportingPeriodFacilityId = reportingPeriodFacilityDocumentEntity.ReportingPeriodFacilityId;
+            existingPeriodFacilityDocument.Version = reportingPeriodFacilityDocumentEntity.Version;
+            existingPeriodFacilityDocument.DisplayName = reportingPeriodFacilityDocumentEntity.DisplayName;
+            existingPeriodFacilityDocument.StoredName = reportingPeriodFacilityDocumentEntity.StoredName;
+            existingPeriodFacilityDocument.Path = reportingPeriodFacilityDocumentEntity.Path;
+            existingPeriodFacilityDocument.DocumentStatusId = reportingPeriodFacilityDocumentEntity.DocumentStatusId;
+            existingPeriodFacilityDocument.DocumentTypeId = reportingPeriodFacilityDocumentEntity.DocumentTypeId;
+            existingPeriodFacilityDocument.ValidationError = reportingPeriodFacilityDocumentEntity.ValidationError;
+            existingPeriodFacilityDocument.UpdatedBy = "System";
+            existingPeriodFacilityDocument.UpdatedOn = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+            _context.ReportingPeriodFacilityDocumentEntities.Update(existingPeriodFacilityDocument);
+        }
+
+        _context.SaveChanges();
         return true;
     }
 
@@ -172,54 +178,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public bool UpdatePeriodFacilityFercRegion(int periodFacilityId, int fercRegionId)
-    {
-        var fercRegionEntity = _context.FercRegionEntities.FirstOrDefault(x => x.Id == fercRegionId);
-        if (fercRegionEntity == null)
-            throw new Exception("FercRegion is not found !!");
-
-        var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.FirstOrDefault(x => x.Id == periodFacilityId);
-        if (periodFacilityEntity == null)
-            throw new Exception("PeriodFacilityEntity is not found !!");
-
-        periodFacilityEntity.FercRegion = fercRegionEntity;
-        periodFacilityEntity.FercRegion.Id = fercRegionEntity.Id;
-        periodFacilityEntity.FercRegion.Name = fercRegionEntity.Name;
-
-        _context.ReportingPeriodFacilityEntities.Update(periodFacilityEntity);
-        _context.SaveChanges();
-
-        return true;
-    }
-
-    public async Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
-    {
-        var existingfacilitydocument = await _context.ReportingPeriodFacilityDocumentEntities.FirstOrDefaultAsync(x => x.Id == reportingPeriodFacilityDocument.Id);
-
-        if (existingfacilitydocument == null)
-        {
-            throw new Exception("Facility Document Not found");
-        }
-
-        existingfacilitydocument.ReportingPeriodFacilityId = reportingPeriodFacilityDocument.ReportingPeriodFacilityId;
-        existingfacilitydocument.Version = reportingPeriodFacilityDocument.Version;
-        existingfacilitydocument.DisplayName = reportingPeriodFacilityDocument.DisplayName;
-        existingfacilitydocument.StoredName = reportingPeriodFacilityDocument.StoredName;
-        existingfacilitydocument.Path = reportingPeriodFacilityDocument.Path;
-        existingfacilitydocument.DocumentStatusId = reportingPeriodFacilityDocument.DocumentStatusId;
-        existingfacilitydocument.DocumentTypeId = reportingPeriodFacilityDocument.DocumentTypeId;
-        existingfacilitydocument.ValidationError = reportingPeriodFacilityDocument.ValidationError;
-        existingfacilitydocument.UpdatedBy = "System";
-        existingfacilitydocument.UpdatedOn = DateTime.UtcNow;
-
-        _context.ReportingPeriodFacilityDocumentEntities.Update(existingfacilitydocument);
-        await _context.SaveChangesAsync();
-
-        return true;
-    }
-
-
-
     public async Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
     {
         var existingsupplierdocument = await _context.ReportingPeriodSupplierDocumentEntities.FirstOrDefaultAsync(x => x.Id == reportingPeriodSupplierDocument.Id);
@@ -260,7 +218,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
           _context.SaveChanges();
           return periodSupplier;
       }
-  */
+    */
     public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
@@ -315,7 +273,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
         }
-        _context.SaveChanges();
+        //_context.SaveChanges();
         return true;
     }
 
@@ -341,7 +299,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     #endregion
 
     #region GetAll Methods
-
 
     public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypes()
     {
@@ -384,14 +341,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return _context.DocumentRequiredStatusEntities.ToList();
     }
 
-    public IEnumerable<DocumentStatusEntity> GetDocumentStatus()
+    public IEnumerable<DocumentStatusEntity> GetDocumentStatusEntities()
     {
-        return _context.DocumentStatusEntities.ToList();
+        return _context.DocumentStatusEntities;
     }
 
-    public IEnumerable<DocumentTypeEntity> GetDocumentType()
+    public IEnumerable<DocumentTypeEntity> GetDocumentTypeEntities()
     {
-        return _context.DocumentTypeEntities.ToList();
+        return _context.DocumentTypeEntities;
     }
 
     public IEnumerable<FacilityReportingPeriodDataStatusEntity> GetFacilityReportingPeriodDataStatus()
@@ -447,6 +404,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                     .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;
@@ -495,6 +454,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.ReportingPeriodSupplier)
                                 .Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
+                                .Include(x => x.ReportingPeriodFacilityDocumentEntities)
                                 .FirstOrDefault(x => x.Id == periodFacilityId);
         return periodFacility;
     }

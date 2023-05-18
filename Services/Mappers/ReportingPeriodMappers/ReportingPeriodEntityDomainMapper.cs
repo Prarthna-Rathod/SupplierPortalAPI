@@ -164,13 +164,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         var entity = new ReportingPeriodFacilityElectricityGridMixEntity();
         entity.ReportingPeriodFacilityId = facilityElectricityGridMix.PeriodFacilityId;
         entity.ElectricityGridMixComponentId = facilityElectricityGridMix.ElectricityGridMixComponent.Id;
-
-        var unitOfMeasureEntity = new UnitOfMeasureEntity();
-        unitOfMeasureEntity.Id = facilityElectricityGridMix.UnitOfMeasure.Id;
-        unitOfMeasureEntity.Name = facilityElectricityGridMix.UnitOfMeasure.Name;
-
-        entity.UnitOfMeasure = unitOfMeasureEntity;
-        entity.UnitOfMeasureId = unitOfMeasureEntity.Id;
+        entity.UnitOfMeasureId = facilityElectricityGridMix.UnitOfMeasure.Id;
         entity.Content = facilityElectricityGridMix.Content;
         entity.IsActive = true;
 
@@ -249,6 +243,24 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     #endregion
 
     #region PeriodDocument
+
+    public ReportingPeriodFacilityDocumentEntity ConvertReportingPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument)
+    {
+        var periodFacilityDocumentEntity = new ReportingPeriodFacilityDocumentEntity();
+        periodFacilityDocumentEntity.Id = periodFacilityDocument.Id;
+        periodFacilityDocumentEntity.ReportingPeriodFacilityId = periodFacilityDocument.ReportingPeriodFacilityId;
+        periodFacilityDocumentEntity.Version = periodFacilityDocument.Version;
+        periodFacilityDocumentEntity.DisplayName = periodFacilityDocument.DisplayName;
+        periodFacilityDocumentEntity.StoredName = periodFacilityDocument.StoredName;
+        periodFacilityDocumentEntity.Path = periodFacilityDocument.Path;
+        periodFacilityDocumentEntity.DocumentStatusId = periodFacilityDocument.DocumentStatus.Id;
+        periodFacilityDocumentEntity.DocumentTypeId = periodFacilityDocument.DocumentType.Id;
+        periodFacilityDocumentEntity.ValidationError = periodFacilityDocument.ValidationError;
+        periodFacilityDocumentEntity.IsActive = true;
+
+        return periodFacilityDocumentEntity;
+    }
+
     #endregion
 
 }

@@ -62,15 +62,25 @@ public class PeriodSupplier
             throw new BadRequestException("SupplierReportingPeriodStatus should be Unlocked !!");
     }
 
+    private PeriodFacility GetPeriodFacility(int periodFacilityId)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility is null)
+            throw new NotFoundException("PeriodFacility is not found !!");
+
+        return periodFacility;
+    }
+
     #endregion
 
 
     #region Period Facility
 
-    internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod,FercRegion fercRegion, bool isActive)
+    internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, FercRegion fercRegion, bool isActive)
     {
         int counter = 0;
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id,fercRegion, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id, fercRegion, isActive);
 
         if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
         {
@@ -117,9 +127,9 @@ public class PeriodSupplier
     }
 
 
-    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId,FercRegion fercRegion, bool isActive)
+    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, FercRegion fercRegion, bool isActive)
     {
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId,fercRegion, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, periodSupplierId, fercRegion, isActive);
 
         return _periodfacilities.Add(periodFacility);
     }
@@ -129,24 +139,18 @@ public class PeriodSupplier
 
     #region PeriodFacilityElectricityGridMix
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure,FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
     {
-        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
-
-        if (periodFacility is null)
-            throw new NotFoundException("PeriodFacility is not found !!");
-
-        periodFacility.FercRegion.Id = fercRegion.Id;
-        periodFacility.FercRegion.Name = fercRegion.Name;
+        var periodFacility = GetPeriodFacility(periodFacilityId);
 
         CheckPeriodSupplierStatus();
 
-        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, electricityGridMixComponentPercents);
+        return periodFacility.AddElectricityGridMixComponents(unitOfMeasure, electricityGridMixComponentPercents, fercRegion);
     }
 
     internal bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents)
     {
-        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+        var periodFacility = GetPeriodFacility(periodFacilityId);
         return periodFacility.LoadPeriodFacilityElectricityGridMix(unitOfMeasure, electricityGridMixComponentPercents);
     }
 
@@ -174,10 +178,7 @@ public class PeriodSupplier
         var periodFacility = gasSupplyBreakdownVOs.GroupBy(x => x.PeriodFacilityId);
         foreach (var facility in periodFacility)
         {
-            var periodFacilityDomain = _periodfacilities.FirstOrDefault(x => x.Id == facility.Key);
-
-            if (periodFacilityDomain is null)
-                throw new NotFoundException("PeriodFacility is not found !!");
+            var periodFacilityDomain = GetPeriodFacility(facility.Key);
 
             list.AddRange(periodFacilityDomain.AddPeriodFacilityGasSupplyBreakdown(facility));
 
@@ -190,12 +191,32 @@ public class PeriodSupplier
     {
         foreach (var gasSupplyBreakdownVo in gasSupplyBreakdownVOs)
         {
-            var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == gasSupplyBreakdownVo.PeriodFacilityId);
+            var periodFacility = GetPeriodFacility(gasSupplyBreakdownVo.PeriodFacilityId);
 
             periodFacility.LoadPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVo.Site, gasSupplyBreakdownVo.UnitOfMeasure, gasSupplyBreakdownVo.Content);
         }
 
         return true;
+    }
+
+    #endregion
+
+    #region PeriodFacilityDocument
+
+    internal PeriodFacilityDocument AddPeriodFacilityDocument(int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string collectionTimePeriod)
+    {
+        CheckPeriodSupplierStatus();
+
+        var periodFacility = GetPeriodFacility(periodFacilityId);
+
+        return periodFacility.AddPeriodFacilityDocument(displayName, path, validationError, documentStatuses, documentType, collectionTimePeriod);
+    }
+
+    internal bool LoadPeriodFacilityDocument(int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+    {
+        var periodFacility = GetPeriodFacility(periodFacilityId);
+
+        return periodFacility.LoadPeriodFacilityDocument(version, displayName, storedName, path, documentStatus, documentType, validationError);
     }
 
     #endregion

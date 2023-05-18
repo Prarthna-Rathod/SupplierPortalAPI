@@ -30,12 +30,6 @@ namespace SupplierPortalAPI.Controllers
             return _services.SetMultiplePeriodSuppliers(multiplePeriodSuppliersDto);
         }
 
-        [HttpPut("LockUnlockPeriodSupplierStatus")]
-        public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
-        {
-            return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
-        }
-
         [HttpPost("AddRemovePeriodFacilities")]
         public string AddRemovePeriodFacilities(ReportingPeriodFacilityDto reportingPeriodFacilityDto)
         {
@@ -52,6 +46,18 @@ namespace SupplierPortalAPI.Controllers
         public string AddRemovePeriodFacilityGasSupplyBreakdowns(MultiplePeriodFacilityGasSupplyBreakdownDto addMultiplePeriodFacilityGasSupplyBreakdownDto)
         {
             return _services.AddRemovePeriodFacilityGasSupplyBreakdown(addMultiplePeriodFacilityGasSupplyBreakdownDto);
+        }
+
+        [HttpPost("AddUpdateReportingPeriodFacilityDocument")]
+        public string AddUpdateReportingPeriodFacilityDocument([FromForm] ReportingPeriodDocumentDto reportingPeriodDocumentDto)
+        {
+            return _services.AddUpdateReportingPeriodFacilityDocument(reportingPeriodDocumentDto);
+        }
+
+        [HttpPut("LockUnlockPeriodSupplierStatus")]
+        public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
+        {
+            return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
         }
 
         #endregion
@@ -77,9 +83,9 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpGet("GetReportingPeriodFacility_ElectricityGridMixes")]
-        public MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId,int reportingPeriodId, int periodSupplierId)
+        public MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId, int reportingPeriodId, int periodSupplierId)
         {
-            return _services.GetReportingPeriodFacilityElectricityGridMixes(periodFacilityId,reportingPeriodId,periodSupplierId);
+            return _services.GetReportingPeriodFacilityElectricityGridMixes(periodFacilityId, reportingPeriodId, periodSupplierId);
         }
 
         [HttpGet("GetReportingPeriodFacility_GasSupplyBreakdown")]
