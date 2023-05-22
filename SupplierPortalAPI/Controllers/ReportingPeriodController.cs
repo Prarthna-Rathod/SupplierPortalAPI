@@ -54,6 +54,13 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriodDocument(reportingPeriodDocumentDto);
         }
 
+        [HttpPut("UpdateReportingPeriodFacilityStatusSubmitted")]
+        public string UpdateReportingPeriodFacilityStatusSubmitted(int reportingPeriodId, int supplierId)
+        {
+            return _services.UpdatePeriodFacilityStatusSubmitted(reportingPeriodId, supplierId);
+        }
+
+
         [HttpPut("LockUnlockPeriodSupplierStatus")]
         public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
         {

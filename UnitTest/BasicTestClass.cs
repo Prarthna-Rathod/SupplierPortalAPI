@@ -264,6 +264,38 @@ namespace UnitTest
             return sites;
         }
 
+        protected IEnumerable<DocumentStatus> GetDocumentStatuses() 
+        {
+            var documentStatuses = new List<DocumentStatus>();
+            documentStatuses.Add(new DocumentStatus(1, "Not-validated"));
+            documentStatuses.Add(new DocumentStatus(2, "Validated"));
+            documentStatuses.Add(new DocumentStatus(3, "Has errors"));
+            documentStatuses.Add(new DocumentStatus(4, "Processing"));
+
+            return documentStatuses;
+        }
+
+        protected IEnumerable<DocumentType> GetDocumentTypes()
+        {
+            var documentTypes = new List<DocumentType>();
+            documentTypes.Add(new DocumentType(1, "Subpart C"));
+            documentTypes.Add(new DocumentType(2, "Subpart W"));
+            documentTypes.Add(new DocumentType(3, "Non-GHGRP"));
+            documentTypes.Add(new DocumentType(4, "Supplemental"));
+
+            return documentTypes;
+        }
+
+        protected IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatuses()
+        {
+            var documentRequiredStatuses = new List<DocumentRequiredStatus>();
+            documentRequiredStatuses.Add(new DocumentRequiredStatus(1, "Optional"));
+            documentRequiredStatuses.Add(new DocumentRequiredStatus(2, "Required"));
+            documentRequiredStatuses.Add(new DocumentRequiredStatus(3, "Not-allowed"));
+
+            return documentRequiredStatuses;
+        }
+
         #region ReportingPeriod methods
 
         public ReportingPeriod AddPeriodSupplierAndPeriodFacilityForPeriod()
@@ -467,6 +499,16 @@ namespace UnitTest
             list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.First(), unitOfMeasure, (decimal)100.00));
 
             return list;
+        }
+
+        protected IEnumerable<FacilityRequiredDocumentTypeVO> GetFacilityRequiredDocumentTypeVOs()
+        {
+            var voList = new List<FacilityRequiredDocumentTypeVO>();
+            var reportingType = GenerateReportingType().First();
+            var supplyChainStage = GenerateSupplyChainStage().First();
+            //var documentStatus = GetD
+
+            return voList;
         }
 
         #endregion

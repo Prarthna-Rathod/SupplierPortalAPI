@@ -60,6 +60,10 @@ public interface IReportingPeriodEntityDomainMapper
 
     ReportingPeriodFacilityDocumentEntity ConvertPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument);
 
+    IEnumerable<FacilityRequiredDocumentTypeVO> ConvertFacilityRequiredDocumentTypeEntitiesToValueObjectList(IEnumerable<FacilityRequiredDocumentTypeEntity> requiredDocumentTypeEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<DocumentType> documentTypes, IEnumerable<DocumentRequiredStatus> documentRequiredStatuses);
+
+    FacilityRequiredDocumentTypeVO ConvertFacilityRequiredDocumentTypeEntityToValueObject(ReportingType reportingType, SupplyChainStage supplyChainStage, DocumentType documentType, DocumentRequiredStatus documentRequiredStatus);
+
     #endregion
 
 }

@@ -9,7 +9,7 @@ namespace BusinessLogic.ValueConstants
     public class FacilityReportingPeriodDataStatusValues
     {
         public static string[] FacilityReportingPeriodDataStatus =
-       {
+        {
             InProgress,
             Complete,
             Submitted

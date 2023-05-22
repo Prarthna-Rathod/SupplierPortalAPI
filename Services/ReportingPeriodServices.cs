@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using DataAccess.DataActions.Interfaces;
@@ -133,6 +134,25 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return _referenceLookUpMapper.GetDocumentTypesLookUp(documentTypes);
     }
 
+    private IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatuses()
+    {
+        var documentRequiredStatuses = _reportingPeriodDataActions.GetDocumentRequiredStatus();
+        return _referenceLookUpMapper.GetDocumentRequiredStatuses(documentRequiredStatuses);
+    }
+
+    private IEnumerable<FacilityRequiredDocumentTypeVO> GetFacilityRequiredDocumentTypeVOs()
+    {
+        var facilityRequiredDocumentTypes = _reportingPeriodDataActions.GetFacilityRequiredDocumentTypes();
+        var reportingTypes = GetAndConvertReportingTypes();
+        var supplyChainStages = GetAndConvertSupplyChainStages();
+        var documentTypes = GetDocumentTypes();
+        var documentRequiredStatuses = GetDocumentRequiredStatuses();
+
+        var voList = _reportingPeriodEntityDomainMapper.ConvertFacilityRequiredDocumentTypeEntitiesToValueObjectList(facilityRequiredDocumentTypes, reportingTypes, supplyChainStages, documentTypes, documentRequiredStatuses);
+
+        return voList;
+    }
+
     /// <summary>
     /// Retrieve ReportingPeriod Entity and Convert it to DomainModel
     /// </summary>
@@ -251,10 +271,10 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private void GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
     {
         var facilityVO = GetAndConvertFacilityValueObject(periodFacilityEntity.FacilityId);
-        var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.FacilityReportingPeriodDataStatusId);
-        var fercRegion = GetAndConvertFercRegions().FirstOrDefault(x => x.Id == periodFacilityEntity.FercRegionId);
+        var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Id == periodFacilityEntity.FacilityReportingPeriodDataStatusId);
+        var fercRegion = GetAndConvertFercRegions().First(x => x.Id == periodFacilityEntity.FercRegionId);
 
-        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.First(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
 
         reportingPeriodDomain.LoadPeriodFacility(periodFacilityEntity.Id, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, fercRegion, periodFacilityEntity.IsActive);
 
@@ -305,6 +325,44 @@ public class ReportingPeriodServices : IReportingPeriodServices
                 reportingPeriodDomain.LoadPeriodFacilityDocuments(documentEntity.Id, periodSupplier.Id, documentEntity.ReportingPeriodFacilityId, documentEntity.Version, documentEntity.DisplayName, documentEntity.StoredName, documentEntity.Path, documentStatus, documentType, documentEntity.ValidationError);
             }
         }
+    }
+
+    private bool CheckDocumentsUploadedForFacility(int periodFacilityId)
+    {
+        bool isDone = false;
+        int counter = 0;
+        var periodFacility = _reportingPeriodDataActions.GetPeriodFacilityById(periodFacilityId);
+
+        var facility = periodFacility.Facility;
+        var reportingType = facility.ReportingType;
+        var supplyChainStage = facility.SupplyChainStage;
+        var facilityRequiredDocumentTypes = GetFacilityRequiredDocumentTypeVOs().Where(x => x.ReportingType.Id == reportingType.Id && x.SupplyChainStage.Id == supplyChainStage.Id && x.DocumentRequiredStatus.Name == DocumentRequiredStatusValues.Required).ToList();
+
+        if (facilityRequiredDocumentTypes.Count() <= periodFacility.ReportingPeriodFacilityDocumentEntities.Count())
+        {
+            for (int i = 0; i < facilityRequiredDocumentTypes.Count(); i++)
+            {
+                var requiredDocument = facilityRequiredDocumentTypes[i].DocumentType.Id;
+                var uploadedDocument = periodFacility.ReportingPeriodFacilityDocumentEntities.ToList()[i].DocumentTypeId;
+
+                if (requiredDocument == uploadedDocument)
+                    counter++;
+            }
+        }
+        if (counter == facilityRequiredDocumentTypes.Count())
+            isDone = true;
+
+        return isDone;
+    }
+
+    private void UpdatePeriodFacilityStatusToComplete(int periodFacilityId)
+    {
+        var isDone = CheckDocumentsUploadedForFacility(periodFacilityId);
+
+        var facilityDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
+
+        if (isDone)
+            _reportingPeriodDataActions.UpdateReportingPeriodFacilityDataStatus(periodFacilityId, facilityDataStatus.Id);
     }
 
     private static readonly Dictionary<string, List<byte[]>> _excelFileSignature =
@@ -611,36 +669,105 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "ReportingPeriodSupplier GasSupplyBreakdown added successfully !!";
     }
 
+    /// <summary>
+    /// Update all PeriodFacilities dataStatus from "Complete" to "Submitted" for given PeriodSupplierId
+    /// </summary>
+    /// <param name="reportingPeriodId"></param>
+    /// <param name="supplierId"></param>
+    /// <returns></returns>
+    public string UpdatePeriodFacilityStatusSubmitted(int reportingPeriodId, int supplierId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
 
-    #region ReportingPeriod Document
+        var facilityPeriodDataStatusSubmitted = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Submitted);
 
+        var periodFacilities = reportingPeriod.UpdateAllPeriodFacilityDataStatus(supplierId, facilityPeriodDataStatusSubmitted);
+
+        foreach (var periodFacility in periodFacilities)
+        {
+            var periodFacilityEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodFacilityDomainToEntity(periodFacility);
+
+            _reportingPeriodDataActions.UpdateReportingPeriodFacilityDataStatus(periodFacilityEntity.Id, facilityPeriodDataStatusSubmitted.Id);
+        }
+
+        return "FacilityReportingPeriodDataStatus changed successfully...";
+    }
+
+    #endregion
+
+    #region ReportingPeriodFacility Document
+
+    /// <summary>
+    /// ********Case 1*********
+    /// AddUpdate ReportingPeriodFacilityDocument
+    /// First add record in DB with Document status "InProcessing"
+    /// Upload the attached file and updated the Document status.
+    /// If no errors occured in file upload then Document status is "Validated" otherwise status is "HasErrors" with stored the errors also.
+    /// 
+    /// ********Case 2*********
+    /// If PeriodFacility dataStatus is "Submitted" and user want to upload file
+    /// First persist record with document status "InProcessing".
+    /// Update PeriodFacility dataStatus to "InProgress" for only fileUpload.
+    /// Upload file and update the existing record with appropriate documentStatus.
+    /// 
+    /// *********Check facilityDocuments and update facilityDataStatus*********
+    /// Check that all required documents are uploaded for periodFacility or not.
+    /// If all documents are uploaded then Update PeriodFacilityDataStatus "InProgress" to "Complete".
+    /// Use 'UpdatePeriodFacilityStatusSubmitted API' to change facilityDataStatus "Complete" to "Submitted"
+    /// </summary>
+    /// <param name="reportingPeriodDocumentDto"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public string AddUpdateReportingPeriodDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodDocumentDto.ReportingPeriodId);
 
         var documentStatuses = GetDocumentStatuses();
-        var documentType = GetDocumentTypes().FirstOrDefault(x => x.Id == reportingPeriodDocumentDto.DocumentTypeId);
+        var documentType = GetDocumentTypes().First(x => x.Id == reportingPeriodDocumentDto.DocumentTypeId);
+        var facilityRequiredDocumentTypes = GetFacilityRequiredDocumentTypeVOs();
 
         //First Add new Record with document status "Processing"
-        var periodDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, null, documentStatuses, documentType, null);
+        var periodDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypes);
 
         var entity = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityDocumentDomainToEntity(periodDocument);
 
-        if (entity.Id == 0)
-           _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(entity);
+        _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(entity);
 
-        //If no errors then upload file
-        var path = _fileUploadDataActions.UploadReportingPeriodDocument(reportingPeriodDocumentDto.DocumentFile);
+        //If FacilityReportingPeriodStatus is submitted and user comes to upload document then change FacilityReportingPeriodStatus to InProgess in Domain and Database
+        var inProgressDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+        
+        reportingPeriod.UpdatePeriodFacilityDataStatusSubmittedToInProgress(reportingPeriodDocumentDto.SupplierId, entity.ReportingPeriodFacilityId, inProgressDataStatus);
+        
+        _reportingPeriodDataActions.CheckAndUpdateReportingPeriodFacilityStatus(periodDocument.ReportingPeriodFacilityId, inProgressDataStatus.Id);
 
-        //Check FileSize and FileType before upload
-        FileInfo file = new FileInfo(path);
-        var fileType = file.Extension;
-        long fileSize = file.Length;
+        //Upload file
+        var path = "";
+        string? fileUploadError = null;
+        string? errors = null;
+        try
+        {
+            path = _fileUploadDataActions.UploadReportingPeriodDocument(reportingPeriodDocumentDto.DocumentFile);
+        }
+        catch (Exception ex)
+        {
+            fileUploadError = $"Some error occured during fileUpload !!";
+        }
 
-        var errors = ValidateFile(fileType, fileSize, path);
+        if (fileUploadError == null)
+        {
+            //Check FileSize and FileType before upload
+            FileInfo file = new FileInfo(path);
+            var fileType = file.Extension;
+            long fileSize = file.Length;
 
-        //Add Hashset record with documentStatus "NotValidated or HasErrors"
-        var uploadedPeriodDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, path, documentStatuses, documentType, errors);
+            errors = ValidateFile(fileType, fileSize, path);
+        }
+
+        if (fileUploadError != null)
+            errors += fileUploadError;
+
+        //Update record with documentStatus "NotValidated, HasErrors or Validated"
+        var uploadedPeriodDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, path, documentStatuses, documentType, errors, facilityRequiredDocumentTypes);
 
         var documentEntity = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityDocumentDomainToEntity(uploadedPeriodDocument);
 
@@ -649,10 +776,11 @@ public class ReportingPeriodServices : IReportingPeriodServices
         if (errors != null)
             throw new Exception(errors);
 
+        //If all required documents are uploaded then change FacilityReportingPeriodDataStatus "Complete"
+        UpdatePeriodFacilityStatusToComplete(documentEntity.ReportingPeriodFacilityId);
+
         return "ReportingPeriodFacilityDocument uploaded successfully....";
     }
-
-    #endregion
 
     #endregion
 

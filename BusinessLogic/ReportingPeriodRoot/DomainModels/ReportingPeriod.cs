@@ -312,12 +312,31 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, fercRegion, isActive);
         }
 
-
         public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, FercRegion fercRegion, bool isActive)
         {
             var periodSupplier = FindPeriodSupplier(periodSupplierId);
 
             return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, fercRegion, isActive);
+        }
+
+        public IEnumerable<PeriodFacility> UpdateAllPeriodFacilityDataStatus(int supplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier not found !!");
+
+            return periodSupplier.UpdatePeriodFacilityDataStatus(facilityReportingPeriodDataStatus);
+        }
+
+        public bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier not found !!");
+
+            return periodSupplier.UpdatePeriodFacilityDataStatusSubmittedToInProgress(periodFacilityId, facilityReportingPeriodDataStatus);
         }
 
         public IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, int supplierId,UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
@@ -361,7 +380,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region Period Document
 
-        public PeriodFacilityDocument AddUpdatePeriodFacilityDocuments(int supplierId, int periodFacilityId, string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError)
+        public PeriodFacilityDocument AddUpdatePeriodFacilityDocuments(int supplierId, int periodFacilityId, string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
         {
             CheckReportingPeriodStatus();
             var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
@@ -369,7 +388,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             if (periodSupplier is null)
                 throw new NotFoundException("PeriodSupplier not found !!");
 
-            return periodSupplier.AddUpdatePeriodFacilityDocument(periodFacilityId, displayName, path, documentStatuses, documentType, validationError, CollectionTimePeriod);
+            return periodSupplier.AddUpdatePeriodFacilityDocument(periodFacilityId, displayName, path, documentStatuses, documentType, validationError, CollectionTimePeriod, facilityRequiredDocumentTypeVOs);
         }
 
         public bool LoadPeriodFacilityDocuments(int documentId, int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)

@@ -23,10 +23,14 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         bool LoadPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs);
 
-        PeriodFacilityDocument AddUpdatePeriodFacilityDocuments(int supplierId, int periodFacilityId, string displayName, string? path,IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError);
+        PeriodFacilityDocument AddUpdatePeriodFacilityDocuments(int supplierId, int periodFacilityId, string displayName, string? path,IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs);
 
         bool LoadPeriodFacilityDocuments(int documentId, int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError);
 
+       IEnumerable<PeriodFacility> UpdateAllPeriodFacilityDataStatus(int periodSupplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
+
+        bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
+       
         /*
         PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId,int periodFacilityId,int documentId);
 

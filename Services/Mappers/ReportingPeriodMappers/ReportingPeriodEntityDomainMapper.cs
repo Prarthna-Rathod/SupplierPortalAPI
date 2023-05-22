@@ -42,8 +42,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     public ReportingPeriod ConvertReportingPeriodEntityToDomain(ReportingPeriodEntity reportingPeriodEntity, IEnumerable<ReportingPeriodType> reportingPeriodTypes, IEnumerable<ReportingPeriodStatus> reportingPeriodStatuses)
     {
-        var reportingPeriodSelectedType = reportingPeriodTypes.Where(x => x.Id == reportingPeriodEntity.ReportingPeriodTypeId).FirstOrDefault();
-        var reportingPeriodSelectedStatus = reportingPeriodStatuses.Where(x => x.Id == reportingPeriodEntity.ReportingPeriodStatusId).FirstOrDefault();
+        var reportingPeriodSelectedType = reportingPeriodTypes.Where(x => x.Id == reportingPeriodEntity.ReportingPeriodTypeId).First();
+        var reportingPeriodSelectedStatus = reportingPeriodStatuses.Where(x => x.Id == reportingPeriodEntity.ReportingPeriodStatusId).First();
 
         var reportingPeriod = new ReportingPeriod(reportingPeriodEntity.Id,
             reportingPeriodEntity.DisplayName,
@@ -103,8 +103,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         foreach (var facilityEntity in supplierEntity.FacilityEntities)
         {
-            var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
-            var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
+            var selectedSupplyChainStage = supplyChainStages.First(x => x.Id == facilityEntity.SupplyChainStageId);
+            var selectedReprtingType = reportingTypes.First(x => x.Id == facilityEntity.ReportingTypeId);
 
             facilityVOs.Add(new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType));
 
@@ -131,8 +131,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     public FacilityVO ConvertFacilityEntityToFacilityValueObject(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
     {
-        var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
-        var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
+        var selectedSupplyChainStage = supplyChainStages.First(x => x.Id == facilityEntity.SupplyChainStageId);
+        var selectedReprtingType = reportingTypes.First(x => x.Id == facilityEntity.ReportingTypeId);
 
         var facilityVOs = new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType);
 
@@ -195,7 +195,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         foreach (var entity in facilityElectricityGridMixeEntities)
         {
-            var gridMixLookUp = electricityGridMixesLookUps.FirstOrDefault(x => x.Id == entity.ElectricityGridMixComponentId);
+            var gridMixLookUp = electricityGridMixesLookUps.First(x => x.Id == entity.ElectricityGridMixComponentId);
             valueObjectList.Add(ConvertPeriodFacilityElectricityGridMixEntityToValueObject(entity.Id, entity.Content, gridMixLookUp));
         }
 
@@ -241,8 +241,8 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         foreach (var entity in gasSupplyEntities)
         {
-            var site = sites.FirstOrDefault(x => x.Id == entity.SiteId);
-            var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.Id == entity.UnitOfMeasureId);
+            var site = sites.First(x => x.Id == entity.SiteId);
+            var unitOfMeasure = unitOfMeasures.First(x => x.Id == entity.UnitOfMeasureId);
             voList.Add(ConvertPeriodFacilityGasSupplyBreakdownEntityToValueObject(entity, site, unitOfMeasure));
         }
 
@@ -277,17 +277,29 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         return entity;
 
-        /* var documentStatusEntity = new DocumentStatusEntity();
-         documentStatusEntity.Id = periodFacilityDocument.DocumentStatus.Id;
-         documentStatusEntity.Name = periodFacilityDocument.DocumentStatus.Name;
-         //entity.DocumentStatus = documentStatusEntity;
-
-         var documentTypeEntity = new DocumentTypeEntity();
-         documentTypeEntity.Id = periodFacilityDocument.DocumentType.Id;
-         documentTypeEntity.Name = periodFacilityDocument.DocumentType.Name;
-         //entity.DocumentType = documentTypeEntity;*/
     }
 
+    public IEnumerable<FacilityRequiredDocumentTypeVO> ConvertFacilityRequiredDocumentTypeEntitiesToValueObjectList(IEnumerable<FacilityRequiredDocumentTypeEntity> requiredDocumentTypeEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<DocumentType> documentTypes, IEnumerable<DocumentRequiredStatus> documentRequiredStatuses)
+    {
+        var list = new List<FacilityRequiredDocumentTypeVO>();
+
+        foreach(var entity in requiredDocumentTypeEntities)
+        {
+            var reportingType = reportingTypes.First(x => x.Id == entity.ReportingTypeId);
+            var supplyChainStage = supplyChainStages.First(x => x.Id == entity.SupplyChainStageId);
+            var documentType = documentTypes.First(x => x.Id == entity.DocumentTypeId);
+            var documentRequiredStatus = documentRequiredStatuses.First(x => x.Id == entity.DocumentRequiredStatusId);
+            list.Add(ConvertFacilityRequiredDocumentTypeEntityToValueObject(reportingType, supplyChainStage, documentType, documentRequiredStatus));
+        }
+
+        return list;
+    }
+
+    public FacilityRequiredDocumentTypeVO ConvertFacilityRequiredDocumentTypeEntityToValueObject(ReportingType reportingType, SupplyChainStage supplyChainStage, DocumentType documentType, DocumentRequiredStatus documentRequiredStatus)
+    {
+        var facilityRequiredDocumentTypeVo = new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStage, documentType, documentRequiredStatus);
+        return facilityRequiredDocumentTypeVo;
+    }
 
     #endregion
 

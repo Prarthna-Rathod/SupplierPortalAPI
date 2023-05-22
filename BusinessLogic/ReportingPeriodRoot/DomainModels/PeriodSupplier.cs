@@ -130,6 +130,25 @@ public class PeriodSupplier
         return _periodfacilities.Add(periodFacility);
     }
 
+    internal IEnumerable<PeriodFacility> UpdatePeriodFacilityDataStatus(FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+    {
+        var periodFacilities = _periodfacilities.Where(x => x.FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Complete).ToList();
+       
+        foreach(var periodFacility in periodFacilities)
+        {
+            periodFacility.UpdatePeriodFacilityDataStatus(facilityReportingPeriodDataStatus);
+        }
+
+        return periodFacilities;
+    }
+
+    internal bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+    {
+        var periodFacility = FindPeriodFacility(periodFacilityId);
+        periodFacility.UpdatePeriodFacilityDataStatusSubmittedToInProgress(facilityReportingPeriodDataStatus);
+        return true;
+    }
+
     internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(int periodFacilityId, UnitOfMeasure unitOfMeasure, FercRegion fercRegion, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents)
     {
         CheckSupplierReportingPeriodStatus();
@@ -192,11 +211,11 @@ public class PeriodSupplier
 
     #region PeriodDocument
 
-    internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(int periodFacilityId, string displayName, string? path, IEnumerable< DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod)
+    internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(int periodFacilityId, string displayName, string? path, IEnumerable< DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
     {
         CheckSupplierReportingPeriodStatus();
         var periodFacility = FindPeriodFacility(periodFacilityId);
-        return periodFacility.AddUpdatePeriodFacilityDocument(displayName, path, documentStatuses, documentType, validationError, collectionTimePeriod);
+        return periodFacility.AddUpdatePeriodFacilityDocument(displayName, path, documentStatuses, documentType, validationError, collectionTimePeriod, facilityRequiredDocumentTypeVOs);
     }
 
     internal bool LoadPeriodFacilityDocuments(int documentId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)

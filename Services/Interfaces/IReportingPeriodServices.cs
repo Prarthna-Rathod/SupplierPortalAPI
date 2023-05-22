@@ -101,7 +101,6 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     MultiplePeriodFacilityElectricityGridMixDto GetFacilityElectricityGridMixComponents(int periodFacilityId);
 
-
     /// <summary>
     /// Get ReportingPeriodSupplierFacility GasSupplyBreakdown data
     /// </summary>
@@ -109,6 +108,16 @@ public interface IReportingPeriodServices
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
     MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int reportingPeriodId, int supplierId);
+
+    /// <summary>
+    /// Update AllReportingPeriodFacilities
+    /// FacilityReportingPeriodDataStatus is changed from Complete to Submitted
+    /// </summary>
+    /// <param name="reportingPeriodDocumentDto"></param>
+    /// <returns></returns>
+
+    string UpdatePeriodFacilityStatusSubmitted(int reportingPeriodId, int supplierId);
+
     #endregion
 
     #region ReportingPeriodDocuments

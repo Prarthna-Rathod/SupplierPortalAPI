@@ -84,6 +84,39 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return documentName;
         }
 
+        private bool CheckFacilityRequiredDocumentType(IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs, DocumentType documentType)
+        {
+            var facilityReportingType = FacilityVO.ReportingType;
+            var facilitySupplyChainStage = FacilityVO.SupplyChainStage;
+            
+            var facilityRequiredDocumentType = facilityRequiredDocumentTypeVOs.Where(x => x.ReportingType.Id == facilityReportingType.Id && x.SupplyChainStage.Id == facilitySupplyChainStage.Id && x.DocumentType.Id == documentType.Id ).FirstOrDefault();
+
+            if (facilityRequiredDocumentType == null)
+                throw new NotFoundException("FacilityRequiredDocumentType not found !!");
+
+            if (facilityRequiredDocumentType.DocumentRequiredStatus.Name == DocumentRequiredStatusValues.NotAllowed)
+                throw new BadRequestException($"{documentType.Name} document is not allowed for this ReportingPeriodFacility !!");
+
+            return true;
+        }
+
+        internal void UpdatePeriodFacilityDataStatus(FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        {
+            if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Complete)
+            {
+                FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
+            }
+            else
+                throw new BadRequestException("FacilityReportingPeriodDataStatus not completed !! So, can't update it to Submitted...");
+        }
+
+        internal void UpdatePeriodFacilityDataStatusSubmittedToInProgress(FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        {
+            if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Submitted)
+                FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
+        }
+
+        #region ElectricityGridMixes
 
         internal IEnumerable<PeriodFacilityElectricityGridMix> AddRemoveElectricityGridMixComponents(UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> gridMixComponentPercents, FercRegion fercRegion)
         {
@@ -142,6 +175,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
             return true;
         }
+        #endregion
 
         #region GasSupplyBreakdown
 
@@ -181,8 +215,10 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region PeriodFacilityDocuments
 
-        internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod)
+        internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
         {
+            CheckFacilityRequiredDocumentType(facilityRequiredDocumentTypeVOs, documentType);
+
             var existingData = _periodFacilityDocuments.Where(x => x.DocumentType.Id == documentType.Id).OrderByDescending(x => x.Version).ToList();
 
             //DocumentStatus -> Processing
@@ -197,7 +233,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             if (existingData.Count() == 0)
             {
                 var version = 1;
-                //var documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
                 var storedName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, version, extension);
                 document = new PeriodFacilityDocument(Id, version, displayName, storedName, path, documentStatusProcessing, documentType, validationError);
 
@@ -212,10 +247,9 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                     var versionNumber = document.Version;
                     var newVersionNumber = versionNumber + 1;
                     var newStoredName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, newVersionNumber, extension);
-                    //var processingDocumentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
-                    var newDocument = new PeriodFacilityDocument(Id, newVersionNumber, displayName, newStoredName, null, documentStatusProcessing, documentType, validationError);
+                    document = new PeriodFacilityDocument(Id, newVersionNumber, displayName, newStoredName, null, documentStatusProcessing, documentType, validationError);
 
-                    _periodFacilityDocuments.Add(newDocument);
+                    _periodFacilityDocuments.Add(document);
                 }
                 else
                 {
@@ -252,7 +286,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                     document.DocumentStatus = documentStatus;
                     document.DocumentType = documentType;
                     document.ValidationError = validationError;
-                    
                 }
             }
 

@@ -33,6 +33,10 @@ namespace DataAccess.DataActions.Interfaces
 
         bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
 
+        bool UpdateReportingPeriodFacilityDataStatus(int periodFacilityId, int facilityPeriodDataStatusId);
+
+        bool CheckAndUpdateReportingPeriodFacilityStatus(int periodFacilityId, int facilityStatusInProgressId);
+
         Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
 
         IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
@@ -78,6 +82,7 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<ReportingPeriodFacilityDocumentEntity> GetReportingPeriodFacilityDocuments();
 
+        IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentTypes();
         #endregion
 
         #region GetById Methods

@@ -3,6 +3,7 @@ using DataAccess.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,6 +29,8 @@ public interface IReferenceLookUpMapper
 
     IEnumerable<DocumentType> GetDocumentTypesLookUp(IEnumerable<DocumentTypeEntity> documentTypesEntities);
     IEnumerable<DocumentStatus> GetDocumentStatusesLookUp(IEnumerable<DocumentStatusEntity> documentStatusesEntities);
+
+    IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatuses(IEnumerable<DocumentRequiredStatusEntity> documentRequiredStatuses);
 
     //Supplier
     IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities);
