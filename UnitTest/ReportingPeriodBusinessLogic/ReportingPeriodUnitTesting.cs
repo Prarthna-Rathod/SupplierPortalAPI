@@ -3,6 +3,7 @@ using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using System.Collections.Generic;
+using System.IO;
 
 namespace UnitTest.ReportingPeriodBusinessLogic
 {
@@ -176,7 +177,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
 
             PeriodSupplier? periodSupplier = null;
 
@@ -213,7 +214,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             try
             {
                 var supplierVO = GetAndConvertSupplierValueObject();
-                var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+                var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
                 reportingPeriod.AddPeriodSupplier(0, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
                 reportingPeriod.AddPeriodSupplier(0, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
             }
@@ -241,7 +242,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             try
             {
                 var supplierVO = GetAndConvertSupplierValueObject();
-                var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+                var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
                 reportingPeriod.AddPeriodSupplier(0, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
             }
             catch (Exception ex)
@@ -266,12 +267,12 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             //set this status open and close here
-            reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open).Id;
-            reportingPeriod.ReportingPeriodStatus.Name = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open).Name;
+            reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Open).Id;
+            reportingPeriod.ReportingPeriodStatus.Name = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Open).Name;
 
             var updatedStatus = GetSupplierReportingPeriodStatuses();
 
@@ -301,12 +302,12 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             var reportingPeriod = GetReportingPeriodDomain();
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             //set this status complete here
-            reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Complete).Id;
-            reportingPeriod.ReportingPeriodStatus.Name = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Complete).Name;
+            reportingPeriod.ReportingPeriodStatus.Id = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Complete).Id;
+            reportingPeriod.ReportingPeriodStatus.Name = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Complete).Name;
 
             var updatedStatuses = GetSupplierReportingPeriodStatuses();
 
@@ -340,13 +341,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = GetReportingPeriodDomain();
             //Get PeriodSupplier Domain
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             try
             {
@@ -377,13 +378,13 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //Get PeriodSupplier Domain
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             try
             {
@@ -416,12 +417,12 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //Get PeriodSupplier Domain
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             try
             {
@@ -451,12 +452,12 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //Get PeriodSupplier Domain
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             try
             {
@@ -488,7 +489,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             //Add periodSupplier
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
 
             //Add new  PeriodFacility
@@ -496,7 +497,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingType = GenerateReportingType().First();
             var facilityVO = new FacilityVO(10, "Test facility", 2, "123", true, supplyChainStage, reportingType);
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             try
             {
@@ -530,8 +531,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -572,8 +573,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
             reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
@@ -616,15 +617,15 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
             reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
             var percents = new List<ElectricityGridMixComponentPercent>();
 
             //Update FercRegion to None for PeriodFacility
-            var updatedFercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var updatedFercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             try
             {
@@ -643,7 +644,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
         }
 
-
         /// <summary>
         /// Add PeriodFacilityElectricityGridMixComponents failure case1.
         /// If FercRegion is not CustomMix for then throw exception.
@@ -656,8 +656,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.None);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -689,8 +689,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var percents = new List<ElectricityGridMixComponentPercent>();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -724,8 +724,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -758,8 +758,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -792,8 +792,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -825,14 +825,14 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //Update SupplierReportingPeriodStatus to Locked
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
-            var unlockedSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+            var unlockedSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == 1);
             unlockedSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPerionStatus.Id;
             unlockedSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPerionStatus.Name;
 
             //GridMix
-            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
 
@@ -951,7 +951,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //Update ReportingPeriodStatus InActive
-            var updatePeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.InActive);
+            var updatePeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.InActive);
             reportingPeriod.ReportingPeriodStatus.Id = updatePeriodStatus.Id;
             reportingPeriod.ReportingPeriodStatus.Name = updatePeriodStatus.Name;
 
@@ -987,8 +987,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
 
             //Update SupplierReportingPeriodStatus to Locked
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
-            var unlockedSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+            var unlockedSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == 1);
             unlockedSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPerionStatus.Id;
             unlockedSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPerionStatus.Name;
 
@@ -1108,6 +1108,319 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
         }
 
+
+        #endregion
+
+        #region AddUpdate ReportingPeriodDocuments
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentSuccess Case1.
+        /// Add record with documentStatus "Processing" where path and error both are null.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodDocumentSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+
+            try
+            {
+               facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            }
+            catch(Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(facilityDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, facilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, facilityDocument.DisplayName);
+            Assert.Equal(1, facilityDocument.Version);
+            Assert.Equal(null, facilityDocument.Path);
+            Assert.Equal(documentType, facilityDocument.DocumentType);
+            Assert.Equal(documentStatusProcessing, facilityDocument.DocumentStatus);
+            Assert.Equal(null, facilityDocument.ValidationError);
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentSuccess Case2.
+        /// Update existingRecord from "Processing" to "Validated".
+        /// For update that record set path and validation error null.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodDocumentSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusValidated = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
+
+            //First add record with documentStatus "Processing"
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Set path
+            var path = "E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles\\filename.xlsx";
+            try
+            {
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, path, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(facilityDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, facilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, facilityDocument.DisplayName);
+            //Assert.Equal(2, facilityDocument.Version);
+            Assert.Equal(path, facilityDocument.Path);
+            Assert.Equal(documentType, facilityDocument.DocumentType);
+            Assert.Equal(documentStatusValidated, facilityDocument.DocumentStatus);
+            Assert.Equal(null, facilityDocument.ValidationError);
+        }
+
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentSuccess Case3.
+        /// Documents are managed by FacilityRequiredDocumentType.
+        /// FacilityRequiredDocumentType is decided by ReportingType and SupplyChainStage of Facility.
+        /// If DocumentRequirementStatus is "Required" or "Optional" in selected FacilityRequiredDocumentType then only document can be upload.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodDocumentSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartW);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusValidated = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
+
+            //First add record with documentStatus "Processing"
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Set path
+            var path = "E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles\\filename.xlsx";
+            try
+            {
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, path, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(facilityDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, facilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, facilityDocument.DisplayName);
+            //Assert.Equal(2, facilityDocument.Version);
+            Assert.Equal(path, facilityDocument.Path);
+            Assert.Equal(documentType, facilityDocument.DocumentType);
+            Assert.Equal(documentStatusValidated, facilityDocument.DocumentStatus);
+            Assert.Equal(null, facilityDocument.ValidationError);
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentSuccess Case4.
+        /// If any error is occured during fileUpload or checking fileSize, fileType and fileSignature or upload error then update existingRecord from "Processing" to "HasErrors".
+        /// For update that record set validation error and path is null.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodDocumentSuccessCase4()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusHasErrors = documentStatuses.First(x => x.Name == DocumentStatusValues.HasErrors);
+
+            //First add record with documentStatus "Processing"
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Set validationError
+            string validationError = "Filetype is not matched !!";
+            try
+            {
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, validationError, facilityRequiredDocumentTypeVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(facilityDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, facilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, facilityDocument.DisplayName);
+            //Assert.Equal(2, facilityDocument.Version);
+            Assert.Equal(null, facilityDocument.Path);
+            Assert.Equal(documentType, facilityDocument.DocumentType);
+            Assert.Equal(documentStatusHasErrors, facilityDocument.DocumentStatus);
+            Assert.NotNull(facilityDocument.ValidationError);
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentSuccess Case5
+        /// If FacilityReportingPeriodDataStatus is "Submitted" and user upload the document then user can add/upload document.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodDocumentSuccessCase5()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+
+            //First add record with documentStatus "Processing"
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Set path
+            var path = "E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles\\filename.xlsx";
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, path, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Change FacilityReportingPeriodDataStatus to Submitted
+            var statusSubmitted = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Submitted);
+            var statusComplete = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
+            var periodSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == 1);
+            var periodFacility = periodSupplier.PeriodFacilities.First(x => x.Id == 1);
+            periodFacility.FacilityReportingPeriodDataStatus.Id = statusComplete.Id;
+            periodFacility.FacilityReportingPeriodDataStatus.Name = statusComplete.Name;
+            reportingPeriod.UpdateAllPeriodFacilityDataStatus(1, statusSubmitted);
+
+            try
+            {
+                //Try to update that record
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, path, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(facilityDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, facilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, facilityDocument.DisplayName);
+            //Assert.Equal(2, facilityDocument.Version);
+            Assert.Equal(null, facilityDocument.Path);
+            Assert.Equal(documentType, facilityDocument.DocumentType);
+            Assert.Equal(documentStatusProcessing, facilityDocument.DocumentStatus);
+            Assert.Equal(null, facilityDocument.ValidationError);
+        }
+
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentFailure Case1.
+        /// If DocumentRequiredStatus is NotAllowed in FacilityRequiredDocumentType then throw exception.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateUpdateReportingPeriodDocumentFailsCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.NonGHGRP);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+            
+            try
+            {
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, "filename.xlsx", null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(facilityDocument);
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+        }
+
+
+        /// <summary>
+        /// Add ReportingPeriodDocumentFailure Case2.
+        /// If existing record path is not null then throw exception.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodDocumentFailsCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodFacilityDocument? facilityDocument = null;
+
+            //First add record with documentStatus "Processing"
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, "filename.xlsx", null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Set path
+            var path = "E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles\\filename.xlsx";
+            reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, "filename.xlsx", path, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            try
+            {
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, "filename.xlsx", path, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(facilityDocument);
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+        }
+
+        
 
         #endregion
     }

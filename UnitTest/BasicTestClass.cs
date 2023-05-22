@@ -304,17 +304,17 @@ namespace UnitTest
 
             //Add PeriodSupplier
             var supplierVO = GetAndConvertSupplierValueObject();
-            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2023, 5, 5), new DateTime(2023, 5, 6));
 
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
             var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-            var fercRegion = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
             var periodFacility = reportingPeriod.AddPeriodFacility(1, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, true, fercRegion, true);
 
             //Update ReportingPeriodStatus InActive To Open
-            var updatePeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            var updatePeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Open);
             reportingPeriod.ReportingPeriodStatus.Id = updatePeriodStatus.Id;
             reportingPeriod.ReportingPeriodStatus.Name = updatePeriodStatus.Name;
 
@@ -336,8 +336,8 @@ namespace UnitTest
             var reportingPeriodEntity = new ReportingPeriodEntity();
             reportingPeriodEntity.Id = reportingPeriodId;
             reportingPeriodEntity.DisplayName = displayName;
-            reportingPeriodEntity.ReportingPeriodTypeId = GetAndConvertReportingPeriodTypes().FirstOrDefault(x => x.Name == ReportingPeriodTypeValues.Annual).Id;
-            reportingPeriodEntity.ReportingPeriodStatusId = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.InActive).Id;
+            reportingPeriodEntity.ReportingPeriodTypeId = GetAndConvertReportingPeriodTypes().First(x => x.Name == ReportingPeriodTypeValues.Annual).Id;
+            reportingPeriodEntity.ReportingPeriodStatusId = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.InActive).Id;
             reportingPeriodEntity.CollectionTimePeriod = collectionTimePeriod;
             reportingPeriodEntity.StartDate = startDate;
             reportingPeriodEntity.EndDate = endDate;
@@ -374,7 +374,7 @@ namespace UnitTest
             periodFacilityEntity.ReportingPeriodId = 1;
             periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
             periodFacilityEntity.ReportingPeriodSupplierId = 1;
-            periodFacilityEntity.FercRegionId = GetFercRegions().FirstOrDefault(x => x.Name == FercRegionValues.Custom_Mix).Id;
+            periodFacilityEntity.FercRegionId = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix).Id;
 
             return periodFacilityEntity;
         }
@@ -458,10 +458,10 @@ namespace UnitTest
             var electricityGridMixComponents = GetElectricityGridMixComponents();
 
             list.Add(new ElectricityGridMixComponentPercent(1, electricityGridMixComponents.First(), (decimal)20.00));
-            list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMixComponents.FirstOrDefault(x => x.Id == 2), (decimal)20.00));
-            list.Add(new ElectricityGridMixComponentPercent(3, electricityGridMixComponents.FirstOrDefault(x => x.Id == 3), (decimal)20.00));
-            list.Add(new ElectricityGridMixComponentPercent(4, electricityGridMixComponents.FirstOrDefault(x => x.Id == 4), (decimal)20.00));
-            list.Add(new ElectricityGridMixComponentPercent(5, electricityGridMixComponents.FirstOrDefault(x => x.Id == 5), (decimal)20.00));
+            list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMixComponents.First(x => x.Id == 2), (decimal)20.00));
+            list.Add(new ElectricityGridMixComponentPercent(3, electricityGridMixComponents.First(x => x.Id == 3), (decimal)20.00));
+            list.Add(new ElectricityGridMixComponentPercent(4, electricityGridMixComponents.First(x => x.Id == 4), (decimal)20.00));
+            list.Add(new ElectricityGridMixComponentPercent(5, electricityGridMixComponents.First(x => x.Id == 5), (decimal)20.00));
 
             return list;
         }
@@ -472,12 +472,12 @@ namespace UnitTest
             var electricityGridMixComponents = GetElectricityGridMixComponents();
 
             list.Add(new ElectricityGridMixComponentPercent(1, electricityGridMixComponents.First(), (decimal)50.00));
-            list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMixComponents.FirstOrDefault(x => x.Id == 2), (decimal)25.00));
-            list.Add(new ElectricityGridMixComponentPercent(3, electricityGridMixComponents.FirstOrDefault(x => x.Id == 3), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(2, electricityGridMixComponents.First(x => x.Id == 2), (decimal)25.00));
+            list.Add(new ElectricityGridMixComponentPercent(3, electricityGridMixComponents.First(x => x.Id == 3), (decimal)25.00));
 
             return list;
         }
-
+            
         protected IEnumerable<GasSupplyBreakdownVO> GetGasSupplyBreakdownVOs()
         {
             var list = new List<GasSupplyBreakdownVO>();
@@ -485,7 +485,7 @@ namespace UnitTest
             var unitOfMeasure = GetUnitOfMeasures().First();
 
             list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.First(), unitOfMeasure, (decimal)100.00));
-            list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.FirstOrDefault(x => x.Id == 2), unitOfMeasure, (decimal)100.00));
+            list.Add(new GasSupplyBreakdownVO(0, 1, 1, sites.First(x => x.Id == 2), unitOfMeasure, (decimal)100.00));
 
             return list;
         }
@@ -504,13 +504,78 @@ namespace UnitTest
         protected IEnumerable<FacilityRequiredDocumentTypeVO> GetFacilityRequiredDocumentTypeVOs()
         {
             var voList = new List<FacilityRequiredDocumentTypeVO>();
-            var reportingType = GenerateReportingType().First();
-            var supplyChainStage = GenerateSupplyChainStage().First();
-            //var documentStatus = GetD
+            var reportingType = GenerateReportingType().First(x => x.Name == ReportingTypeValues.GHGRP);
+            var supplyChainStageProduction = GenerateSupplyChainStage().First(x => x.Name == SupplyChainStagesValues.Production);
+            var supplyChainStageProcessing = GenerateSupplyChainStage().First(x => x.Name == SupplyChainStagesValues.Processing);
+
+            //Document types
+            var documentType1 = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var documentType2 = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartW);
+            var documentType3 = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.NonGHGRP);
+            var documentType4 = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            //Document required status
+            var documentRequiredStatus = GetDocumentRequiredStatuses().First(x => x.Name == DocumentRequiredStatusValues.Required);
+            var documentOptionalStatus = GetDocumentRequiredStatuses().First(x => x.Name == DocumentRequiredStatusValues.Optional);
+            var documentNotAllowedStatus = GetDocumentRequiredStatuses().First(x => x.Name == DocumentRequiredStatusValues.NotAllowed);
+
+            //ReportingType 1 and SupplyChainStage "Production"
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType1, documentRequiredStatus));
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType2, documentOptionalStatus));
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType3, documentNotAllowedStatus));
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType4, documentNotAllowedStatus));
+            
+            //ReportingType 1 and supplyChainStage "Processing"
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType1, documentRequiredStatus));
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType2, documentOptionalStatus));
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType3, documentNotAllowedStatus));
+            voList.Add(new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStageProduction, documentType4, documentNotAllowedStatus));
 
             return voList;
         }
 
+        protected IEnumerable<FacilityRequiredDocumentTypeEntity> CreateFacilityRequiredDocumentTypeEntities()
+        {
+            var entityList = new List<FacilityRequiredDocumentTypeEntity>();
+            entityList.Add(new FacilityRequiredDocumentTypeEntity()
+            {
+                Id = 1,
+                ReportingTypeId = 1,
+                SupplyChainStageId = 1,
+                DocumentTypeId = 1,
+                DocumentRequiredStatusId = 2,
+                IsActive = true
+            });
+            entityList.Add(new FacilityRequiredDocumentTypeEntity()
+            {
+                Id = 2,
+                ReportingTypeId = 1,
+                SupplyChainStageId = 1,
+                DocumentTypeId = 2,
+                DocumentRequiredStatusId = 3,
+                IsActive = true
+            }); 
+            entityList.Add(new FacilityRequiredDocumentTypeEntity()
+            {
+                Id = 3,
+                ReportingTypeId = 1,
+                SupplyChainStageId = 1,
+                DocumentTypeId = 3,
+                DocumentRequiredStatusId = 3,
+                IsActive = true
+            });
+            entityList.Add(new FacilityRequiredDocumentTypeEntity()
+            {
+                Id = 4,
+                ReportingTypeId = 1,
+                SupplyChainStageId = 1,
+                DocumentTypeId = 4,
+                DocumentRequiredStatusId = 1,
+                IsActive = true
+            });
+            
+            return entityList;
+        }
         #endregion
 
         #region Created Dto for mapper testing

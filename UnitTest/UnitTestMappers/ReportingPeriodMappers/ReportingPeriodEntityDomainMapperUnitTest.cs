@@ -248,5 +248,53 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
 
         #endregion
 
+        #region ReportingPeriodDocument
+
+        [Fact]
+        public void ConvertReportingPeriodDocumentDomainToEntity()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+
+            //Add record in domain
+            var facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, "filename.xlsx", null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+
+            //Convert domain to entity
+            var documentEntity = mapper.ConvertPeriodFacilityDocumentDomainToEntity(facilityDocument);
+
+            Assert.NotNull(documentEntity);
+            Assert.Equal(facilityDocument.Id, documentEntity.Id);
+            Assert.Equal(facilityDocument.ReportingPeriodFacilityId, documentEntity.ReportingPeriodFacilityId);
+            Assert.Equal(facilityDocument.Version, documentEntity.Version);
+            Assert.Equal(facilityDocument.DisplayName, documentEntity.DisplayName);
+            Assert.Equal(facilityDocument.StoredName, documentEntity.StoredName);
+            Assert.Equal(facilityDocument.Path, documentEntity.Path);
+            Assert.Equal(facilityDocument.DocumentStatus.Id, documentEntity.DocumentStatusId);
+            Assert.Equal(facilityDocument.DocumentType.Id, documentEntity.DocumentTypeId);
+            Assert.Equal(facilityDocument.ValidationError, documentEntity.ValidationError);
+
+        }
+
+        [Fact]
+        public void ConvertFacilityRequiredDocumentTypeEntitiesToValueObjectList()
+        {
+            var facilityRequiredDocumentTypeEntities = CreateFacilityRequiredDocumentTypeEntities();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var documentTypes = GetDocumentTypes();
+            var documentRequiredStatuses = GetDocumentRequiredStatuses();
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+
+            var voList = mapper.ConvertFacilityRequiredDocumentTypeEntitiesToValueObjectList(facilityRequiredDocumentTypeEntities, reportingTypes, supplyChainStages, documentTypes, documentRequiredStatuses);
+
+            Assert.NotNull(voList);
+            Assert.Equal(facilityRequiredDocumentTypeEntities.Count(), voList.Count());
+
+        }
+
+        #endregion
     }
 }
