@@ -37,7 +37,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="periodSupplierId"></param>
     /// <returns></returns>
-    string LockUnlockPeriodSupplierStatus(int periodSupplierId);
+    string LockUnlockPeriodSupplierStatus(int periodSupplierId);   
 
     /// <summary>
     /// Get Relevant PeriodSuppliers
@@ -114,6 +114,17 @@ public interface IReportingPeriodServices
     #region ReportingPeriodDocuments
 
     string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto);
+
+    #endregion
+
+    #region UpdateFacilityDataStatus
+
+    /// <summary>
+    /// Update PeriodFacilityDataStatus Complete To Submitted
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    string UpdatePeriodFacilityDataStatusCompleteToSubmitted(int reportingPeriodId, int periodSupplierId);
 
     #endregion
 

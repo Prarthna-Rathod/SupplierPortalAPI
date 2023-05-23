@@ -32,6 +32,10 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
 
+        IEnumerable<ReportingPeriodFacilityEntity> UpdatePeriodFacilities(IEnumerable<ReportingPeriodFacilityEntity> periodFacilityEntities);
+
+        bool UpdateReportingPeriodFacilityDataStatus(int periodFacilityId, int periodFacilityDataStatusId);
+
         #endregion
 
         #region Remove Methods
@@ -60,7 +64,7 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<DocumentStatusEntity> GetDocumentStatusEntities();
         IEnumerable<DocumentTypeEntity> GetDocumentTypeEntities();
-        IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType();
+        
         IEnumerable<ReportingTypeEntity> GetReportingTypes();
 
         IEnumerable<ElectricityGridMixComponentEntity> GetElectricityGridMixComponentEntities();
@@ -68,6 +72,8 @@ namespace DataAccess.DataActions.Interfaces
         IEnumerable<UnitOfMeasureEntity> GetUnitOfMeasureEntities();
         IEnumerable<FercRegionEntity> GetFercRegionEntities();
         IEnumerable<SiteEntity> GetSiteEntities();
+
+        IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentTypeEntities();
 
 
         #endregion

@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using DataAccess.DataActions.Interfaces;
@@ -128,9 +129,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return _referenceLookUpMapper.GetDocumentTypesLookUp(documentTypes);
     }
 
-    /// <summary>
-    /// Validate file signature
-    /// </summary>
+    private IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatuses()
+    {
+        var documentRequiredStatus = _reportingPeriodDataActions.GetDocumentRequiredStatus();
+        return _referenceLookUpMapper.GetDocumentRequiredStatusesLookUp(documentRequiredStatus);
+    }
+
+
     private static readonly Dictionary<string, List<byte[]>> _fileSignature = new Dictionary<string, List<byte[]>>
         {
             {".xlsx",new List<byte[]>
@@ -157,6 +162,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
             }
         };
 
+    /// <summary>
+    /// Validate file signature
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     private bool ValidateFileSignature(string filePath, string fileName)
     {
         using (var reader = new BinaryReader(File.Open(filePath, FileMode.Open)))
@@ -172,8 +184,84 @@ public class ReportingPeriodServices : IReportingPeriodServices
             var signatures = _fileSignature[fileExtension];
             var headerBytes = reader.ReadBytes(signatures.Max(x => x.Length));
             return signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
+            /*string? error = null;
+            if (!isFileSignature)
+                error = "File Signature is not match !!";
+            return error;*/
         }
     }
+
+    /*
+     private bool CheckDocumentsUploadedForFacility(int periodFacilityId)
+    {
+        bool isDone = false;
+        int counter = 0;
+        var periodFacility = _reportingPeriodDataActions.GetPeriodFacilityById(periodFacilityId);
+
+        var facility = periodFacility.Facility;
+        var reportingType = facility.ReportingType;
+        var supplyChainStage = facility.SupplyChainStage;
+        var facilityRequiredDocumentTypes = GetFacilityRequiredDocumentTypeVOs().Where(x => x.ReportingType.Id == reportingType.Id && x.SupplyChainStage.Id == supplyChainStage.Id && x.DocumentRequiredStatus.Name == DocumentRequiredStatusValues.Required).ToList();
+
+        if (facilityRequiredDocumentTypes.Count() <= periodFacility.ReportingPeriodFacilityDocumentEntities.Count())
+        {
+            for (int i = 0; i < facilityRequiredDocumentTypes.Count(); i++)
+            {
+                var requiredDocument = facilityRequiredDocumentTypes[i].DocumentType.Id;
+                var uploadedDocument = periodFacility.ReportingPeriodFacilityDocumentEntities.ToList()[i].DocumentTypeId;
+
+                if (requiredDocument == uploadedDocument)
+                    counter++;
+            }
+        }
+        if (counter == facilityRequiredDocumentTypes.Count())
+            isDone = true;
+
+        return isDone;
+    }
+
+    private void UpdatePeriodFacilityStatusToComplete(int periodFacilityId)
+    {
+        var isDone = CheckDocumentsUploadedForFacility(periodFacilityId);
+
+        var facilityDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
+
+        if (isDone)
+            _reportingPeriodDataActions.UpdateReportingPeriodFacilityDataStatus(periodFacilityId, facilityDataStatus.Id);
+    }
+     */
+
+    private void UpdatePeriodFacilityDataStatus(int periodFacilityId)
+    {
+        var facilityDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
+
+        _reportingPeriodDataActions.UpdateReportingPeriodFacilityDataStatus(periodFacilityId, facilityDataStatus.Id);
+    }
+
+    /*private string ValidateFile(string fileType, long fileSize, string path)
+    {
+        string? error = null;
+        var fileTypes = new List<string>();
+        fileTypes.Add(".xlsx");
+        fileTypes.Add(".xml");
+
+        var isCorrect = fileTypes.Contains(fileType);
+        if (!isCorrect)
+            error += "FileType is not match.";
+
+        //Check file signature
+        var fileError = ValidateFileSignature(path, fileType);
+        if (fileError != null)
+            error += fileError;
+
+        //Check File size (should be 20MB)
+        long sizeInBytes = fileSize;
+        long maxSizeInBytes = 20971520;
+        if (sizeInBytes > maxSizeInBytes)
+            error += "Filesize should be in 20Mb";
+
+        return error;
+    }*/
 
     /// <summary>
     /// Retrieve ReportingPeriod Entity and Convert it to DomainModel
@@ -249,6 +337,93 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
     }
 
+    /*private PeriodSupplier RetrieveAndConvertReportingPeriodSupplierFacility(int periodFacilityId)
+    {
+        var periodFacilityEntity = _reportingPeriodDataActions.GetPeriodFacilityById(periodFacilityId);
+        var reportingPeriodEntity = periodFacilityEntity.ReportingPeriod;
+
+        if (periodFacilityEntity is null)
+            throw new NotFoundException("ReportingPeriodFacilityEntity not found !!");
+
+        var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
+        var reportingPeriodStatus = GetAndConvertReportingPeriodStatuses();
+
+        var reportingPeriodDomain = ConfigureReportingPeriod(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatus);
+
+        //Load PeriodSupplier
+        var supplierVO = GetAndConvertSupplierValueObject(periodFacilityEntity.ReportingPeriodSupplier.SupplierId);
+        var supplierReportingPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplier.SupplierReportingPeriodStatusId);
+        reportingPeriodDomain.LoadPeriodSupplier(periodFacilityEntity.ReportingPeriodSupplierId, supplierVO, supplierReportingPeriodStatus, periodFacilityEntity.ReportingPeriodSupplier.InitialDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.ResendDataRequestDate);
+
+        if (periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities.Count() == 0)
+            throw new NotFoundException("ElectricityGridMixes not available in this ReportingPeriodFacility !!");
+
+        GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(periodFacilityEntity, reportingPeriodDomain);
+        GetAndLoadPeriodFacilityDocuments(periodFacilityEntity, reportingPeriodDomain);
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+
+        return periodSupplier;
+    }
+
+    private void GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
+    {
+        var facilityVO = GetAndConvertFacilityValueObject(periodFacilityEntity.FacilityId);
+        var facilityReportingPeriodStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.FacilityReportingPeriodDataStatusId);
+        var fercRegion = GetAndConvertFercRegions().FirstOrDefault(x => x.Id == periodFacilityEntity.FercRegionId);
+
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+
+        reportingPeriodDomain.LoadPeriodFacility(periodFacilityEntity.Id, facilityVO, facilityReportingPeriodStatus, periodSupplier.Id, fercRegion, periodFacilityEntity.IsActive);
+
+        //Load PeriodFacilityElectricityGridMixes
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityEntity.Id);
+        var gridMixEntities = periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities;
+
+        if (gridMixEntities.Count() != 0)
+        {
+            var gridMixComponents = GetAndConvertElectricityGridMixComponents();
+
+            var gridMixValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityElectricityGridMixEntitiesToValueObjects(gridMixEntities, gridMixComponents);
+            var unitOfMeasureId = gridMixEntities.First().UnitOfMeasureId;
+
+            var unitOfMeasure = GetAndConvertUnitOfMeasures().FirstOrDefault(x => x.Id == unitOfMeasureId);
+
+            reportingPeriodDomain.LoadPeriodFacilityElectricityGridMix(periodFacility.Id, periodFacility.ReportingPeriodSupplierId, unitOfMeasure, gridMixValueObjectList);
+        }
+
+        //Load PeriodFacilityGasSupplyBreakdowns
+        var gasSupplyEntities = periodFacilityEntity.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+        if (gasSupplyEntities.Count() != 0)
+        {
+            var sites = GetAndConvertSites();
+            var unitOfMeasures = GetAndConvertUnitOfMeasures();
+            var gasSupplyValueObjectList = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownEntitiesToValueObjects(gasSupplyEntities, sites, unitOfMeasures);
+
+            reportingPeriodDomain.LoadPeriodFacilityGasSupplyBreakdown(periodFacility.ReportingPeriodSupplierId, gasSupplyValueObjectList);
+        }
+    }
+
+    private void GetAndLoadPeriodFacilityDocuments(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
+    {
+        var periodSupplier = reportingPeriodDomain.PeriodSuppliers.FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplierId);
+
+        // Load PeriodFacilityDocuments
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityEntity.Id);
+        var documentEntities = periodFacilityEntity.ReportingPeriodFacilityDocumentEntities;
+
+        if (documentEntities.Count() != 0)
+        {
+            foreach (var documentEntity in documentEntities)
+            {
+                var documentStatus = GetDocumentStatuses().First(x => x.Id == documentEntity.DocumentStatusId);
+                var documentType = GetDocumentTypes().First(x => x.Id == documentEntity.DocumentTypeId);
+
+                reportingPeriodDomain.LoadPeriodFacilityDocument(documentEntity.Id, periodSupplier.Id, documentEntity.ReportingPeriodFacilityId, documentEntity.Version, documentEntity.DisplayName, documentEntity.StoredName, documentEntity.Path, documentStatus, documentType, documentEntity.ValidationError);
+            }
+        }
+    }*/
+
     /// <summary>
     /// GetAndConvert PeriodFacilityEntity To PeriodFacilityDocument
     /// </summary>
@@ -268,10 +443,10 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         foreach (var periodFacilityDocument in periodFacilityDocumentEntities)
         {
-            var documentStatus = GetDocumentStatuses().FirstOrDefault(x => x.Id == periodFacilityDocument.DocumentStatusId);
-            var documentType = GetDocumentTypes().FirstOrDefault(x => x.Id == periodFacilityDocument.DocumentTypeId);
+            var documentStatus = GetDocumentStatuses().First(x => x.Id == periodFacilityDocument.DocumentStatusId);
+            var documentType = GetDocumentTypes().First(x => x.Id == periodFacilityDocument.DocumentTypeId);
 
-            reportingPeriod.LoadPeriodFacilityDocument(periodSupplierDomain.Id, periodFacilityDocument.ReportingPeriodFacilityId, periodFacilityDocument.Version, periodFacilityDocument.DisplayName, periodFacilityDocument.StoredName, periodFacilityDocument.Path, documentStatus, documentType, periodFacilityDocument.ValidationError);
+            reportingPeriod.LoadPeriodFacilityDocument(periodFacilityDocument.Id, periodSupplierDomain.Id, periodFacilityDocument.ReportingPeriodFacilityId, periodFacilityDocument.Version, periodFacilityDocument.DisplayName, periodFacilityDocument.StoredName, periodFacilityDocument.Path, documentStatus, documentType, periodFacilityDocument.ValidationError);
         }
 
     }
@@ -313,6 +488,19 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var facilityVO = _reportingPeriodEntityDomainMapper.ConvertFacilityEntityToFacilityValueObject(facilityEntity, supplyChainStages, reportingTypes);
 
         return facilityVO;
+    }
+
+    private IEnumerable<FacilityRequiredDocumentTypeVO> GetAndConvertFacilityRequiredDocumentTypeVO()
+    {
+        var facilityRequiredDocumentTypeEntities = _reportingPeriodDataActions.GetFacilityRequiredDocumentTypeEntities();
+        var reportingTypes = GetAndConvertReportingTypes();
+        var supplyChainStages = GetAndConvertSupplyChainStages();
+        var documentTypes = GetDocumentTypes();
+        var documentRequiredStatuses = GetDocumentRequiredStatuses();
+
+        var facilityRequiredDocumentTypeVo = _reportingPeriodEntityDomainMapper.ConvertFacilityRequiredDocumentTypeEntitiesToValueObjects(facilityRequiredDocumentTypeEntities, reportingTypes, supplyChainStages, documentTypes, documentRequiredStatuses);
+
+        return facilityRequiredDocumentTypeVo;
     }
 
     private ReportingPeriod ConfigureReportingPeriod(ReportingPeriodEntity reportingPeriodEntity, IEnumerable<ReportingPeriodType> reportingPeriodTypes, IEnumerable<ReportingPeriodStatus> reportingPeriodStatuses)
@@ -530,6 +718,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return "PeriodFacilityGasSupplyBreakdown is added successfully...";
     }
 
+    /// <summary>
+    /// AddUpdate ReportingPeriodFacilityDocument
+    /// </summary>
+    /// <param name="reportingPeriodDocumentDto"></param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundException"></exception>
+    /// <exception cref="Exception"></exception>
     public string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodDocumentDto.ReportingPeriodId);
@@ -542,11 +737,21 @@ public class ReportingPeriodServices : IReportingPeriodServices
         if (documentType is null)
             throw new NotFoundException("DocumentType is not found !!");
 
-        var periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, null, null, documentStatuses, documentType);
+        var facilityRequiredDocumentTypeVos = GetAndConvertFacilityRequiredDocumentTypeVO();
+
+        var periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVos);
 
         var periodFacilityDocumentEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodFacilityDocumentDomainToEntity(periodFacilityDocument);
 
-        _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(periodFacilityDocumentEntity);
+        if (periodFacilityDocumentEntity.Id == 0)
+            _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(periodFacilityDocumentEntity);
+
+        //change status Submitted To InProgress
+        var progressDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+        reportingPeriod.UpdatePeriodFacilityDataStatusSubmittedToInProgress(reportingPeriodDocumentDto.SupplierId, periodFacilityDocumentEntity.ReportingPeriodFacilityId, progressDataStatus);
+
+        _reportingPeriodDataActions.UpdateReportingPeriodFacilityDataStatus(periodFacilityDocument.ReportingPeriodFacilityId, progressDataStatus.Id);
 
         var documentPath = _uploadDocuments.UploadFile(reportingPeriodDocumentDto.DocumentFile);
 
@@ -554,146 +759,173 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         var error = _uploadDocuments.validationError(reportingPeriodDocumentDto.DocumentFile);
 
-        var updatedPeriodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, documentPath, error, documentStatuses, documentType);
+        var updatedPeriodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(reportingPeriodDocumentDto.SupplierId, reportingPeriodDocumentDto.PeriodFacilityId, reportingPeriodDocumentDto.DocumentFile.FileName, documentPath, error, documentStatuses, documentType, facilityRequiredDocumentTypeVos);
 
         var updatedPeriodFacilityDocumentEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodFacilityDocumentDomainToEntity(updatedPeriodFacilityDocument);
 
         _reportingPeriodDataActions.AddUpdateReportingPeriodFacilityDocument(updatedPeriodFacilityDocumentEntity);
 
         if (error != null)
-            return "ReportingPeriodFacilityDocument is not added because unable to save the uploaded file at this time.";
+            throw new Exception(error);
+
+        //Check facilityRequiredDocumentType is required than update facilityDataStatus is InProgress To Complete
+        var requiredDocument = facilityRequiredDocumentTypeVos.Any(x => x.DocumentType.Id == updatedPeriodFacilityDocumentEntity.DocumentTypeId && x.DocumentRequiredStatus.Name == DocumentRequiredStatusValues.Required);
+        if (requiredDocument)
+            UpdatePeriodFacilityDataStatus(reportingPeriodDocumentDto.PeriodFacilityId);
 
         return "ReportingPeriodFacilityDocument is added successfully...";
     }
 
-#endregion
-
-#region GetMethods
-
-/// <summary>
-/// Get Active ReportingPeriodList
-/// [Without PeriodSuppliersList]
-/// </summary>
-/// <returns></returns>
-public IEnumerable<ReportingPeriodDto> GetActiveReportingPeriods()
-{
-    var activeReportingPeriods = _reportingPeriodDataActions.GetReportingPeriods().Where(x => x.IsActive);
-    var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
-    var reportingPeriodStatuses = GetAndConvertReportingPeriodStatuses();
-
-    var reportingPeriodDomainList = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodEntitiesToDomain(activeReportingPeriods, reportingPeriodTypes, reportingPeriodStatuses);
-
-    var reportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodDomainListToDtos(reportingPeriodDomainList);
-
-    return reportingPeriodDtos;
-}
-
-/// <summary>
-/// Get ReportingPeriodSupplierFacilities
-/// List of PeriodSupplier facilities.
-/// Relevant and NotRelevant both are display with status 'FacilityIsRelevantForPeriod'
-/// </summary>
-/// <param name="periodSupplierId"></param>
-/// <returns></returns>
-/// <exception cref="BadRequestException"></exception>
-public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
-{
-    var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
-
-    if (periodSupplierEntity == null)
-        throw new NotFoundException("ReportingPeriodSupplierEntity is not found !!");
-
-    var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
-    var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
-
-    //Get PeriodSupplierFacilities
-    var periodFacilities = periodSupplier.PeriodFacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
-
-    var allFacilities = periodSupplierEntity.Supplier.FacilityEntities;
-    var inRelaventFacilities = new List<FacilityEntity>();
-
-    foreach (var facility in allFacilities)
+    /// <summary>
+    /// Update ReportingPeriodFacilityDataStatus Complete To Submitted
+    /// </summary>
+    /// <param name="reportingPeriodId"></param>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    public string UpdatePeriodFacilityDataStatusCompleteToSubmitted(int reportingPeriodId, int periodSupplierId)
     {
-        if (facility.ReportingPeriodFacilityEntities.Count() == 0)
-        {
-            inRelaventFacilities.Add(facility);
-        }
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierId);
+        var periodFacilities = periodSupplier.PeriodFacilities;
+
+        var facilityDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().FirstOrDefault(x => x.Name == FacilityReportingPeriodDataStatusValues.Submitted);
+        reportingPeriod.UpdatePeriodFacilityDataStatusCompleteToSubmitted(periodSupplierId, facilityDataStatus);
+
+        var entities = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodFacilitiesDomainToEntity(periodFacilities);
+
+        _reportingPeriodDataActions.UpdatePeriodFacilities(entities);
+
+        return "Update PeriodFacilityDataStatus is successfully...";
     }
 
-    var periodFacilitiesDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities, inRelaventFacilities);
-    var supplierFacilitiesDto = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodSupplierFacilitiesDomainToDto(periodSupplier, periodFacilitiesDtos);
+    #endregion
 
-    return supplierFacilitiesDto;
+    #region GetMethods
 
-}
-
-/// <summary>
-/// Get ReportingPeriodSuppliersList
-/// </summary>
-/// <param name="reportingPeriodId"></param>
-/// <returns></returns>
-public IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId)
-{
-    var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-    var periodSupplierDomainlist = reportingPeriod.PeriodSuppliers;
-
-    var allSuppliers = _supplierDataActions.GetAllSuppliers();
-    var supplierList = new List<SupplierEntity>();
-
-    foreach (var inRelevantSuppliers in allSuppliers)
+    /// <summary>
+    /// Get Active ReportingPeriodList
+    /// [Without PeriodSuppliersList]
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<ReportingPeriodDto> GetActiveReportingPeriods()
     {
-        if (inRelevantSuppliers.ReportingPeriodSupplierEntities.Count() == 0 && inRelevantSuppliers.IsActive)
-        {
-            supplierList.Add(inRelevantSuppliers);
-        }
+        var activeReportingPeriods = _reportingPeriodDataActions.GetReportingPeriods().Where(x => x.IsActive);
+        var reportingPeriodTypes = GetAndConvertReportingPeriodTypes();
+        var reportingPeriodStatuses = GetAndConvertReportingPeriodStatuses();
+
+        var reportingPeriodDomainList = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodEntitiesToDomain(activeReportingPeriods, reportingPeriodTypes, reportingPeriodStatuses);
+
+        var reportingPeriodDtos = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodDomainListToDtos(reportingPeriodDomainList);
+
+        return reportingPeriodDtos;
     }
 
-    var periodsuppliersDtos = _reportingPeriodDomainDtoMapper.ConvertReleventPeriodSupplierDomainToDto(periodSupplierDomainlist, supplierList, reportingPeriod);
+    /// <summary>
+    /// Get ReportingPeriodSupplierFacilities
+    /// List of PeriodSupplier facilities.
+    /// Relevant and NotRelevant both are display with status 'FacilityIsRelevantForPeriod'
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    /// <exception cref="BadRequestException"></exception>
+    public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
+    {
+        var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
 
-    return periodsuppliersDtos;
-}
+        if (periodSupplierEntity == null)
+            throw new NotFoundException("ReportingPeriodSupplierEntity is not found !!");
 
-/// <summary>
-/// Get PeriodFacilityElectricityGridMixList
-/// </summary>
-/// <param name="periodFacilityId"></param>
-/// <param name="reportingPeriodId"></param>
-/// <param name="periodSupplierId"></param>
-/// <returns></returns>
-/// <exception cref="NotFoundException"></exception>
-public MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId, int reportingPeriodId, int periodSupplierId)
-{
-    var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
-    var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierId);
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
 
-    var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+        //Get PeriodSupplierFacilities
+        var periodFacilities = periodSupplier.PeriodFacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
 
-    if (periodFacility is null)
-        throw new NotFoundException("PeriodFacility is not found !!");
+        var allFacilities = periodSupplierEntity.Supplier.FacilityEntities;
+        var inRelaventFacilities = new List<FacilityEntity>();
 
-    var gridMixDto = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityElectricityGridMixDomainListToDto(periodFacility.periodFacilityElectricityGridMixes, periodFacility, periodSupplier);
+        foreach (var facility in allFacilities)
+        {
+            if (facility.ReportingPeriodFacilityEntities.Count() == 0)
+            {
+                inRelaventFacilities.Add(facility);
+            }
+        }
 
-    return gridMixDto;
+        var periodFacilitiesDtos = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityDomainListToDtos(periodFacilities, inRelaventFacilities);
+        var supplierFacilitiesDto = _reportingPeriodDomainDtoMapper.ConvertReportingPeriodSupplierFacilitiesDomainToDto(periodSupplier, periodFacilitiesDtos);
 
-}
+        return supplierFacilitiesDto;
 
-/// <summary>
-/// Get PeriodFacilityGasSupplyBreakdownList
-/// </summary>
-/// <param name="periodSupplierId"></param>
-/// <returns></returns>
-public MultiplePeriodFacilityGasSupplyBreakdownDto GetReportingPeriodFacilityGasSupplyBreakdown(int periodSupplierId)
-{
-    var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
-    var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
-    var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
+    }
 
-    var periodFacilities = periodSupplier.PeriodFacilities;
+    /// <summary>
+    /// Get ReportingPeriodSuppliersList
+    /// </summary>
+    /// <param name="reportingPeriodId"></param>
+    /// <returns></returns>
+    public IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+        var periodSupplierDomainlist = reportingPeriod.PeriodSuppliers;
 
-    var gasSupplyBreakdownDto = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityGasSupplyBreakdownDoaminListToDto(periodFacilities, periodSupplier);
+        var allSuppliers = _supplierDataActions.GetAllSuppliers();
+        var supplierList = new List<SupplierEntity>();
 
-    return gasSupplyBreakdownDto;
-}
+        foreach (var inRelevantSuppliers in allSuppliers)
+        {
+            if (inRelevantSuppliers.ReportingPeriodSupplierEntities.Count() == 0 && inRelevantSuppliers.IsActive)
+            {
+                supplierList.Add(inRelevantSuppliers);
+            }
+        }
+
+        var periodsuppliersDtos = _reportingPeriodDomainDtoMapper.ConvertReleventPeriodSupplierDomainToDto(periodSupplierDomainlist, supplierList, reportingPeriod);
+
+        return periodsuppliersDtos;
+    }
+
+    /// <summary>
+    /// Get PeriodFacilityElectricityGridMixList
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <param name="reportingPeriodId"></param>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundException"></exception>
+    public MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId, int reportingPeriodId, int periodSupplierId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility is null)
+            throw new NotFoundException("PeriodFacility is not found !!");
+
+        var gridMixDto = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityElectricityGridMixDomainListToDto(periodFacility.periodFacilityElectricityGridMixes, periodFacility, periodSupplier);
+
+        return gridMixDto;
+
+    }
+
+    /// <summary>
+    /// Get PeriodFacilityGasSupplyBreakdownList
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    public MultiplePeriodFacilityGasSupplyBreakdownDto GetReportingPeriodFacilityGasSupplyBreakdown(int periodSupplierId)
+    {
+        var periodSupplierEntity = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
+        var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
+
+        var periodFacilities = periodSupplier.PeriodFacilities;
+
+        var gasSupplyBreakdownDto = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityGasSupplyBreakdownDoaminListToDto(periodFacilities, periodSupplier);
+
+        return gasSupplyBreakdownDto;
+    }
 
 }
 

@@ -26,7 +26,7 @@ namespace DataAccess.DataActions
 
         public string validationError(IFormFile displayName)
         {
-            string error = null;
+            string? error = null;
             var totalBytes = 20971520; //20 mb
             var uploadedBytes = displayName.Length;
 
@@ -36,6 +36,31 @@ namespace DataAccess.DataActions
             }
             return error;
         }
+
+        /*private string ValidateFile(string fileType, long fileSize, string path)
+        {
+            string? error = null;
+            var fileTypes = new List<string>();
+            fileTypes.Add(".xlsx");
+            fileTypes.Add(".xml");
+
+            var isCorrect = fileTypes.Contains(fileType);
+            if (!isCorrect)
+                error += "FileType is not match.";
+
+            //Check file signature
+            var fileError = CheckFileSignature(path, fileType);
+            if (fileError != null)
+                error += fileError;
+
+            //Check File size (should be 20MB)
+            long sizeInBytes = fileSize;
+            long maxSizeInBytes = 20971520;
+            if (sizeInBytes > maxSizeInBytes)
+                error += "Filesize should be in 20Mb";
+
+            return error;
+        }*/
 
         #endregion
     }

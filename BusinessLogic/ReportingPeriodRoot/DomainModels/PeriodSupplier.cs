@@ -74,6 +74,28 @@ public class PeriodSupplier
 
     #endregion
 
+    #region UpdateFacilityDataStatus
+
+    internal IEnumerable<PeriodFacility> UpdatePeriodFacilityDataStatusCompleteToSubmitted(FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+    {
+        var periodFacilities = _periodfacilities.Where(x => x.FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Complete).ToList();
+
+        foreach (var periodFacility in periodFacilities)
+        {
+            periodFacility.UpdatePeriodFacilityDataStatusCompleteToSubmitted(facilityReportingPeriodDataStatus);
+        }
+
+        return periodFacilities;
+    }
+
+    internal bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+    {
+        var periodFacility = GetPeriodFacility(periodFacilityId);
+        periodFacility.UpdatePeriodFacilityDataStatusSubmittedToInProgress(facilityReportingPeriodDataStatus);
+        return true;
+    }
+
+    #endregion
 
     #region Period Facility
 
@@ -126,14 +148,12 @@ public class PeriodSupplier
         return periodFacility;
     }
 
-
     internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, FercRegion fercRegion, bool isActive)
     {
         var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, periodSupplierId, fercRegion, isActive);
 
         return _periodfacilities.Add(periodFacility);
     }
-
 
     #endregion
 
@@ -203,22 +223,24 @@ public class PeriodSupplier
 
     #region PeriodFacilityDocument
 
-    internal PeriodFacilityDocument AddPeriodFacilityDocument(int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string collectionTimePeriod)
+    internal PeriodFacilityDocument AddPeriodFacilityDocument(int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string collectionTimePeriod, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
     {
         CheckPeriodSupplierStatus();
 
         var periodFacility = GetPeriodFacility(periodFacilityId);
 
-        return periodFacility.AddPeriodFacilityDocument(displayName, path, validationError, documentStatuses, documentType, collectionTimePeriod);
+        return periodFacility.AddPeriodFacilityDocument(displayName, path, validationError, documentStatuses, documentType, collectionTimePeriod, facilityRequiredDocumentTypeVOs);
     }
 
-    internal bool LoadPeriodFacilityDocument(int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+    internal bool LoadPeriodFacilityDocument(int periodFacilityDocumentId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
     {
         var periodFacility = GetPeriodFacility(periodFacilityId);
 
-        return periodFacility.LoadPeriodFacilityDocument(version, displayName, storedName, path, documentStatus, documentType, validationError);
+        return periodFacility.LoadPeriodFacilityDocument(periodFacilityDocumentId, version, displayName, storedName, path, documentStatus, documentType, validationError);
     }
 
     #endregion
+
+
 
 }

@@ -155,6 +155,16 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         return periodFacilityEntity;
     }
 
+    public IEnumerable<ReportingPeriodFacilityEntity> ConvertReportingPeriodFacilitiesDomainToEntity(IEnumerable<PeriodFacility> periodFacilities)
+    {
+        var periodFacilityEntities = new List<ReportingPeriodFacilityEntity>();
+        foreach (var periodFacility in periodFacilities)
+        {
+            periodFacilityEntities.Add(ConvertReportingPeriodFacilityDomainToEntity(periodFacility));
+        }
+        return periodFacilityEntities;
+    }
+
     #endregion
 
     #region PeriodFacilityElectricityGridMix
@@ -259,6 +269,33 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityDocumentEntity.IsActive = true;
 
         return periodFacilityDocumentEntity;
+    }
+
+    #endregion
+
+    #region FacilityRequiredDocumentType
+
+    public IEnumerable<FacilityRequiredDocumentTypeVO> ConvertFacilityRequiredDocumentTypeEntitiesToValueObjects(IEnumerable<FacilityRequiredDocumentTypeEntity> facilityRequiredDocumentTypeEntities,IEnumerable<ReportingType> reportingTypes,IEnumerable<SupplyChainStage> supplyChainStages,IEnumerable<DocumentType> documentTypes,IEnumerable<DocumentRequiredStatus> documentRequiredStatuses)
+    {
+        var list = new List<FacilityRequiredDocumentTypeVO>();
+        foreach(var facilityRequiredDocumentTypeEntity in facilityRequiredDocumentTypeEntities)
+        {
+            var reportingType = reportingTypes.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.ReportingTypeId);
+
+            var supplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.SupplyChainStageId);
+
+            var documentType = documentTypes.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.DocumentTypeId);
+
+            var documentRequiredStatus = documentRequiredStatuses.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.DocumentRequiredStatusId);
+
+            list.Add(ConvertFacilityRequiredDocumentTypeEntityToValueObject(reportingType, supplyChainStage, documentType,documentRequiredStatus));
+        }
+        return list;
+    }
+
+    public FacilityRequiredDocumentTypeVO ConvertFacilityRequiredDocumentTypeEntityToValueObject(ReportingType reportingType,SupplyChainStage supplyChainStage,DocumentType documentType,DocumentRequiredStatus documentRequiredStatus)
+    {
+        return new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStage, documentType, documentRequiredStatus);
     }
 
     #endregion

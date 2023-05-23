@@ -92,6 +92,14 @@ namespace Services.Mappers.ReportingPeriodMappers
             }
         }
 
+        public IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatusesLookUp(IEnumerable<DocumentRequiredStatusEntity> documentRequiredStatusEntities)
+        {
+            foreach(var item in documentRequiredStatusEntities)
+            {
+                yield return new DocumentRequiredStatus(item.Id, item.Name);
+            }
+        }
+
         //SupplierFacility
         public IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities)
         {

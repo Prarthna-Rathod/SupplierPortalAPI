@@ -109,7 +109,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     public bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity)
     {
         var existingPeriodFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.DocumentTypeId == reportingPeriodFacilityDocumentEntity.DocumentTypeId && x.ReportingPeriodFacilityId == reportingPeriodFacilityDocumentEntity.ReportingPeriodFacilityId).FirstOrDefault();
-
+        
         if (existingPeriodFacilityDocument is null)
         {
             reportingPeriodFacilityDocumentEntity.CreatedBy = "System";
@@ -243,6 +243,42 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return updatedReportingPeriodSuppliers;
     }
 
+    public IEnumerable<ReportingPeriodFacilityEntity> UpdatePeriodFacilities(IEnumerable<ReportingPeriodFacilityEntity> periodFacilityEntities)
+    {
+        var updatedPeriodFacilities = new List<ReportingPeriodFacilityEntity>();
+
+        var reportingPeriodId = periodFacilityEntities.First().ReportingPeriodId;
+        var allPeriodFacilities = _context.ReportingPeriodFacilityEntities.Where(x => x.ReportingPeriodId == reportingPeriodId).ToList();
+
+        foreach (var periodFacility in periodFacilityEntities)
+        {
+            var updatePeriodFacility = allPeriodFacilities
+            .Where(x => x.Id == periodFacility.Id).FirstOrDefault();
+
+            if (updatePeriodFacility == null)
+                throw new Exception("PeriodFacilityEntity not found for update !!");
+
+            updatePeriodFacility.FacilityReportingPeriodDataStatusId = periodFacility.FacilityReportingPeriodDataStatusId;
+
+            updatedPeriodFacilities.Add(updatePeriodFacility);
+        }
+
+        _context.SaveChanges();
+        return updatedPeriodFacilities;
+    }
+
+    public bool UpdateReportingPeriodFacilityDataStatus(int periodFacilityId,int periodFacilityDataStatusId)
+    {
+        var periodFacility = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).Include(x => x.ReportingPeriodFacilityDocumentEntities).FirstOrDefault();
+
+        periodFacility.FacilityReportingPeriodDataStatusId = periodFacilityDataStatusId;
+
+        _context.ReportingPeriodFacilityEntities.Update(periodFacility);
+
+        _context.SaveChanges();
+        return true;
+    }
+
     #endregion
 
     #region Remove Methods
@@ -338,7 +374,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public IEnumerable<DocumentRequiredStatusEntity> GetDocumentRequiredStatus()
     {
-        return _context.DocumentRequiredStatusEntities.ToList();
+        return _context.DocumentRequiredStatusEntities;
     }
 
     public IEnumerable<DocumentStatusEntity> GetDocumentStatusEntities()
@@ -356,14 +392,15 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return _context.FacilityReportingPeriodDataStatusEntities.ToList();
     }
 
-    public IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType()
+    public IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentTypeEntities()
     {
-        return _context.FacilityRequiredDocumentTypeEntities
+        var facilityRequiredDocumentType = _context.FacilityRequiredDocumentTypeEntities
                                     .Include(x => x.ReportingType)
                                     .Include(x => x.SupplyChainStage)
                                     .Include(x => x.DocumentType)
                                     .Include(x => x.DocumentRequiredStatus)
                                     .ToList();
+        return facilityRequiredDocumentType;
     }
 
     public IEnumerable<ReportingTypeEntity> GetReportingTypes()

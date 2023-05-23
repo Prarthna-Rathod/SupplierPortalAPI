@@ -33,6 +33,8 @@ public interface IReportingPeriodEntityDomainMapper
 
     ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility);
 
+    IEnumerable<ReportingPeriodFacilityEntity> ConvertReportingPeriodFacilitiesDomainToEntity(IEnumerable<PeriodFacility> periodFacilities);
+
     #endregion
 
     #region PeriodFacilityElectricityGridMix
@@ -62,6 +64,14 @@ public interface IReportingPeriodEntityDomainMapper
     #region PeriodDocument
 
     ReportingPeriodFacilityDocumentEntity ConvertReportingPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument);
+
+    #endregion
+
+    #region FacilityRequiredDocumentType
+
+    IEnumerable<FacilityRequiredDocumentTypeVO> ConvertFacilityRequiredDocumentTypeEntitiesToValueObjects(IEnumerable<FacilityRequiredDocumentTypeEntity> facilityRequiredDocumentTypeEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<DocumentType> documentTypes, IEnumerable<DocumentRequiredStatus> documentRequiredStatuses);
+
+    FacilityRequiredDocumentTypeVO ConvertFacilityRequiredDocumentTypeEntityToValueObject(ReportingType reportingType, SupplyChainStage supplyChainStage, DocumentType documentType, DocumentRequiredStatus documentRequiredStatus);
 
     #endregion
 

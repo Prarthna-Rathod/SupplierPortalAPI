@@ -60,6 +60,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.LockUnlockPeriodSupplierStatus(periodSupplierId);
         }
 
+        [HttpPut("UpdatePeriodFacilityDataStatus")]
+        public string UpdatePeriodFacilityDataStatus(int reportingPeriodId, int periodSupplierId)
+        {
+            return _services.UpdatePeriodFacilityDataStatusCompleteToSubmitted(reportingPeriodId, periodSupplierId);
+        }
+
         #endregion
 
         #region GetAll Methods

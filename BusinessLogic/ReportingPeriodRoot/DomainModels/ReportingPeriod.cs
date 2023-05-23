@@ -304,6 +304,23 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #endregion
 
+        #region UpdateFacilityDataStatus
+
+        public IEnumerable<PeriodFacility> UpdatePeriodFacilityDataStatusCompleteToSubmitted(int periodSupplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        {
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
+            return periodSupplier.UpdatePeriodFacilityDataStatusCompleteToSubmitted(facilityReportingPeriodDataStatus);
+        }
+
+        public bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            return periodSupplier.UpdatePeriodFacilityDataStatusSubmittedToInProgress(periodFacilityId, facilityReportingPeriodDataStatus);
+        }
+
+        #endregion
+
         #region Period Facility
 
         public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, FercRegion fercRegion, bool isActive)
@@ -364,20 +381,20 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         #region Period Document
 
-        public PeriodFacilityDocument AddPeriodFacilityDocument(int periodSupplierId, int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType)
+        public PeriodFacilityDocument AddPeriodFacilityDocument(int periodSupplierId, int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
         {
             CheckReportingPeriodStatus();
 
             var periodSupplier = GetPeriodSupplier(periodSupplierId);
 
-            return periodSupplier.AddPeriodFacilityDocument(periodFacilityId, displayName, path, validationError, documentStatuses, documentType, CollectionTimePeriod);
+            return periodSupplier.AddPeriodFacilityDocument(periodFacilityId, displayName, path, validationError, documentStatuses, documentType, CollectionTimePeriod, facilityRequiredDocumentTypeVOs);
         }
 
-        public bool LoadPeriodFacilityDocument(int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+        public bool LoadPeriodFacilityDocument(int periodFacilityDocumentId, int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
         {
             var periodSupplier = GetPeriodSupplier(periodSupplierId);
 
-            return periodSupplier.LoadPeriodFacilityDocument(periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
+            return periodSupplier.LoadPeriodFacilityDocument(periodFacilityDocumentId, periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
         }
 
         #endregion
