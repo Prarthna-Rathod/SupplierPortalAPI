@@ -49,6 +49,7 @@ namespace DataAccess.DataActions.Interfaces
 
         bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId);
         bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId);
+        bool RemovePeriodFacilityDocument(int documentId);
 
         #endregion
 
@@ -87,14 +88,14 @@ namespace DataAccess.DataActions.Interfaces
 
         #region GetById Methods
 
-        Task<IEnumerable<ReportingPeriodEntity>> GetReportingPeriods(int ReportingPeriodId);
-
         ReportingPeriodEntity GetReportingPeriodById(int reportingPeriodId);
 
         ReportingPeriodSupplierEntity GetPeriodSupplierById(int periodSupplierId);
 
         ReportingPeriodFacilityEntity GetPeriodFacilityById(int periodFacilityId);
 
+        ReportingPeriodFacilityDocumentEntity GetReportingPeriodDocument(int documentId);
+/*
         IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId);
         
         IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId);
@@ -106,7 +107,7 @@ namespace DataAccess.DataActions.Interfaces
         Task<IEnumerable<ReportingPeriodSupplierDocumentEntity>> GetReportingPeriodSuppliersDocument(int DocumentId);
 
         IEnumerable<ReportingPeriodSupplierEntity> GetReportingPeriodSuppliers(int ReportingPeriodId);
-
+*/
         #endregion
 
     }

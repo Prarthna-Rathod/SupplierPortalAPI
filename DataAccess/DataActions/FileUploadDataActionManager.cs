@@ -1,5 +1,6 @@
 ﻿using DataAccess.DataActions.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DataAccess.DataActions
 {
@@ -15,6 +16,22 @@ namespace DataAccess.DataActions
             }
 
             return filepath;
+        }
+
+        public FileContentResult DownloadDocument(string filePath)
+        {
+            FileInfo file = new FileInfo(filePath);
+            var fileName = file.Name;
+            var downloadPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+            //System.Net.Mime.MediaTypeNames.Application.Octet for contentType
+            FileContentResult result = new FileContentResult
+            (System.IO.File.ReadAllBytes(downloadPath), System.Net.Mime.MediaTypeNames.Application.Octet)
+            {
+                FileDownloadName = fileName
+            };
+
+            return result;
         }
 
     }

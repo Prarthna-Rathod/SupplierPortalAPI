@@ -5,6 +5,7 @@ using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
@@ -12,6 +13,7 @@ using Services.Factories.Interface;
 using Services.Interfaces;
 using Services.Mappers.Interfaces;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
+using System.Net;
 
 namespace Services;
 
@@ -208,8 +210,8 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var supplierReportingPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplier.SupplierReportingPeriodStatusId);
         reportingPeriodDomain.LoadPeriodSupplier(periodFacilityEntity.ReportingPeriodSupplierId, supplierVO, supplierReportingPeriodStatus, periodFacilityEntity.ReportingPeriodSupplier.InitialDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.ResendDataRequestDate);
 
-        if (periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities.Count() == 0)
-            throw new NotFoundException("ElectricityGridMixes not available in this ReportingPeriodFacility !!");
+        /*if (periodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities.Count() == 0)
+            throw new NotFoundException("ElectricityGridMixes not available in this ReportingPeriodFacility !!");*/
 
         GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(periodFacilityEntity, reportingPeriodDomain);
         GetAndLoadPeriodFacilityDocuments(periodFacilityEntity, reportingPeriodDomain);
@@ -903,6 +905,48 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return dto;
     }
 
+
+    public ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetPeriodFacilityDocuments(int periodFacilityId)
+    {
+        var periodSupplier = RetrieveAndConvertReportingPeriodSupplierFacility(periodFacilityId);
+        var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        var dto = _reportingPeriodDomainDtoMapper.GetAndConvertPeriodFacilityElectricityGridMixAndDocumentsDomainListToDto(periodFacility, periodSupplier.Supplier.Id);
+
+        return dto;
+    }
+
+    public FileContentResult DownloadPeriodFacilityDocument(int documentId)
+    {
+        var documentEntity = _reportingPeriodDataActions.GetReportingPeriodDocument(documentId);
+
+        var filePath = documentEntity.Path;
+        
+        var file = _fileUploadDataActions.DownloadDocument(filePath);
+
+        return file;
+    }
+
+    public string RemoveReportingPeriodFacilityDocument(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int documentId)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriod(reportingPeriodId);
+
+        var isRemoved = reportingPeriod.RemovePeriodFacilityDocument(supplierId, reportingPeriodFacilityId, documentId);
+
+        var inProgressDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+        if (isRemoved)
+        {
+            _reportingPeriodDataActions.RemovePeriodFacilityDocument(documentId);
+            var isDone = CheckDocumentsUploadedForFacility(reportingPeriodFacilityId);
+            if (!isDone)
+                _reportingPeriodDataActions.CheckAndUpdateReportingPeriodFacilityStatus(reportingPeriodFacilityId, inProgressDataStatus.Id);
+            return "ReportingPeriodDocument removed successfully..";
+        }
+        else
+            return "ReportingPeriodDocument not removed !!";
+
+    }
 }
 
 #endregion

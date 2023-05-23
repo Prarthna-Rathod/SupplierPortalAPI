@@ -40,6 +40,8 @@ public interface IReportingPeriodDomainDtoMapper
 
     MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(PeriodFacility periodFacility, int supplierId);
 
+    ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetAndConvertPeriodFacilityElectricityGridMixAndDocumentsDomainListToDto(PeriodFacility periodFacility, int supplierId);
+
     #endregion
 
     #region PeriodFacility

@@ -101,6 +101,28 @@ namespace SupplierPortalAPI.Controllers
             return _services.GetFacilityElectricityGridMixComponents(reportingPeriodFacilityId);
         }
 
+        [HttpGet("GetPeriodFacilityElectricityGridMixAndDocuments")]
+        public ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetReportingPeriodFacilityElectricityGridMixAndDocuments(int reportingPeriodFacilityId)
+        {
+            return _services.GetPeriodFacilityDocuments(reportingPeriodFacilityId);
+        }
+
+        [HttpGet("DownloadReportingPeriodFacilityDocument")]
+        public IActionResult DownloadReportingPeriodFacilityDocumentById(int documentId)
+        {
+            return _services.DownloadPeriodFacilityDocument(documentId);
+        }
+
+        #endregion
+
+        #region Remove Methods
+
+        [HttpDelete("RemoveReportingPeriodFacilityDocuments")]
+        public string RemoveReportingPeriodFacilityDocuments(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int documentId)
+        {
+            return _services.RemoveReportingPeriodFacilityDocument(reportingPeriodFacilityId, reportingPeriodId, supplierId, documentId);
+        }
+
         #endregion
 
     }

@@ -1,7 +1,6 @@
 using DataAccess.DataActionContext;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.DataActions;
@@ -264,16 +263,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         var periodSupplier = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId)
             .Include(x => x.ReportingPeriodFacilityEntities).FirstOrDefault();
 
-        //var periodSupplierRelevantFacility = _context.ReportingPeriodSupplierEntities.Where(x=>x.Id == periodSupplierId).Include(x=>x .ReportingPeriodFacilityEntities).ToList();
         if (periodSupplier == null)
         {
             return false;
         }
-        //if(periodSupplierRelevantFacility.Count() != 0 )
-        //{
-        //    throw new Exception("Supplier has relevant facilities");
-        //}
-
+       
         _context.ReportingPeriodSupplierEntities.Remove(periodSupplier);
         _context.SaveChanges();
         return true;
@@ -311,6 +305,37 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         }
 
         //_context.SaveChanges();
+        return true;
+    }
+
+    private bool RemoveDocumentFromFolder(string path)
+    {
+        //Delete file from "DocumentFiles" folder
+        FileInfo file = new FileInfo(path);
+        if (file.Exists)
+        {
+            file.Delete();
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public bool RemovePeriodFacilityDocument(int documentId)
+    {
+        var documentEntity = _context.ReportingPeriodFacilityDocumentEntities.FirstOrDefault(x => x.Id == documentId);
+
+        if (documentEntity is null)
+            throw new Exception("Document not found !!");
+
+        var fileDeleted = RemoveDocumentFromFolder(documentEntity.Path);
+
+        //If file deleted successfully then remove from database
+        if (fileDeleted)
+            _context.ReportingPeriodFacilityDocumentEntities.Remove(documentEntity);
+        
+        _context.SaveChanges();
+
         return true;
     }
 
@@ -452,32 +477,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return reportingPeriod;
     }
 
-    public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId)
-    {
-        var reportingPeriodType = _context.ReportingPeriodTypeEntities.Where(x => x.Id == reportingPeriodTypeId).ToList();
-
-        return reportingPeriodType;
-    }
-
-    public IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId)
-    {
-        var reportingPeriodStatus = _context.ReportingPeriodStatusEntities.Where(x => x.Id == reportingPeriodStatusId).ToList();
-        return reportingPeriodStatus;
-    }
-
-    public IEnumerable<ReportingPeriodSupplierEntity> GetReportingPeriodSuppliers(int reportingPeriodId)
-    {
-        var reportingPeriodSupplier =
-            _context.ReportingPeriodSupplierEntities
-                                    .Where(x => x.ReportingPeriodId == reportingPeriodId)
-                                    .Include(x => x.Supplier)
-                                    .Include(x => x.ReportingPeriod)
-                                    .Include(x => x.SupplierReportingPeriodStatus)
-                                    .ToList();
-        return reportingPeriodSupplier;
-
-    }
-
     public ReportingPeriodSupplierEntity GetPeriodSupplierById(int periodSupplierId)
     {
         var periodSupplier = _context.ReportingPeriodSupplierEntities
@@ -493,6 +492,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     {
         var periodFacility = _context.ReportingPeriodFacilityEntities
                                 .Include(x => x.Facility)
+                                .Include(x => x.ReportingType)
+                                .Include(x => x.SupplyChainStage)
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.ReportingPeriodSupplier)
                                 .Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
@@ -502,41 +503,16 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return periodFacility;
     }
 
-    public async Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId)
+    public ReportingPeriodFacilityDocumentEntity GetReportingPeriodDocument(int documentId)
     {
-        return await _context.ReportingPeriodFacilityEntities
-                                    .Include(x => x.Facility)
-                                    .Include(x => x.FacilityReportingPeriodDataStatus)
-                                    .Include(x => x.ReportingPeriod)
-                                    .Include(x => x.ReportingPeriodSupplier)
-                                    .ToListAsync();
+        var periodDocument = _context.ReportingPeriodFacilityDocumentEntities.First(x => x.Id == documentId);
+
+        if (periodDocument is null)
+            throw new Exception("ReportingPeriodDocumentEntity not found !!");
+
+        return periodDocument;
     }
 
-    public async Task<IEnumerable<ReportingPeriodFacilityDocumentEntity>> GetReportingPeriodFacilitiesDocument(int DocumentId)
-    {
-        return await _context.ReportingPeriodFacilityDocumentEntities
-                                .Include(x => x.ReportingPeriodFacility)
-                                .Include(x => x.DocumentStatus)
-                                .Include(x => x.DocumentType)
-                                .ToListAsync();
-    }
-
-    public async Task<IEnumerable<ReportingPeriodSupplierDocumentEntity>> GetReportingPeriodSuppliersDocument(int DocumentId)
-    {
-        return await _context.ReportingPeriodSupplierDocumentEntities
-                                    .Include(x => x.ReportingPeriodSupplier)
-                                    .Include(x => x.DocumentStatus)
-                                    .Include(x => x.DocumentType)
-                                    .ToListAsync();
-    }
-
-    public async Task<IEnumerable<ReportingPeriodEntity>> GetReportingPeriods(int ReportingPeriodId)
-    {
-        return await _context.ReportingPeriodEntities
-                                .Include(x => x.ReportingPeriodType)
-                                .Include(x => x.ReportingPeriodStatus)
-                                .ToListAsync();
-    }
 
     #endregion
 
@@ -562,5 +538,5 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #endregion
 
-   
+
 }

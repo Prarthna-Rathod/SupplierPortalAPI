@@ -216,6 +216,35 @@ namespace Services.Mappers.ReportingPeriodMappers
             return periodFacilityGridMixDto;
         }
 
+        public ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetAndConvertPeriodFacilityElectricityGridMixAndDocumentsDomainListToDto(PeriodFacility periodFacility, int supplierId)
+        {
+            //First load electricityGridMixes
+            var periodFacilityGridMixList = periodFacility.periodFacilityElectricityGridMixes;
+
+            var gridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+            foreach (var gridMix in periodFacilityGridMixList)
+            {
+                var gridMixDto = new ReportingPeriodFacilityElectricityGridMixDto(gridMix.ElectricityGridMixComponent.Id, gridMix.ElectricityGridMixComponent.Name, gridMix.Content);
+
+                gridMixDtos.Add(gridMixDto);
+            }
+            var unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
+
+            //Load PeriodFacilityDocuments
+            var periodFacilityDocuments = periodFacility.periodFacilityDocuments;
+            var documentDtos = new List<GetReportingPeriodFacilityDocumentDto>();
+            foreach(var document in periodFacilityDocuments)
+            {
+                var documentDto = new GetReportingPeriodFacilityDocumentDto(document.Id, document.DisplayName, document.Version, document.DocumentStatus.Id, document.DocumentStatus.Name, document.DocumentType.Id, document.DocumentType.Name, document.ValidationError);
+                
+                documentDtos.Add(documentDto);
+            }
+
+            var gridMixAndDocumentDto = new ReportingPeriodFacilityElectricityGridMixAndDocumentDto(periodFacility.Id, periodFacility.ReportingPeriodId, supplierId, unitOfMeasure.Id, unitOfMeasure.Name, periodFacility.FercRegion.Id, periodFacility.FercRegion.Name, gridMixDtos, documentDtos);
+
+            return gridMixAndDocumentDto;
+        }
+
         #endregion
 
         #region PeriodDocument

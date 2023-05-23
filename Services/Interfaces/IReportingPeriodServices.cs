@@ -1,6 +1,7 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using DataAccess.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using System;
@@ -122,7 +123,23 @@ public interface IReportingPeriodServices
 
     #region ReportingPeriodDocuments
 
+    /// <summary>
+    /// AddUpdate ReportingPeriodDocument
+    /// </summary>
+    /// <param name="reportingPeriodDocumentDto"></param>
+    /// <returns></returns>
     string AddUpdateReportingPeriodDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto);
+
+    /// <summary>
+    /// Get ReportingPeriodFacility ElectricityGridMix and document details
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetPeriodFacilityDocuments(int periodFacilityId);
+
+    FileContentResult DownloadPeriodFacilityDocument(int documentId);
+
+    string RemoveReportingPeriodFacilityDocument(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int documentId);
 
     #endregion
 

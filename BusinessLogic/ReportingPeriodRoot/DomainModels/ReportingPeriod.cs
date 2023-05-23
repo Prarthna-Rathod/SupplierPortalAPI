@@ -398,6 +398,16 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacilityDocuments(documentId, periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
         }
 
+        public bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int documentId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier not found !!");
+
+            return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId, documentId);
+        }
 
         /*
          public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)

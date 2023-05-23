@@ -298,6 +298,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return _periodFacilityDocuments.Add(document);
         }
 
+        public bool RemovePeriodFacilityDocument(int documentId)
+        {
+            var document = _periodFacilityDocuments.FirstOrDefault(x => x.Id == documentId);
+            if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Submitted)
+            {
+                _periodFacilityDocuments.Remove(document);
+                return true;
+            }
+            else
+                return false;
+
+        }
 
         #endregion
 

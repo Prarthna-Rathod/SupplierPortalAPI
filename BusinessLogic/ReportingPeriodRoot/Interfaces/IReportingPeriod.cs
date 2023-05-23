@@ -30,17 +30,8 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
        IEnumerable<PeriodFacility> UpdateAllPeriodFacilityDataStatus(int periodSupplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
 
         bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
+
+        bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int documentId);
        
-        /*
-        PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId,int periodFacilityId,int documentId);
-
-        PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId,int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType,IEnumerable<DocumentRequirementStatus> documentRequirementStatus);
-
-        PeriodSupplierDocument AddSupplementalDataDocumentToReportingPeriodSupplier(int supplierId,string documentName,DocumentType documentType,IEnumerable<DocumentStatus> documentStatus);
-
-        PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId,int documentId);
-
-        IEnumerable<PeriodFacility> UpdateDataStatusToSubmittedForCompletePeriodFacility(int supplierId,FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
-        */
     }
 }
