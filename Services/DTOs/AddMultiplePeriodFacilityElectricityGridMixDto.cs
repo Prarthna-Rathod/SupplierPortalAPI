@@ -1,20 +1,14 @@
-﻿namespace Services.DTOs
-{
-    public class AddMultiplePeriodFacilityElectricityGridMixDto
-    {
-        public int Id { get; set; }
-        public int ReportingPeriodFacilityId { get; set; }
-        public int ReportingPeriodSupplierId { get; set; }
-        public IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> ReportingPeriodFacilityElectricityGridMixDtos { get; set; }
-        public bool IsActive { get; set; }
+﻿namespace Services.DTOs;
 
-        public AddMultiplePeriodFacilityElectricityGridMixDto(int id, int reportingPeriodFacilityId, int reportingPeriodSupplierId, IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> reportingPeriodFacilityElectricityGridMixDtos,bool isActive)
-        {
-            Id = id;
-            ReportingPeriodFacilityId = reportingPeriodFacilityId;
-            ReportingPeriodSupplierId = reportingPeriodSupplierId;
-            ReportingPeriodFacilityElectricityGridMixDtos = reportingPeriodFacilityElectricityGridMixDtos;
-            IsActive = isActive;
-        }
-    }
+public class AddMultiplePeriodFacilityElectricityGridMixDto
+{
+ 
+    public int ReportingPeriodId { get; set; }
+    public int ReportingPeriodFacilityId { get; set; }
+    public int ReportingPeriodSupplierId { get; set; }
+
+    public int FercRegionId { get; set; }
+    public IEnumerable<ReportingPeriodFacilityElectricityGridMixDto> ReportingPeriodFacilityElectricityGridMixDtos { get; set; }
+
+
 }

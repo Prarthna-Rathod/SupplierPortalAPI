@@ -72,29 +72,6 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     #region PeriodSupplier
 
-    /*  public PeriodSupplier ConvertPeriodSupplierEntityToDomain(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses, SupplierVO supplierVO)
-      {
-          var supplierReportingPeriodSelectedStatus = supplierReportingPeriodStatuses.FirstOrDefault(x => x.Id == reportingPeriodSupplierEntity.SupplierReportingPeriodStatusId);
-
-          var periodSupplier = new PeriodSupplier(reportingPeriodSupplierEntity.Id, supplierVO, reportingPeriodSupplierEntity.ReportingPeriodId, supplierReportingPeriodSelectedStatus, reportingPeriodSupplierEntity.InitialDataRequestDate, reportingPeriodSupplierEntity.ResendDataRequestDate);
-
-          return periodSupplier;
-      }
-
-      public IEnumerable<PeriodSupplier> ConvertPeriodSuppliersEntitiesToDomainList(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntities, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses,
-          IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages)
-      {
-          var periodSupplierDomainList = new List<PeriodSupplier>();
-
-          foreach (var periodSupplierEntity in reportingPeriodSupplierEntities)
-          {
-              var supplierVO = ConvertSupplierEntityToSupplierValueObject(periodSupplierEntity.Supplier, supplyChainStages, reportingTypes);
-              periodSupplierDomainList.Add(ConvertPeriodSupplierEntityToDomain(periodSupplierEntity, supplierReportingPeriodStatuses, supplierVO));
-          }
-
-          return periodSupplierDomainList;
-      }*/
-
 
     public ReportingPeriodSupplierEntity ConvertReportingPeriodSupplierDomainToEntity(PeriodSupplier periodSupplier)
     {
@@ -160,10 +137,43 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
         return facilityVOs;
     }
-    public ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility)
+
+    public IEnumerable<FacilityVO> ConvertFacilityEntityToFacilityValueObjectList(IEnumerable<FacilityEntity> facilityEntities, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
+    {
+        var facilityVOs = new List<FacilityVO>();
+
+        foreach (var facilityEntity in facilityEntities)
+        {
+            var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
+            var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
+
+            facilityVOs.Add(new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType));
+        }
+
+        return facilityVOs;
+
+
+
+    }
+
+
+    public FacilityVO ConvertFacilityEntityToFacilityVO(FacilityEntity facilityEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
+    {
+
+        var selectedSupplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityEntity.SupplyChainStageId);
+        var selectedReprtingType = reportingTypes.FirstOrDefault(x => x.Id == facilityEntity.ReportingTypeId);
+
+        var facilityVO = new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType);
+        return facilityVO;
+
+    }
+
+
+    public ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility, IEnumerable<FercRegion> fercRegions)
     {
         var periodFacilityEntity = new ReportingPeriodFacilityEntity();
-        periodFacilityEntity.Id = periodFacility.Id;
+        var fercRegion = fercRegions.FirstOrDefault(x => x.Id == periodFacilityEntity.FercRegionId);
+
         periodFacilityEntity.FacilityId = periodFacility.FacilityVO.Id;
         periodFacilityEntity.FacilityReportingPeriodDataStatusId = periodFacility.FacilityReportingPeriodDataStatus.Id;
         periodFacilityEntity.ReportingPeriodId = periodFacility.ReportingPeriodId;
@@ -171,10 +181,29 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         periodFacilityEntity.GhgrpfacilityId = periodFacility.FacilityVO.GHGRPFacilityId;
         periodFacilityEntity.SupplyChainStageId = periodFacility.FacilityVO.SupplyChainStage.Id;
         periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
+        periodFacilityEntity.FercRegionId = periodFacility.FercRegion.Id;
         periodFacilityEntity.IsActive = periodFacility.IsActive;
+        periodFacilityEntity.Id = periodFacility.Id;
 
         return periodFacilityEntity;
     }
+
+    public IEnumerable<ReportingPeriodFacilityEntity> ConvertReportingPeriodFacilityDomainListToEntity(IEnumerable<PeriodFacility> periodFacilities, IEnumerable<FercRegion> fercRegions)
+    {
+        var periodFacilityEntity = new List<ReportingPeriodFacilityEntity>();
+
+        foreach (var periodFacility in periodFacilities)
+        {
+            periodFacilityEntity.Add(ConvertReportingPeriodFacilityDomainToEntity(periodFacility, fercRegions));
+        }
+        return periodFacilityEntity;
+    }
+
+
+    #endregion
+
+    #region PeriodFacility ElectricityGridMix
+
 
     public ReportingPeriodFacilityElectricityGridMixEntity ConvertPeriodFacilityElectricityGridMixDomainToEntity(PeriodFacilityElectricityGridMix facilityElectricityGridMix)
     {
@@ -182,12 +211,25 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
         entity.ReportingPeriodFacilityId = facilityElectricityGridMix.PeriodFacilityId;
         entity.ElectricityGridMixComponentId = facilityElectricityGridMix.ElectricityGridMixComponent.Id;
         entity.UnitOfMeasureId = facilityElectricityGridMix.UnitOfMeasure.Id;
-        entity.FercRegionId = facilityElectricityGridMix.FercRegion.Id;
         entity.Content = facilityElectricityGridMix.Content;
         entity.IsActive = facilityElectricityGridMix.IsActive;
+        entity.CreatedBy = "system";
+        entity.CreatedOn = DateTime.UtcNow;
 
         return entity;
     }
+    public IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> ConvertPeriodFacilityElectricityGridMixDomainListToEntity(IEnumerable<PeriodFacilityElectricityGridMix> facilityElectricityGridMix)
+    {
+        var periodFacilityElectricityGridMixEntity = new List<ReportingPeriodFacilityElectricityGridMixEntity>();
+
+        foreach(var electricityGridMix in facilityElectricityGridMix)
+        {
+            periodFacilityElectricityGridMixEntity.Add(ConvertPeriodFacilityElectricityGridMixDomainToEntity(electricityGridMix));
+        }
+        return periodFacilityElectricityGridMixEntity;
+    }
+    
+
 
     #endregion
 

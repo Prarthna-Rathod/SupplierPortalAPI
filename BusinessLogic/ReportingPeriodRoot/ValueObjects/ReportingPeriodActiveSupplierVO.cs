@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic.ReportingPeriodRoot.ValueObjects;
 
-public class ReportingPeriodActiveSupplier
+public class ReportingPeriodActiveSupplierVO
 {
-    public ReportingPeriodActiveSupplier(int reportingPeriodSupplierId, SupplierVO supplier,
+    public ReportingPeriodActiveSupplierVO(int reportingPeriodSupplierId, SupplierVO supplier,
         int periodId, string periodName, SupplierReportingPeriodStatus? supplierPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive)
 
     {
@@ -26,7 +26,7 @@ public class ReportingPeriodActiveSupplier
 
 
     }
-    public ReportingPeriodActiveSupplier()
+    public ReportingPeriodActiveSupplierVO()
     {
 
     }

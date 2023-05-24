@@ -237,15 +237,35 @@ namespace DataAccess.DataActions
                                                   .FirstOrDefault();
             return contact;
         }
+        public IEnumerable<FacilityEntity> GetFacilityByIds(IEnumerable<int> facilityId) 
+        {
+            var facilities = new List<FacilityEntity>();
+            foreach(var Id in facilityId)
+            {
+                var facility = _context.FacilityEntities.Include(x => x.AssociatePipeline)
+                                                    .Include(x => x.ReportingType)
+                                                    .Include(x => x.SupplyChainStage)
+                                                    .Include(x => x.ReportingPeriodFacilityEntities)
+                                                    .FirstOrDefault(x => x.Id ==Id);
+                facilities.Add(facility);
+            }
+
+           
+            return facilities;
+        }
+
         public FacilityEntity GetFacilityById(int facilityId)
         {
-            var facility = _context.FacilityEntities.Include(x => x.AssociatePipeline)
+                var facility = _context.FacilityEntities.Include(x => x.AssociatePipeline)
                                                     .Include(x => x.ReportingType)
                                                     .Include(x => x.SupplyChainStage)
                                                     .Include(x => x.ReportingPeriodFacilityEntities)
                                                     .FirstOrDefault(x => x.Id == facilityId);
+
+
             return facility;
         }
+
         public AssociatePipelineEntity GetAssociatePipelineById(int associatePipelineId)
         {
             var associatePipeline = _context.AssociatePipelineEntities.FirstOrDefault(x => x.Id == associatePipelineId);

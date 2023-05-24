@@ -1,15 +1,15 @@
 using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
-using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 
 public class PeriodSupplier
 {
     private HashSet<PeriodFacility> _periodfacilities;
-    
-    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate,bool isActive)
+
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
@@ -20,21 +20,12 @@ public class PeriodSupplier
         _periodfacilities = new HashSet<PeriodFacility>();
     }
 
-    //internal PeriodSupplier(int supplierId, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate) : this(supplierId, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
-    //{
-    //    SupplierId = supplierId;
-    //    ReportingPeriodId = reportingPeriodId;
-    //    SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
-    //    InitialDataRequestDate = initialDataRequestDate;
-    //    ResendDataRequestDate = resendDataRequestDate;
-    //}
-
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus,DateTime? initialDataRequestDate, DateTime? resendDataRequestDate,bool isActive) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate,isActive)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive)
     {
         Id = id;
     }
 
-    private PeriodSupplier()
+    internal PeriodSupplier()
     { }
 
     public int Id { get; private set; }
@@ -65,64 +56,91 @@ public class PeriodSupplier
 
     #region Period Facility
 
-    internal PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, bool facilityIsRelevantForPeriod, bool isActive)
+    internal string AddRemoveUpdatePeriodFacility(IEnumerable<ReportingPeriodRelevantFacilityVO> reportingPeriodRelevantFacilities, IEnumerable<FercRegion> fercRegions, IEnumerable<FacilityReportingPeriodDataStatus> facilityReportingPeriodDataStatuses)
     {
-        int counter = 0;
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, Id, isActive);
+        var checkFacility = "";
 
-        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new Exception("Supplier ReportingPeriodStatus is Locked..");
+
+
+        var fercRegion = fercRegions.FirstOrDefault(x => x.Name == FercRegionvalues.None);
+
+        var facilityReportingPeriodDataStatus = facilityReportingPeriodDataStatuses.FirstOrDefault(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+
+        foreach (var facility in reportingPeriodRelevantFacilities)
         {
-            var periodSupplierFacilities = Supplier.Facilities;
+            var isExist = _periodfacilities.FirstOrDefault(x => x.FacilityVO.Id == facility.FacilityVO.Id);
 
-            //Check existing PeriodSupplier
-            foreach (var existingPeriodFacility in _periodfacilities)
+            if (facility.FacilityIsRelevantForPeriod && facility.ReportingPeriodFacilityId == 0)
             {
-                if (existingPeriodFacility.FacilityVO.Id == facilityVO.Id && existingPeriodFacility.ReportingPeriodId == Id)
+                if (isExist is null)
                 {
-                    if (facilityIsRelevantForPeriod)
-                        throw new BadRequestException("ReportingPeriodFacility is already exists !!");
-                    else
-                        _periodfacilities.Remove(existingPeriodFacility);
-                }
-            }
+                    var periodFacility = new PeriodFacility(facility.FacilityVO, facilityReportingPeriodDataStatus, facility.ReportingPeriodId, facility.ReportingPeriodSupplierId, fercRegion, facility.FacilityIsRelevantForPeriod);
 
-            if (facilityIsRelevantForPeriod)
+                    _periodfacilities.Add(periodFacility);
+                }
+                else
+                {
+                    checkFacility = checkFacility + "," + $"{facility.FacilityVO.Id}";
+                }
+
+            }
+            if (isExist is not null)
             {
-                if (facilityReportingPeriodDataStatus.Name != FacilityReportingPeriodDataStatusValues.InProgress)
-                    throw new BadRequestException("FacilityReportingPeriodStatus should be InProgress only !!");
-
-                foreach (var supplierFacility in periodSupplierFacilities)
+                if (!facility.FacilityIsRelevantForPeriod)
                 {
-                    if (supplierFacility.Id == facilityVO.Id)
-                    {
-                        _periodfacilities.Add(periodFacility);
-                        counter = 0;
-                        break;
-                    }
-                    else
-                        counter++;
+                    _periodfacilities.Remove(isExist);
                 }
-            }
+                if (facility.FacilityIsRelevantForPeriod)
+                {
+                    isExist.FacilityVO.ReportingType = facility.FacilityVO.ReportingType;
+                }
 
-            if (counter != 0)
-                throw new BadRequestException("The given facility is not relavent with given ReportingPeriodSupplier !!");
+            }
 
         }
-        else
-            throw new BadRequestException("SupplierReportingPeriodStatus is locked !! Can't add new PeriodFacility !!");
 
-        return periodFacility;
+
+        return "This facility is not performed Successfull.." + checkFacility;
     }
 
 
-    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, bool isActive)
+    internal bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, FercRegion fercRegion, bool isActive)
     {
-        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+        var periodFacility = new PeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, reportingPeriodId, periodSupplierId, fercRegion, isActive);
 
         return _periodfacilities.Add(periodFacility);
     }
 
 
+
+
+
+    #endregion
+
+    #region PeriodFacilityElectricityGridMix
+
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new Exception("Supplier ReportingPeriodStatus Should be Unlocked");
+
+        var periodFacility = _periodfacilities.Where(x=>x.ReportingPeriodSupplierId==Id).FirstOrDefault();
+
+        periodFacility.FercRegion.Id = fercRegion.Id;
+        periodFacility.FercRegion.Name = fercRegion.Name;
+
+        return periodFacility.AddElectricityGridMix(reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
+
+    }
+
+        internal bool LoadPeriodFacilityElectricityGridMix(int id, int reportingPeriodFacilityId, ElectricityGridMixComponent electricityComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x=>x.Id==reportingPeriodFacilityId);
+
+        return periodFacility.LoadPeriodFacilityElecticGridMix(id,reportingPeriodFacilityId, electricityComponent,unitOfMeasure,content,isActive);
+    }
     #endregion
 
 }

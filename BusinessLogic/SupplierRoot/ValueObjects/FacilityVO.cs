@@ -16,11 +16,11 @@ public class FacilityVO
 
     }
 
-    public int Id { get; private set; }
-    public string FacilityName { get; private set; }
-    public int SupplierId { get; private set; }
-    public string? GHGRPFacilityId { get; private set; }
+    public int Id { get; set; }
+    public string FacilityName { get; set; }
+    public int SupplierId { get; set; }
+    public string? GHGRPFacilityId { get; set; }
     public bool IsActive { get; private set; }
-    public SupplyChainStage SupplyChainStage { get; private set; }
-    public ReportingType ReportingType { get; private set; }
+    public SupplyChainStage SupplyChainStage { get; set; }
+    public ReportingType ReportingType { get;  set; }
 }

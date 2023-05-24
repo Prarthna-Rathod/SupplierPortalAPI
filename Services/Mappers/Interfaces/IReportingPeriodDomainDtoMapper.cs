@@ -1,16 +1,11 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
-using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Services.Mappers.Interfaces;
 
@@ -22,7 +17,7 @@ public interface IReportingPeriodDomainDtoMapper
 
     #endregion
 
-    #region 
+    #region PeriodSupplier
 
    
 
@@ -31,7 +26,9 @@ public interface IReportingPeriodDomainDtoMapper
 
     IEnumerable<ReportingPeriodRelevantSupplierDto> ConvertReleventPeriodSupplierDomainToDto(IEnumerable<PeriodSupplier> periodSupplierDomainList,IEnumerable<SupplierEntity> inRelevantSupplierList, ReportingPeriod reportingPeriod);
 
-    IEnumerable<ReportingPeriodActiveSupplier> ConvertMultiplePeriodSupplierDtosToValueObject(IEnumerable<MultiplePeriodSuppliersDto> multiplePeriodSuppliersDtos,IEnumerable<SupplierVO>supplierVO,IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses);
+    IEnumerable<ReportingPeriodActiveSupplierVO> ConvertMultiplePeriodSupplierDtosToValueObject(IEnumerable<MultiplePeriodSuppliersDto> multiplePeriodSuppliersDtos,IEnumerable<SupplierVO>supplierVO,IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses);
+
+
 
     #endregion
 
@@ -43,10 +40,20 @@ public interface IReportingPeriodDomainDtoMapper
 
     ReportingPeriodSupplierFacilitiesDto ConvertReportingPeriodSupplierFacilitiesDomainToDto(PeriodSupplier periodSupplier, IEnumerable<ReportingPeriodSupplierRelaventFacilityDto> periodFacilitiesDtos);
 
+    IEnumerable<ReportingPeriodRelevantFacilityVO> ConvertPeriodFacilityDtoToValueObject(ReportingPeriodFacilityDto reportingPeriodFacilityDtos, IEnumerable<FacilityVO> facilityVOs, IEnumerable<FacilityReportingPeriodDataStatus> facilityReportingPeriodDataStatus, PeriodSupplier periodSupplier);
+
+    #endregion
+
+    #region PeriodFacilityElectricityGridMix
+    IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> ConvertPeriodFacilityElectricityGridMixDtoToValueObject(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDtos, IEnumerable<ElectricityGridMixComponent> electricityGridMixComponent, IEnumerable<UnitOfMeasure> unitOfMeasure);
+
+    AddMultiplePeriodFacilityElectricityGridMixDto ConvertReportingPeriodFacilityEntityToDto(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, IEnumerable<UnitOfMeasure> unitOfMeasures, IEnumerable<ElectricityGridMixComponent> electricityGridMixComponents);
+
     #endregion
 
     #region PeriodDocument
     #endregion
+
 
 
 }

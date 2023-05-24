@@ -28,6 +28,7 @@ namespace DataAccess.DataActions.Interfaces
         UserEntity GetUserById(int userId);
         SupplierEntity GetSupplierById(int supplierId);
         ContactEntity GetContactById(int contactId);
+        IEnumerable<FacilityEntity> GetFacilityByIds(IEnumerable<int> facilityId);
         FacilityEntity GetFacilityById(int facilityId);
         AssociatePipelineEntity GetAssociatePipelineById(int associatePipelineId);
         #endregion

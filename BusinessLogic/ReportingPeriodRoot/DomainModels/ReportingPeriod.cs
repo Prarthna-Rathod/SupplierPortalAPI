@@ -59,6 +59,7 @@ public class ReportingPeriod : IReportingPeriod
         }
     }
 
+
     #region Private Methods
     private string[] SplitCollectionTimePeriod()
     {
@@ -234,14 +235,16 @@ public class ReportingPeriod : IReportingPeriod
     #region Period Supplier
     public bool LoadPeriodSupplier(int reportingPeriodSupplierId, int supplierId, IEnumerable<SupplierVO> supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive)
     {
-      
+
         var supplier = supplierVO.FirstOrDefault(x => x.Id == supplierId);
         var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplier, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive);
 
         return _periodSupplier.Add(reportingPeriodSupplier);
     }
 
-    public IEnumerable<PeriodSupplier> AddRemovePeriodSupplier(IEnumerable<ReportingPeriodActiveSupplier> reportingPeriodActiveSuppliers)
+
+
+    public IEnumerable<PeriodSupplier> AddRemovePeriodSupplier(IEnumerable<ReportingPeriodActiveSupplierVO> reportingPeriodActiveSuppliers)
     {
         var reportingPeriodSuppliers = new List<PeriodSupplier>();
         if (ReportingPeriodStatus.Name != ReportingPeriodStatusValues.Open)
@@ -253,7 +256,7 @@ public class ReportingPeriod : IReportingPeriod
 
         foreach (var periodSupplier in reportingPeriodActiveSuppliers)
         {
-            var isExist = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == periodSupplier.Supplier.Id && x.IsActive /*&& x.ReportingPeriodId == periodSupplier.PeriodId*/);
+            var isExist = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == periodSupplier.Supplier.Id && x.IsActive);
             //Check existing PeriodSupplier
             if (periodSupplier.IsActive)
             {
@@ -273,10 +276,6 @@ public class ReportingPeriod : IReportingPeriod
         return _periodSupplier;
 
     }
-
-
-
-
 
     public PeriodSupplier UpdateLockUnlockPeriodSupplierStatus(int periodSupplierId, IEnumerable<SupplierReportingPeriodStatus> supplierReportingPeriodStatuses)
     {
@@ -308,18 +307,47 @@ public class ReportingPeriod : IReportingPeriod
 
     #region Period Facility
 
-    public PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive)
+    public IEnumerable<PeriodFacility> AddRemoveUpdatePeriodFacility(IEnumerable<ReportingPeriodRelevantFacilityVO> reportingPeriodRelevantFacilityVO, IEnumerable<FercRegion> fercRegion, IEnumerable<FacilityReportingPeriodDataStatus> facilityReportingPeriodDataStatus, PeriodSupplier periodSupplier)
     {
-        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
-        return periodSupplier.AddPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, facilityIsRelevantForPeriod, isActive);
+        if (ReportingPeriodStatus.Name != ReportingPeriodStatusValues.Open)
+            throw new Exception("Reporting Period is not Open..!");
+
+        periodSupplier.AddRemoveUpdatePeriodFacility(reportingPeriodRelevantFacilityVO, fercRegion, facilityReportingPeriodDataStatus);
+
+        return periodSupplier.PeriodFacilities;
+
+
     }
 
-
-    public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive)
+    public bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, FercRegion fercRegion, bool isActive)
     {
-        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
-        return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, isActive);
+            return periodSupplier.LoadPeriodFacility(periodFacilityId, facilityVO, facilityReportingPeriodDataStatus, Id, periodSupplierId, fercRegion, isActive);
+        }
+    }
+
+    #endregion
+
+    #region PeriodFacilityElectricGridMix
+
+    public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
+    {
+
+        if (ReportingPeriodStatus.Name != ReportingPeriodStatusValues.Open && ReportingPeriodStatus.Name !=ReportingPeriodStatusValues.Close)
+            
+            throw new Exception("Reporting period Should Be Open or Close..!");
+
+        var periodSupplier = _periodSupplier.Where(x => x.ReportingPeriodId == Id).FirstOrDefault();
+
+        return periodSupplier.AddPeriodFacilityElectricityGridMix(reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
+    }
+
+    public bool LoadPeriodFacilityElectricityGridMix(int Id,int Periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
+    {
+        var periodSupplier = _periodSupplier.Where(x => x.ReportingPeriodId==Id ).FirstOrDefault();
+        return periodSupplier.LoadPeriodFacilityElectricityGridMix(Id,Periodfacilityid,electricityGridMixComponent,unitOfMeasure,content,isActive);
     }
 
 
@@ -364,35 +392,3 @@ public class ReportingPeriod : IReportingPeriod
 
 }
 
-//public IEnumerable<ReportingPeriodSupplier> AddDeleteReportingPeriodSupplier(IEnumerable<ReportingPeriodSupplierActiveVO> reportingPeriodSupplierActiveVOs)
-//{
-//    if (ReportingPeriodStatus.Name != GetReportingPeriodStatusEnum(ReportingPeriodStatusEnum.Open))
-//        throw new Exception("ReportingPeriodStatus is not Open...");
-
-//    foreach (var activeSupplier in reportingPeriodSupplierActiveVOs)
-//    {
-//        var isExist = _reportingPeriodSuppliers.FirstOrDefault(x => x.SupplierVo.SupplierId == activeSupplier.SupplierVo.SupplierId && x.PeriodId == activeSupplier.PeriodId);
-
-//        if (activeSupplier.IsActive)
-//        {
-//            if (isExist is null)
-//            {
-
-//                var reportingPeriodSupplier = new ReportingPeriodSupplier(Id, activeSupplier.SupplierPeriodStatus, activeSupplier.IsActive, null, null, activeSupplier.SupplierVo);
-//                _reportingPeriodSuppliers.Add(reportingPeriodSupplier);
-//            }
-
-//            else throw new Exception("Period supplier already exist");
-//        }
-
-//        if (isExist is not null && !activeSupplier.IsActive)
-//        {
-//            if (activeSupplier.ReportingPeriodSupplierId == 0 || activeSupplier.ReportingPeriodSupplierId == null)
-//                throw new Exception("ReportingPeriodSupplierId is compulsory for delete...");
-
-//            _reportingPeriodSuppliers.Remove(isExist);
-//        }
-//    }
-//    return _reportingPeriodSuppliers;
-
-//}

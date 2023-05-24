@@ -306,12 +306,6 @@ public partial class SupplierPortalDBContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_ElectricityGridMixComponentEntity");
 
-            entity.HasOne(d => d.FercRegion)
-                .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
-                .HasForeignKey(d => d.FercRegionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ReportingPeriodFacilityElectricityGridMixEntity_FercRegionEntity");
-
             entity.HasOne(d => d.ReportingPeriodFacility)
                 .WithMany(p => p.ReportingPeriodFacilityElectricityGridMixEntities)
                 .HasForeignKey(d => d.ReportingPeriodFacilityId)

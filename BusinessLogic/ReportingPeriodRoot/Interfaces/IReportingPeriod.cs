@@ -7,12 +7,19 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 {
     public interface IReportingPeriod
     {
-        IEnumerable<PeriodSupplier> AddRemovePeriodSupplier(IEnumerable<ReportingPeriodActiveSupplier> reportingPeriodActiveSuppliers);
+        IEnumerable<PeriodSupplier> AddRemovePeriodSupplier(IEnumerable<ReportingPeriodActiveSupplierVO> reportingPeriodActiveSuppliers);
 
         bool LoadPeriodSupplier(int reportingPeriodSupplierId, int SupplierId, IEnumerable<SupplierVO> supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive);
-        PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, bool isActive);
 
-        bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool isActive);
+
+        
+       IEnumerable<PeriodFacility> AddRemoveUpdatePeriodFacility(IEnumerable<ReportingPeriodRelevantFacilityVO> reportingPeriodRelevantFacilityVO, IEnumerable<FercRegion> fercRegion, IEnumerable<FacilityReportingPeriodDataStatus> facilityReportingPeriodDataStatus,PeriodSupplier periodSupplier);
+
+        bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, FercRegion fercRegion, bool isActive);
+
+        IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs,FercRegion fercRegion);
+
+        bool LoadPeriodFacilityElectricityGridMix(int Id, int Periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure UnitOfMeasure, decimal Content, bool IsActive);
 
 
 

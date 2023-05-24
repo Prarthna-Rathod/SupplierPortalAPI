@@ -94,13 +94,29 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId);
 
-  /*  string AddPeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
-*/
+    #endregion
+
+    #region PeriodFacilityElectricityGridMix
+
+    /// <summary>
+    /// Add PeriodFacilityElectricGridMix
+    /// </summary>
+    /// <param name="periodFacilityElectricityGridMixDto"></param>
+    /// <returns></returns>
+    string AddPeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto periodFacilityElectricityGridMixDto);
+
+    /// <summary>
+    /// GetReportingPeriodFacilityElecticityGridMix
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    AddMultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMix(int periodFacilityId);
+
     #endregion
 
     #region ReportingPeriodDocuments
     #endregion
 
-    
+
 
 }

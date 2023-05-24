@@ -36,12 +36,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddPeriodFacilities(reportingPeriodFacilityDto);
         }
 
-       /* [HttpPost("AddReportingPeriodFacilityElectricityGridMixComponents")]
-        public string AddReportingPeriodFacilityElectricityGridMixComponents(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDto)
+        [HttpPost("AddPeriodFacilityElectricityGridMix")]
+        public string AddReportingPeriodFacilityElectricityGridMix(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDto)
         {
             return _services.AddPeriodFacilityElectricityGridMix(addMultiplePeriodFacilityElectricityGridMixDto);
         }
-*/
+
         [HttpPut("LockUnlockPeriodSupplierStatus")]
         public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
         {
@@ -59,35 +59,24 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpGet("GetReportingPeriodSuppliersList")]
-        public IEnumerable<ReportingPeriodRelevantSupplierDto> GetReportingPeriodSuppliersList(int reportingperiodId)
+        public IEnumerable<ReportingPeriodRelevantSupplierDto> GetReportingPeriodSuppliersList(int reportingPeriodId)
         {
-            return _services.GetRelevantSuppliers(reportingperiodId);
+            return _services.GetRelevantSuppliers(reportingPeriodId);
         }
 
-        [HttpGet("GetReportingPeriodFacilities")]
+        [HttpGet("GetPeriodFacilities")]
         public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
         {
             return _services.GetReportingPeriodFacilities(periodSupplierId);
         }
 
-        #endregion
-
-        #region Remove_PeriodSupplier
-
-        /*[HttpDelete("RemovePeriodSupplier")]
-        public string RemovePeriodSupplier(int PeriodSupplierId)
+        [HttpGet("GetPeriodFacilityElectricityGridMix")]
+        public AddMultiplePeriodFacilityElectricityGridMixDto GetPeriodFacilityElecticityGridMix(int periodFacilityId)
         {
-            var result = _services.RemovePeriodSupplier(PeriodSupplierId);
-
-            if (result == true)
-            {
-                return "Record deleted successfully..";
-            }
-            else
-                return "PeriodSupplier is not exists !!";
+            return _services.GetReportingPeriodFacilityElectricityGridMix(periodFacilityId);
         }
-*/
-        #endregion                   
+
+        #endregion             
 
     }
 }
