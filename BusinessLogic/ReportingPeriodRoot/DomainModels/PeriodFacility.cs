@@ -165,6 +165,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                         if (_periodFacilityElectricityGridMixes.Count() != 0)
                             _periodFacilityElectricityGridMixes.Clear();
+
                     }
                     break;
             }
@@ -310,6 +311,19 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             _periodFacilityDocuments.Add(periodFacilityDocument);
 
             return true;
+        }
+
+        internal bool RemovePeriodFacilityDocument(int periodFacilityDocumentId)
+        {
+            var periodFacilityDocument = _periodFacilityDocuments.FirstOrDefault(x => x.Id == periodFacilityDocumentId);
+
+            if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Submitted)
+            {
+                _periodFacilityDocuments.Remove(periodFacilityDocument);
+                return true;
+            }
+            else
+                throw new Exception("FacilityDataStatus is not submitted !!");
         }
 
         #endregion

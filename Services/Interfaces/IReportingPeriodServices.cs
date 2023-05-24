@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 
@@ -43,15 +44,7 @@ public interface IReportingPeriodServices
     /// Get Relevant PeriodSuppliers
     /// </summary>
     /// <returns></returns>
-
-    IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId);
-
-    /// <summary>
-    /// Remove Period Supplier
-    /// </summary>
-    /// <param name="PeriodSupplierId"></param>
-    /// <returns></returns>
-    bool RemovePeriodSupplier(int PeriodSupplierId);
+    IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId);  
 
     #endregion
 
@@ -88,7 +81,7 @@ public interface IReportingPeriodServices
     /// <param name="periodFacilityId"></param>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId, int reportingPeriodId, int periodSupplierId);
+    MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId);
 
     #endregion
 
@@ -113,7 +106,35 @@ public interface IReportingPeriodServices
 
     #region ReportingPeriodDocuments
 
-    string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodDocumentDto reportingPeriodDocumentDto);
+    /// <summary>
+    /// AddUpdate PeriodFacilityDocument
+    /// </summary>
+    /// <param name="reportingPeriodDocumentDto"></param>
+    /// <returns></returns>
+    string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentDto reportingPeriodDocumentDto);
+
+    /// <summary>
+    /// Get PeriodFacility GridMixes and Documents
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <param name="reportingPeriodId"></param>
+    /// <param name="supplierId"></param>
+    /// <returns></returns>
+    ReportingPeriodFacilityGridMixAndDocumentDto GetReportingPeriodFacilityGridMixAndDocuments(int periodFacilityId);
+
+    /// <summary>
+    /// Download PeriodFacilityDocument
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    FileStreamResult GetReportingPeriodFacilityDocumentDownload(int documentId);
+
+    /// <summary>
+    /// Remove PeriodFacilityDocument
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    string RemovePeriodFacilityDocument(int documentId);
 
     #endregion
 

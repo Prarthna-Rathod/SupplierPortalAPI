@@ -236,56 +236,85 @@ namespace UnitTest
             var facilityReportingPeriodDataStatuses = new List<FacilityReportingPeriodDataStatus>();
             facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(1, "In-progress"));
             facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(2, "Complete"));
-            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(3, "Submitted"));
+            facilityReportingPeriodDataStatuses.Add(new FacilityReportingPeriodDataStatus(3, "Submitted "));
 
             return facilityReportingPeriodDataStatuses;
         }
 
         protected IEnumerable<UnitOfMeasure> GetUnitOfMeasures()
         {
-            var unitOfMeasure = new List<UnitOfMeasure>();
-            unitOfMeasure.Add(new UnitOfMeasure(1, "kg/m3"));
-            unitOfMeasure.Add(new UnitOfMeasure(2, "MMbtu/Mcf"));
-            unitOfMeasure.Add(new UnitOfMeasure(3, "MMbtu/bbl"));
-            unitOfMeasure.Add(new UnitOfMeasure(4, "MWh"));
-            unitOfMeasure.Add(new UnitOfMeasure(5, "tonne"));
-            unitOfMeasure.Add(new UnitOfMeasure(6, "Mass % "));
-            return unitOfMeasure;
+            var unitOfMeasures = new List<UnitOfMeasure>();
+            unitOfMeasures.Add(new UnitOfMeasure(1, "kg/m3"));
+            unitOfMeasures.Add(new UnitOfMeasure(2, "MMbtu/Mcf"));
+            unitOfMeasures.Add(new UnitOfMeasure(3, "MMbtu/bbl"));
+            unitOfMeasures.Add(new UnitOfMeasure(4, "MWh"));
+            unitOfMeasures.Add(new UnitOfMeasure(5, "tonne"));
+            unitOfMeasures.Add(new UnitOfMeasure(6, "Mass % "));
+            return unitOfMeasures;
         }
 
         protected IEnumerable<FercRegion> GetFercRegions()
         {
-            var fercRegion = new List<FercRegion>();
-            fercRegion.Add(new FercRegion(1, "None"));
-            fercRegion.Add(new FercRegion(2, "CAISO"));
-            fercRegion.Add(new FercRegion(3, "MISO"));
-            fercRegion.Add(new FercRegion(4, "PJM"));
-            fercRegion.Add(new FercRegion(5, "SPP"));
-            fercRegion.Add(new FercRegion(6, "Custom Mix"));
-            return fercRegion;
+            var fercRegions = new List<FercRegion>();
+            fercRegions.Add(new FercRegion(1, "None"));
+            fercRegions.Add(new FercRegion(2, "CAISO"));
+            fercRegions.Add(new FercRegion(3, "MISO"));
+            fercRegions.Add(new FercRegion(4, "PJM"));
+            fercRegions.Add(new FercRegion(5, "SPP"));
+            fercRegions.Add(new FercRegion(6, "Custom Mix"));
+            return fercRegions;
         }
 
         protected IEnumerable<ElectricityGridMixComponent> GetElectricityGridMixComponents()
         {
-            var electricityGridMixComponent = new List<ElectricityGridMixComponent>();
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(1, "Biomass"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(2, "Coal"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(3, "NaturalGas"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(4, "Geothermal"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(5, "Hydro"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(6, "Nuclear"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(7, "Petroleum"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(8, "Solar"));
-            electricityGridMixComponent.Add(new ElectricityGridMixComponent(9, "Wind"));
-            return electricityGridMixComponent;
+            var electricityGridMixComponents = new List<ElectricityGridMixComponent>();
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(1, "Biomass"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(2, "Coal"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(3, "NaturalGas"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(4, "Geothermal"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(5, "Hydro"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(6, "Nuclear"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(7, "Petroleum"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(8, "Solar"));
+            electricityGridMixComponents.Add(new ElectricityGridMixComponent(9, "Wind"));
+            return electricityGridMixComponents;
         }
 
         protected IEnumerable<Site> GetSites()
         {
-            var site = new List<Site>();
-            site.Add(new Site(1, "SPL"));
-            site.Add(new Site(2, "CCL"));
-            return site;
+            var sites = new List<Site>();
+            sites.Add(new Site(1, "SPL"));
+            sites.Add(new Site(2, "CCL"));
+            return sites;
+        }
+
+        protected IEnumerable<DocumentStatus> GetDocumentStatuses()
+        {
+            var documentStatuses = new List<DocumentStatus>();
+            documentStatuses.Add(new DocumentStatus(1, "Not-validated"));
+            documentStatuses.Add(new DocumentStatus(2, "Validated"));
+            documentStatuses.Add(new DocumentStatus(3, "Has errors"));
+            documentStatuses.Add(new DocumentStatus(4, "Processing"));
+            return documentStatuses;
+        }
+
+        protected IEnumerable<DocumentType> GetDocumentTypes()
+        {
+            var documentTypes = new List<DocumentType>();
+            documentTypes.Add(new DocumentType(1, "Subpart C"));
+            documentTypes.Add(new DocumentType(2, "Subpart W"));
+            documentTypes.Add(new DocumentType(3, "Non-GHGRP"));
+            documentTypes.Add(new DocumentType(4, "Supplemental"));
+            return documentTypes;
+        }
+
+        protected IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatuses()
+        {
+            var documentRequiredStatuses = new List<DocumentRequiredStatus>();
+            documentRequiredStatuses.Add(new DocumentRequiredStatus(1, "Optional"));
+            documentRequiredStatuses.Add(new DocumentRequiredStatus(2, "Required"));
+            documentRequiredStatuses.Add(new DocumentRequiredStatus(3, "Not-allowed"));
+            return documentRequiredStatuses;
         }
 
         #endregion
@@ -489,6 +518,29 @@ namespace UnitTest
         protected ReportingPeriodFacilityGasSupplyBreakdownDto PeriodFacilityGasSupplyBreakdownDto()
         {
             return new ReportingPeriodFacilityGasSupplyBreakdownDto(1, 1, "Test facility 1", 1, "abc", 1, "Biomass", (decimal)100.00);
+        }
+
+        #endregion
+
+        #region PeriodFacilityDocument
+
+        protected IEnumerable<FacilityRequiredDocumentTypeVO> GetFacilityRequiredDocumentTypeVOs()
+        {
+            var list = new List<FacilityRequiredDocumentTypeVO>();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var documentTypes = GetDocumentTypes();
+            var documentRequiredStatuses = GetDocumentRequiredStatuses();
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 1), documentTypes.First(x => x.Id == 1), documentRequiredStatuses.First(x => x.Id == 2)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 1), documentTypes.First(x => x.Id == 2), documentRequiredStatuses.First(x => x.Id == 3)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 1), documentTypes.First(x => x.Id == 3), documentRequiredStatuses.First(x => x.Id == 3)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 1), documentTypes.First(x => x.Id == 4), documentRequiredStatuses.First(x => x.Id == 1)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 2), documentTypes.First(x => x.Id == 1), documentRequiredStatuses.First(x => x.Id == 2)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 2), documentTypes.First(x => x.Id == 2), documentRequiredStatuses.First(x => x.Id == 3)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 2), documentTypes.First(x => x.Id == 3), documentRequiredStatuses.First(x => x.Id == 3)));
+            list.Add(new FacilityRequiredDocumentTypeVO(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 2), documentTypes.First(x => x.Id == 4), documentRequiredStatuses.First(x => x.Id == 1)));
+
+            return list;
         }
 
         #endregion

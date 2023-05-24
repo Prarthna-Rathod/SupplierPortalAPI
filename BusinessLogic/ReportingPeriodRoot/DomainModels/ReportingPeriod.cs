@@ -397,6 +397,13 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacilityDocument(periodFacilityDocumentId, periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
         }
 
+        public bool RemovePeriodFacilityDocument(int periodSupplierId,int periodFacilityId,int periodFacilityDocumentId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
+            return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId,periodFacilityDocumentId);
+        }
+
         #endregion
 
         #region other

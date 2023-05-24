@@ -1094,5 +1094,300 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         }
 
         #endregion
+
+        #region PeriodFacilityDocument
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument success case1
+        /// existingDocument count is 0
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var displayName = "abc.xlsx";
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            PeriodFacilityDocument? periodFacilityDocument = null;
+
+            try
+            {
+                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName,path, null,documentStatuses,documentType,facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodFacilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, periodFacilityDocument.DisplayName);
+            Assert.Equal(null, periodFacilityDocument.Path);
+            Assert.Equal(null, periodFacilityDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Processing), periodFacilityDocument.DocumentStatus);
+            Assert.Equal(documentType,periodFacilityDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument success case2
+        /// existingDocument is already exists than update the facilityDocument 
+        /// path is not null and validationError is null than update the documentStatus is Validated
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            PeriodFacilityDocument? periodFacilityDocument = null;
+
+            try
+            {
+                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, path, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodFacilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, periodFacilityDocument.DisplayName);
+            Assert.Equal(path, periodFacilityDocument.Path);
+            Assert.Equal(null, periodFacilityDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Validated), periodFacilityDocument.DocumentStatus);
+            Assert.Equal(documentType, periodFacilityDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument success case3
+        /// if facilityDataStatus is submitted than update the existingDocument
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+
+            var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            var periodFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == 1);
+            var facilityDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Submitted);
+            periodFacility.FacilityReportingPeriodDataStatus.Id = facilityDataStatus.Id;
+            periodFacility.FacilityReportingPeriodDataStatus.Name = facilityDataStatus.Name;
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            PeriodFacilityDocument? periodFacilityDocument = null;
+
+            try
+            {
+                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, path, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodFacilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, periodFacilityDocument.DisplayName);
+            Assert.Equal(null, periodFacilityDocument.Path);
+            Assert.Equal(null, periodFacilityDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Processing), periodFacilityDocument.DocumentStatus);
+            Assert.Equal(documentType, periodFacilityDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument success case4
+        /// validation error store and documentstatus is changed in HasError
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentSuccessCase4()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            var validationError = "Unable to save the uploaded file at this time.Please attempt the upload again later.";
+
+            PeriodFacilityDocument? periodFacilityDocument = null;
+
+            try
+            {
+                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, path, validationError, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodFacilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, periodFacilityDocument.DisplayName);
+            Assert.Equal(null, periodFacilityDocument.Path);
+            Assert.Equal(validationError, periodFacilityDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.HasErrors), periodFacilityDocument.DocumentStatus);
+            Assert.Equal(documentType, periodFacilityDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument success case2
+        /// existingDocument is already exists than update the facilityDocument 
+        /// path is null and validationError is null than update the documentStatus is NotValidated
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentSuccessCase5()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+
+            PeriodFacilityDocument? periodFacilityDocument = null;
+
+            try
+            {
+                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodFacilityDocument.ReportingPeriodFacilityId);
+            Assert.Equal(displayName, periodFacilityDocument.DisplayName);
+            Assert.Equal(null, periodFacilityDocument.Path);
+            Assert.Equal(null, periodFacilityDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.NotValidated), periodFacilityDocument.DocumentStatus);
+            Assert.Equal(documentType, periodFacilityDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument fail case1
+        /// if file path is already exists in the system than throw exception
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentFailCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            reportingPeriod.AddPeriodFacilityDocument(1, 1, "abc.xlsx", null, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+            try
+            {
+                reportingPeriod.AddPeriodFacilityDocument(1, 1, "abc.xlsx", path, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+                path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+                reportingPeriod.AddPeriodFacilityDocument(1, 1, "abc.xlsx", path, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodFacilityDocument fail case2
+        /// if documentRequiredStatus is NotAllowed than throw exception
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodFacilityDocumentFailCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.NonGHGRP);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+            try
+            {
+                reportingPeriod.AddPeriodFacilityDocument(1, 1, "abc.xlsx", path, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        #endregion
     }
 }

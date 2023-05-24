@@ -239,6 +239,13 @@ public class PeriodSupplier
         return periodFacility.LoadPeriodFacilityDocument(periodFacilityDocumentId, version, displayName, storedName, path, documentStatus, documentType, validationError);
     }
 
+    internal bool RemovePeriodFacilityDocument(int periodFacilityId,int periodFacilityDocumentId)
+    {
+        CheckPeriodSupplierStatus();
+        var periodFacility = GetPeriodFacility(periodFacilityId);
+        return periodFacility.RemovePeriodFacilityDocument(periodFacilityDocumentId);
+    }
+
     #endregion
 
 

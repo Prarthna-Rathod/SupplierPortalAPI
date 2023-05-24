@@ -240,5 +240,57 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         }
 
         #endregion
+
+        #region PeriodFacilityDocument
+
+        [Fact]
+        public void ConvertReportingPeriodFacilityDocumentDomainToEntity()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().FirstOrDefault(x => x.Name == DocumentTypeValues.SubpartC);
+            var facilityRequiredDocumentTypeVOs = GetFacilityRequiredDocumentTypeVOs();
+
+            var periodFacilityDocumentDomain = reportingPeriod.AddPeriodFacilityDocument(1,1,"abc.xlsx",null,null,documentStatuses,documentType,facilityRequiredDocumentTypeVOs);
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var periodFacilityDocumentEntity = mapper.ConvertReportingPeriodFacilityDocumentDomainToEntity(periodFacilityDocumentDomain);
+
+            Assert.NotNull(periodFacilityDocumentEntity);
+            Assert.Equal(periodFacilityDocumentDomain.Id, periodFacilityDocumentEntity.Id);
+            Assert.Equal(periodFacilityDocumentDomain.ReportingPeriodFacilityId, periodFacilityDocumentEntity.ReportingPeriodFacilityId);
+            Assert.Equal(periodFacilityDocumentDomain.Version, periodFacilityDocumentEntity.Version);
+            Assert.Equal(periodFacilityDocumentDomain.DisplayName, periodFacilityDocumentEntity.DisplayName);
+            Assert.Equal(periodFacilityDocumentDomain.StoredName, periodFacilityDocumentEntity.StoredName);
+            Assert.Equal(periodFacilityDocumentDomain.Path, periodFacilityDocumentEntity.Path);
+            Assert.Equal(periodFacilityDocumentDomain.DocumentStatus.Id, periodFacilityDocumentEntity.DocumentStatusId);
+            Assert.Equal(periodFacilityDocumentDomain.DocumentType.Id, periodFacilityDocumentEntity.DocumentTypeId);
+            Assert.Equal(periodFacilityDocumentDomain.ValidationError, periodFacilityDocumentEntity.ValidationError);
+        }
+
+        [Fact]
+        public void ConvertFacilityRequiredDocumentTypeEntityToValueObject()
+        {
+            var reportingType = GenerateReportingType().First();
+            var supplyChainStage = GenerateSupplyChainStage().First();
+            var documentType = GetDocumentTypes().First();
+            var documentRequiredStatus = GetDocumentRequiredStatuses().First();
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var facilityRequiredDocumentTypeVo = mapper.ConvertFacilityRequiredDocumentTypeEntityToValueObject(reportingType, supplyChainStage, documentType, documentRequiredStatus);
+
+            Assert.NotNull(facilityRequiredDocumentTypeVo);
+            Assert.Equal(reportingType.Id, facilityRequiredDocumentTypeVo.ReportingType.Id);
+            Assert.Equal(reportingType.Name, facilityRequiredDocumentTypeVo.ReportingType.Name);
+            Assert.Equal(supplyChainStage.Id, facilityRequiredDocumentTypeVo.SupplyChainStage.Id);
+            Assert.Equal(supplyChainStage.Name, facilityRequiredDocumentTypeVo.SupplyChainStage.Name);
+            Assert.Equal(documentType.Id, facilityRequiredDocumentTypeVo.DocumentType.Id);
+            Assert.Equal(documentType.Name, facilityRequiredDocumentTypeVo.DocumentType.Name);
+            Assert.Equal(documentRequiredStatus.Id, facilityRequiredDocumentTypeVo.DocumentRequiredStatus.Id);
+            Assert.Equal(documentRequiredStatus.Name, facilityRequiredDocumentTypeVo.DocumentRequiredStatus.Name);
+        }
+
+        #endregion
     }
 }

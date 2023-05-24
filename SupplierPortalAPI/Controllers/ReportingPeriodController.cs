@@ -2,6 +2,7 @@
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Interfaces;
+using System.Net;
 
 namespace SupplierPortalAPI.Controllers
 {
@@ -49,7 +50,7 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpPost("AddUpdateReportingPeriodFacilityDocument")]
-        public string AddUpdateReportingPeriodFacilityDocument([FromForm] ReportingPeriodDocumentDto reportingPeriodDocumentDto)
+        public string AddUpdateReportingPeriodFacilityDocument([FromForm] ReportingPeriodFacilityDocumentDto reportingPeriodDocumentDto)
         {
             return _services.AddUpdateReportingPeriodFacilityDocument(reportingPeriodDocumentDto);
         }
@@ -89,15 +90,38 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpGet("GetReportingPeriodFacility_ElectricityGridMixes")]
-        public MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId, int reportingPeriodId, int periodSupplierId)
+        public MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId)
         {
-            return _services.GetReportingPeriodFacilityElectricityGridMixes(periodFacilityId, reportingPeriodId, periodSupplierId);
+            return _services.GetReportingPeriodFacilityElectricityGridMixes(periodFacilityId);
         }
 
         [HttpGet("GetReportingPeriodFacility_GasSupplyBreakdown")]
         public MultiplePeriodFacilityGasSupplyBreakdownDto GetReportingPeriodFacilityGasSupplyBreakdowns(int periodSupplierId)
         {
             return _services.GetReportingPeriodFacilityGasSupplyBreakdown(periodSupplierId);
+        }
+
+        [HttpGet("ReportingPeriodFacility_ElectricityGridMixes_Documents")]
+        public ReportingPeriodFacilityGridMixAndDocumentDto GetReportingPeriodFacilityGridMixAndDocuments(int periodFacilityId)
+        {
+            return _services.GetReportingPeriodFacilityGridMixAndDocuments(periodFacilityId);
+        }
+
+        [HttpGet("ReportingPeriodFacilityDocumentDownload")]
+        public IActionResult GetReportingPeriodFacilityDocumentDownload(int documentId)
+        {
+            var result = _services.GetReportingPeriodFacilityDocumentDownload(documentId);
+            return result;
+        }
+
+        #endregion
+
+        #region Remove methods
+
+        [HttpDelete("RemoveReportingPeriodFacilityDocument")]
+        public string RemoveReportingPeriodFacilityDocument(int documentId)
+        {
+            return _services.RemovePeriodFacilityDocument(documentId);
         }
 
         #endregion

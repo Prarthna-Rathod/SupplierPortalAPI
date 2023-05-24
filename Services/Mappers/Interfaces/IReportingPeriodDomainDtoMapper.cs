@@ -64,6 +64,9 @@ public interface IReportingPeriodDomainDtoMapper
     #endregion
 
     #region PeriodDocument
+
+    ReportingPeriodFacilityGridMixAndDocumentDto ConvertPeriodFacilityElectricityGridMixAndDocumentDomainListToDto(PeriodFacility periodFacility, PeriodSupplier periodSupplier);
+
     #endregion
 
 

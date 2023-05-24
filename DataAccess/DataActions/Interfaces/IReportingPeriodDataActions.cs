@@ -1,36 +1,31 @@
 ﻿using DataAccess.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DataAccess.DataActions.Interfaces
 {
     public interface IReportingPeriodDataActions : IDisposable
     {
 
-        #region Add Methods
+        #region ReportingPeriod
 
         bool AddReportingPeriod(ReportingPeriodEntity reportingPeriodEntity);
 
-        bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
-
-        bool AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, bool facilityIsRelaventForPeriod);
-
-        bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities,int periodFacilityId, int fercRegionId);
-
-        bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId);
-
-        bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity);
-
-        Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
+        bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
 
         #endregion
 
-        #region Update Methods
+        #region PeriodSupplier
 
-        bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod);
-
-        Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
+        bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
 
         IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
+
+        #endregion
+
+        #region PeriodFacility
+
+        bool AddPeriodFacility(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, bool facilityIsRelaventForPeriod);
 
         IEnumerable<ReportingPeriodFacilityEntity> UpdatePeriodFacilities(IEnumerable<ReportingPeriodFacilityEntity> periodFacilityEntities);
 
@@ -38,14 +33,38 @@ namespace DataAccess.DataActions.Interfaces
 
         #endregion
 
-        #region Remove Methods
+        #region PeriodFacilityElectricityGridMix
 
-        bool RemovePeriodSupplier(int periodSupplierId);
+        bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId, int fercRegionId);
+
         bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId);
+
+        #endregion
+
+        #region PeriodFacilityGasSupplyBreakDown
+
+        bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId);
+
         bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId);
 
         #endregion
 
+        #region PeriodFacilityDocument
+
+        bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity);
+
+        FileStreamResult DownloadFile(string path);
+
+        bool RemovePeriodFacilityDocument(int documentId);
+
+        #endregion
+
+        
+        Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
+
+        Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
+
+        
         #region GetAll Methods
 
         IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypes();
@@ -88,13 +107,13 @@ namespace DataAccess.DataActions.Interfaces
 
         ReportingPeriodFacilityEntity GetPeriodFacilityById(int periodFacilityId);
 
+        ReportingPeriodFacilityDocumentEntity GetReportingPeriodFacilityDocumentById(int documentId);
+
         IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId);
 
         IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId);
 
         Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId);
-
-        Task<IEnumerable<ReportingPeriodFacilityDocumentEntity>> GetReportingPeriodFacilitiesDocument(int DocumentId);
 
         Task<IEnumerable<ReportingPeriodSupplierDocumentEntity>> GetReportingPeriodSuppliersDocument(int DocumentId);
 

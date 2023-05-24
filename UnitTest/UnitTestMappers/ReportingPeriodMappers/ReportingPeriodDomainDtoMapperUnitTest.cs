@@ -176,5 +176,32 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.NotNull(dto);
 
         }
+
+        [Fact]
+        public void ConvertPeriodFacilityElectricityGridMixAndDocumentDomainListToDto()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+
+            //Add PeriodSupplier
+            var supplierVo = GetAndConvertSupplierValueObject();
+            var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVo, supplierReportingPeriodStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
+
+            //Add PeriodFacility
+            var facilityVo = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodDataStatus = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
+
+            var periodFacilityDomain = reportingPeriod.AddPeriodFacility(1, facilityVo, facilityReportingPeriodDataStatus, periodSupplier.Id, true, fercRegion, true);
+
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            var dto = mapper.ConvertPeriodFacilityElectricityGridMixAndDocumentDomainListToDto( periodFacilityDomain, periodSupplier);
+
+            Assert.NotNull(dto);
+        }
     }
 }

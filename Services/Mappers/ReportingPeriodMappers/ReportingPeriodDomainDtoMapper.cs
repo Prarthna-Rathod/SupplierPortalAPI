@@ -151,7 +151,7 @@ namespace Services.Mappers.ReportingPeriodMappers
             if (periodFacilityElectricityGridMixes.Count() == 0)
                 throw new Exception("PeriodFacilityElectricityGridMix is not connetcted !!");
 
-            foreach(var electricityGridMix in periodFacilityElectricityGridMixes)
+            foreach (var electricityGridMix in periodFacilityElectricityGridMixes)
             {
                 var electricityGridMixDto = new ReportingPeriodFacilityElectricityGridMixDto(electricityGridMix.ElectricityGridMixComponent.Id,electricityGridMix.ElectricityGridMixComponent.Name,electricityGridMix.Content);
                 gridMixDtos.Add(electricityGridMixDto);
@@ -216,6 +216,46 @@ namespace Services.Mappers.ReportingPeriodMappers
                 gasSupplyDto.Add(gasSupplyBreakdownDto);
             }
             return gasSupplyDto;
+        }
+
+        #endregion
+
+        #region PeriodFacilityDocument
+
+        public ReportingPeriodFacilityGridMixAndDocumentDto ConvertPeriodFacilityElectricityGridMixAndDocumentDomainListToDto(PeriodFacility periodFacility, PeriodSupplier periodSupplier)
+        {
+            var gridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
+
+            /*if (periodFacility.periodFacilityElectricityGridMixes.Count() == 0)
+                throw new Exception("PeriodFacilityElectricityGridMix is not connetcted !!");*/
+
+            foreach (var electricityGridMix in periodFacility.periodFacilityElectricityGridMixes)
+            {
+                var electricityGridMixDto = new ReportingPeriodFacilityElectricityGridMixDto(electricityGridMix.ElectricityGridMixComponent.Id, electricityGridMix.ElectricityGridMixComponent.Name, electricityGridMix.Content);
+                gridMixDtos.Add(electricityGridMixDto);
+            }
+
+            UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
+            if (periodFacility.periodFacilityElectricityGridMixes.Count() == 0)
+            {
+                unitOfMeasure.Id = 0;
+                unitOfMeasure.Name = "";
+            }
+            else
+                unitOfMeasure = periodFacility.periodFacilityElectricityGridMixes.First().UnitOfMeasure;
+
+            var facilityDocumentDtos = new List<PeriodFacilityDocumentDto>();
+            /*if(periodFacility.PeriodFacilityDocuments.Count() == 0)
+                throw new Exception("PeriodFacilityDocum`ent is not found !!");*/
+            foreach(var document in periodFacility.PeriodFacilityDocuments)
+            {
+                var facilityDocumentDto = new PeriodFacilityDocumentDto(document.Id, document.Version, document.DisplayName, document.DocumentStatus.Id, document.DocumentStatus.Name, document.DocumentType.Id, document.DocumentType.Name, document.ValidationError);
+                facilityDocumentDtos.Add(facilityDocumentDto);
+            }
+
+            
+            var facilityGridMixAndDocumentDto = new ReportingPeriodFacilityGridMixAndDocumentDto(periodFacility.Id,periodFacility.ReportingPeriodId,periodSupplier.Supplier.Id,unitOfMeasure.Id,unitOfMeasure.Name,periodFacility.FercRegion.Id,periodFacility.FercRegion.Name,gridMixDtos,facilityDocumentDtos);
+            return facilityGridMixAndDocumentDto;
         }
 
         #endregion
