@@ -332,16 +332,16 @@ public class ReportingPeriod : IReportingPeriod
 
     #region PeriodFacilityElectricGridMix
 
-    public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
+    public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodSupplierId, int periodFacilityId,IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
     {
 
         if (ReportingPeriodStatus.Name != ReportingPeriodStatusValues.Open && ReportingPeriodStatus.Name !=ReportingPeriodStatusValues.Close)
             
             throw new Exception("Reporting period Should Be Open or Close..!");
 
-        var periodSupplier = _periodSupplier.Where(x => x.ReportingPeriodId == Id).FirstOrDefault();
+        var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();
 
-        return periodSupplier.AddPeriodFacilityElectricityGridMix(reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
+        return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId,reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
     }
 
     public bool LoadPeriodFacilityElectricityGridMix(int Id,int Periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)

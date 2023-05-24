@@ -17,7 +17,7 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         bool LoadPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int reportingPeriodId, int periodSupplierId, FercRegion fercRegion, bool isActive);
 
-        IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs,FercRegion fercRegion);
+        IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodSupplierId, int periodFacilityId, IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion);
 
         bool LoadPeriodFacilityElectricityGridMix(int Id, int Periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure UnitOfMeasure, decimal Content, bool IsActive);
 

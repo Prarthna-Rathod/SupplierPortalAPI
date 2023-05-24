@@ -549,7 +549,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                reportingPeriod.AddPeriodFacilityElectricityGridMix(CreateReportingPeriodFacilityElecticityGridMixEntity(),fercRegion.FirstOrDefault(X => X.Id == 12));
+                reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,CreateReportingPeriodFacilityElecticityGridMixEntity(),fercRegion.FirstOrDefault(X => X.Id == 12));
                 
 
             }
@@ -587,8 +587,8 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                 reportingPeriod.AddPeriodFacilityElectricityGridMix(CreateReportingPeriodFacilityElecticityGridMixEntity(),fercRegion.FirstOrDefault(X => X.Id == 12));
-                reportingPeriod.AddPeriodFacilityElectricityGridMix(CreateReportingPeriodFacilityElecticityGridMixEntity(), fercRegion.FirstOrDefault(X => X.Id == 12));
+                 reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,CreateReportingPeriodFacilityElecticityGridMixEntity(),fercRegion.FirstOrDefault(X => X.Id == 12));
+                reportingPeriod.AddPeriodFacilityElectricityGridMix(1,1,CreateReportingPeriodFacilityElecticityGridMixEntity(), fercRegion.FirstOrDefault(X => X.Id == 12));
             }
             catch (Exception ex)
             {

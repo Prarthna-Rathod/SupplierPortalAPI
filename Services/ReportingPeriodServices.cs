@@ -397,13 +397,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var periodFacilityElectricGridMixVO = _reportingPeriodDomainDtoMapper.ConvertPeriodFacilityElectricityGridMixDtoToValueObject(addMultiplePeriodFacilityElectricityGridMixDtos,electricityGridMixComponent,unitOfMeasure);
         
         //GridMixDomain
-        var periodFacilityacilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(periodFacilityElectricGridMixVO,fercRegion);
+        var periodFacilityacilityElectricityGridMixDomain = reportingPeriod.AddPeriodFacilityElectricityGridMix(addMultiplePeriodFacilityElectricityGridMixDtos.ReportingPeriodSupplierId,addMultiplePeriodFacilityElectricityGridMixDtos.ReportingPeriodFacilityId,periodFacilityElectricGridMixVO, fercRegion);
 
         //ELectricityGridMix Domain to Entity
         var entity = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityElectricityGridMixDomainListToEntity(periodFacilityacilityElectricityGridMixDomain);
 
         //DataAction to Database
-        _reportingPeriodDataActions.AddPeriodFacilityElectricityGridMix(entity,addMultiplePeriodFacilityElectricityGridMixDtos.ReportingPeriodFacilityId);
+        _reportingPeriodDataActions.AddPeriodFacilityElectricityGridMix(entity,addMultiplePeriodFacilityElectricityGridMixDtos.ReportingPeriodFacilityId,addMultiplePeriodFacilityElectricityGridMixDtos.FercRegionId);
 
 
         return "ReportingPeriodFacility ElectricityGridMix added successfully !!";

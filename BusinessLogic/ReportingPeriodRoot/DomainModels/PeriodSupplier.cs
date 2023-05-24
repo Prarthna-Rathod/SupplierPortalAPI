@@ -121,25 +121,25 @@ public class PeriodSupplier
 
     #region PeriodFacilityElectricityGridMix
 
-    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
+    internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
     {
         if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
             throw new Exception("Supplier ReportingPeriodStatus Should be Unlocked");
 
-        var periodFacility = _periodfacilities.Where(x=>x.ReportingPeriodSupplierId==Id).FirstOrDefault();
+        var periodFacility = _periodfacilities.Where(x => x.Id == periodFacilityId).FirstOrDefault();
 
-        periodFacility.FercRegion.Id = fercRegion.Id;
-        periodFacility.FercRegion.Name = fercRegion.Name;
+        /*periodFacility.FercRegion.Id = fercRegion.Id;
+        periodFacility.FercRegion.Name = fercRegion.Name;*/
 
-        return periodFacility.AddElectricityGridMix(reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
+        return periodFacility.AddElectricityGridMix(reportingPeriodFacilityElectricityGridMixVOs, fercRegion);
 
     }
 
-        internal bool LoadPeriodFacilityElectricityGridMix(int id, int reportingPeriodFacilityId, ElectricityGridMixComponent electricityComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
+    internal bool LoadPeriodFacilityElectricityGridMix(int id, int reportingPeriodFacilityId, ElectricityGridMixComponent electricityComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
     {
-        var periodFacility = _periodfacilities.FirstOrDefault(x=>x.Id==reportingPeriodFacilityId);
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == reportingPeriodFacilityId);
 
-        return periodFacility.LoadPeriodFacilityElecticGridMix(id,reportingPeriodFacilityId, electricityComponent,unitOfMeasure,content,isActive);
+        return periodFacility.LoadPeriodFacilityElecticGridMix(id, reportingPeriodFacilityId, electricityComponent, unitOfMeasure, content, isActive);
     }
     #endregion
 

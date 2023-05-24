@@ -79,6 +79,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                             contentValue = contentValue + facilityElectricityGridMix.Content;
 
+
                         }
                         if (contentValue != 100)
                         {

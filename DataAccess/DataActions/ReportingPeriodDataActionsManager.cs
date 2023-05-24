@@ -104,15 +104,15 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     }
 
 
-    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity,int periodFacilityId)
+    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity,int periodFacilityId,int fercRegionId)
     {
-        var periodFacility = GetReportingPeriodFacility(periodFacilityId);
+        // periodFacility = GetReportingPeriodFacility(periodFacilityId);
 
         var electicityGridMixEntities = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId);
 
         var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.FirstOrDefault(x => x.Id == periodFacilityId);
 
-        periodFacilityEntity.FercRegionId=periodFacility.FercRegionId; //Update FercRegionId in PeriodFacility
+        periodFacilityEntity.FercRegionId=fercRegionId; //Update FercRegionId in PeriodFacility
 
         _context.ReportingPeriodFacilityElectricityGridMixEntities.RemoveRange(electicityGridMixEntities);
 
@@ -232,22 +232,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         return true;
     }
-
-    /*  public ReportingPeriodSupplierEntity UpdatePeriodSupplier(ReportingPeriodSupplierEntity periodSupplierEntity)
-      {
-          var periodSupplier = _context.ReportingPeriodSupplierEntities
-              .Where(x => x.Id == periodSupplierEntity.Id).FirstOrDefault();
-
-          if (periodSupplier == null)
-              throw new Exception("ReportingPeriodSupplierEntity not found for update !!");
-
-          periodSupplier.SupplierReportingPeriodStatusId = periodSupplierEntity.SupplierReportingPeriodStatusId;
-
-          _context.ReportingPeriodSupplierEntities.Update(periodSupplier);
-          _context.SaveChanges();
-          return periodSupplier;
-      }
-  */
     public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
