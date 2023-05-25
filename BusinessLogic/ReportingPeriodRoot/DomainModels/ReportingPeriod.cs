@@ -249,16 +249,16 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #endregion
 
         #region Period Supplier
-        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate);
+            var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
         public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
         {
-            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate);
+            var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, true);
 
             //Check existing PeriodSupplier
             foreach (var periodSupplier in _periodSupplier)
@@ -409,39 +409,42 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId, documentId);
         }
 
-        /*
-         public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
-         {
-             throw new NotImplementedException();
-         }
-
-         public void AddDocumentToPeriodSupplierFacility(DocumentType documentType, DocumentStatus documentStatus)
-         {
-             throw new NotImplementedException();
-         }
-
-        
-         public PeriodSupplierDocument AddSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, string documentName, DocumentType documentType, IEnumerable<DocumentStatus> documentStatus)
-         {
-             throw new NotImplementedException();
-         }
-
-         public PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId, int periodFacilityId, int documentId)
-         {
-             throw new NotImplementedException();
-         }
-
-         public PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, int documentId)
-         {
-             throw new NotImplementedException();
-         }
-
-
-
-        */
-
         #endregion
 
+        #region PeriodSupplierDocument
+
+        public PeriodSupplierDocument AddUpdatePeriodSupplierDocument(int supplierId, string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError)
+        {
+            if (ReportingPeriodStatus.Name != ReportingPeriodStatusValues.Close)
+                throw new BadRequestException("ReportingPeriod not closed !! You can't add/update SupplierDocument !!");
+
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier not found !!");
+
+            return periodSupplier.AddUpdatePeriodSupplierDocument(displayName, path, documentStatuses, documentType, validationError, CollectionTimePeriod);
+        }
+
+        public bool LoadPeriodSupplierDocuments(int periodSupplierId, int documentId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+        {
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
+
+            return periodSupplier.LoadPeriodSupplierDocuments(documentId, version, displayName, storedName, path, documentStatus, documentType, validationError);
+        }
+
+        public bool RemovePeriodSupplierDocument(int supplierId, int documentId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            if (periodSupplier is null)
+                throw new NotFoundException("PeriodSupplier not found !!");
+
+            return periodSupplier.RemovePeriodSupplierDocument(documentId);
+        }
+
+        #endregion
 
     }
 }

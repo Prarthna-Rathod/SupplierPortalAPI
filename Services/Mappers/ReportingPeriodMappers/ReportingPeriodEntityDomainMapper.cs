@@ -303,4 +303,24 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     #endregion
 
+    #region PeriodSupplierDocument
+    public ReportingPeriodSupplierDocumentEntity ConvertPeriodSupplierDocumentDomainToEntity(PeriodSupplierDocument periodSupplierDocument)
+    {
+        var supplierDocumentEntity = new ReportingPeriodSupplierDocumentEntity();
+        supplierDocumentEntity.Id = periodSupplierDocument.Id;
+        supplierDocumentEntity.ReportingPeriodSupplierId = periodSupplierDocument.ReportingPeriodSupplierId;
+        supplierDocumentEntity.Version = periodSupplierDocument.Version;
+        supplierDocumentEntity.DisplayName = periodSupplierDocument.DisplayName;
+        supplierDocumentEntity.StoredName = periodSupplierDocument.StoredName;
+        supplierDocumentEntity.Path = periodSupplierDocument.Path;
+        supplierDocumentEntity.DocumentStatusId = periodSupplierDocument.DocumentStatus.Id;
+        supplierDocumentEntity.DocumentTypeId = periodSupplierDocument.DocumentType.Id;
+        supplierDocumentEntity.ValidationError = periodSupplierDocument.ValidationError;
+        supplierDocumentEntity.IsActive = true;
+
+        return supplierDocumentEntity;
+    }
+
+    #endregion
+
 }

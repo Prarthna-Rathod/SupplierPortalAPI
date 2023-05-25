@@ -40,8 +40,7 @@ public interface IReportingPeriodDomainDtoMapper
 
     MultiplePeriodFacilityElectricityGridMixDto GetAndConvertPeriodFacilityElectricityGridMixDomainListToDto(PeriodFacility periodFacility, int supplierId);
 
-    ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetAndConvertPeriodFacilityElectricityGridMixAndDocumentsDomainListToDto(PeriodFacility periodFacility, int supplierId);
-
+    
     #endregion
 
     #region PeriodFacility
@@ -59,6 +58,10 @@ public interface IReportingPeriodDomainDtoMapper
     #endregion
 
     #region PeriodDocument
+    ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetAndConvertPeriodFacilityElectricityGridMixAndDocumentsDomainListToDto(PeriodFacility periodFacility, int supplierId);
+
+    ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetAndConvertPeriodSupplierGasSupplyBreakdownAndDocumentsDomainListToDto(PeriodSupplier periodSupplier);
+
     #endregion
 
 

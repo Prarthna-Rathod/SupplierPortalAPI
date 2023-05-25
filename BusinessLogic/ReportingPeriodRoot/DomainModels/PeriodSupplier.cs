@@ -5,24 +5,29 @@ using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 using System;
+using System.Reflection.Metadata;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 
 public class PeriodSupplier
 {
     private HashSet<PeriodFacility> _periodfacilities;
+    private HashSet<PeriodSupplierDocument> _periodSupplierDocuments;
 
-    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
         InitialDataRequestDate = initialDataRequestDate;
         ResendDataRequestDate = resendDataRequestDate;
+        IsActive = isActive;
         _periodfacilities = new HashSet<PeriodFacility>();
+        _periodSupplierDocuments = new HashSet<PeriodSupplierDocument>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive)
     {
         Id = id;
     }
@@ -50,6 +55,18 @@ public class PeriodSupplier
         }
     }
 
+    public IEnumerable<PeriodSupplierDocument> PeriodSupplierDocuments
+    {
+        get
+        {
+            if (_periodSupplierDocuments == null)
+            {
+                return new List<PeriodSupplierDocument>();
+            }
+            return _periodSupplierDocuments.ToList();
+        }
+    }
+
     internal void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
     {
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
@@ -69,6 +86,13 @@ public class PeriodSupplier
             throw new NotFoundException("ReportingPeriodFacility is not found !!");
 
         return periodFacility;
+    }
+
+    private string GeneratedReportingPeriodSupplierDocumentName(string collectionTimePeriod, string documentTypeName, int version, string extension)
+    {
+        var documentName = Supplier.Name + "-" + collectionTimePeriod + "-" + documentTypeName + "-" + version + extension;
+
+        return documentName;
     }
 
     #region Period Facility
@@ -233,4 +257,109 @@ public class PeriodSupplier
 
     #endregion
 
+    #region PeriodSupplierDocument
+
+    private void CheckSupplementalDocumentTypeOrNot(DocumentType documentType)
+    {
+        if (documentType.Name != DocumentTypeValues.Supplemental)
+            throw new BadRequestException("ReportingPeriodSupplierDocument should be SupplementalDocumentType !!");
+    }
+
+    internal PeriodSupplierDocument AddUpdatePeriodSupplierDocument(string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod)
+    {
+        CheckSupplementalDocumentTypeOrNot(documentType);
+
+        var existingData = _periodSupplierDocuments.Where(x => x.DocumentType.Id == documentType.Id).OrderByDescending(x => x.Version).ToList();
+
+        //DocumentStatus -> Processing
+        var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+
+        //Retrieve FileExtension from fileName
+        FileInfo file = new FileInfo(displayName);
+        var extension = file.Extension;
+
+        PeriodSupplierDocument? document = null;
+
+        if(SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
+        {
+            if (existingData.Count() == 0)
+            {
+                var version = 1;
+                var storedName = GeneratedReportingPeriodSupplierDocumentName(collectionTimePeriod, documentType.Name, version, extension);
+                document = new PeriodSupplierDocument(Id, version, displayName, storedName, null, documentStatusProcessing, documentType, validationError);
+
+                _periodSupplierDocuments.Add(document);
+            }
+            else
+            {
+                document = existingData.First();
+
+                //Update existing versioned data record
+                var version = document.Version;
+                DocumentStatus? documentStatus = null;
+
+                if (validationError == null)
+                {
+                    documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.NotValidated);
+                }
+                else
+                {
+                    documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.HasErrors);
+                    path = null;
+                    validationError = "Unable to save the uploaded file at this time.  Please attempt the upload again later.";
+                }
+
+                if (validationError == null && path != null)
+                {
+                    documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
+                    version += 1;
+                }
+
+                var newStoredName = GeneratedReportingPeriodSupplierDocumentName(collectionTimePeriod, documentType.Name, version, extension);
+                document.Version = version;
+                document.DisplayName = file.Name;
+                document.StoredName = newStoredName;
+                document.Path = path;
+                document.DocumentStatus = documentStatus;
+                document.DocumentType = documentType;
+                document.ValidationError = validationError;
+            }
+        }
+        else
+        {
+            document = existingData.First();
+            if (document.Path is not null)
+                throw new Exception("This file already exists in the system. If you wish to upload a new version of the file, please delete existing file and try the upload again.");
+
+            document.DisplayName = file.Name;
+        }
+
+        return document;
+    }
+
+    internal bool LoadPeriodSupplierDocuments(int documentId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+    {
+        var supplierDocument = new PeriodSupplierDocument(documentId, Id, version, displayName, storedName, path, documentStatus, documentType, validationError);
+
+        return _periodSupplierDocuments.Add(supplierDocument);
+    }
+
+    internal bool RemovePeriodSupplierDocument(int documentId)
+    {
+        var document = _periodSupplierDocuments.First(x => x.Id == documentId);
+
+        if (document is null)
+            throw new NotFoundException("ReportingPeriodDocument not found !!");
+
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
+        {
+            _periodSupplierDocuments.Remove(document);
+            return true;
+        }
+        else
+            return false;
+
+    }
+
+    #endregion
 }

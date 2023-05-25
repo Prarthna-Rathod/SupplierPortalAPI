@@ -296,5 +296,37 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         }
 
         #endregion
+
+        #region ReportingPeriodSupplierDocument
+
+        [Fact]
+        public void ConvertPeriodSupplierDocumentDomainToEntity()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+
+            //Add record in domain
+            var supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, "filename.xlsx", null, documentStatuses, documentType, null);
+
+            var entity = mapper.ConvertPeriodSupplierDocumentDomainToEntity(supplierDocument);
+
+            Assert.NotNull(entity);
+            Assert.Equal(supplierDocument.Id , entity.Id);
+            Assert.Equal(supplierDocument.ReportingPeriodSupplierId , entity.ReportingPeriodSupplierId);
+            Assert.Equal(supplierDocument.Version , entity.Version);
+            Assert.Equal(supplierDocument.DisplayName , entity.DisplayName);
+            Assert.Equal(supplierDocument.StoredName , entity.StoredName);
+            Assert.Equal(supplierDocument.Path , entity.Path);
+            Assert.Equal(supplierDocument.DocumentStatus.Id , entity.DocumentStatusId);
+            Assert.Equal(supplierDocument.DocumentType.Id , entity.DocumentTypeId);
+            Assert.Equal(supplierDocument.ValidationError , entity.ValidationError);
+
+        }
+
+        #endregion
+
     }
 }

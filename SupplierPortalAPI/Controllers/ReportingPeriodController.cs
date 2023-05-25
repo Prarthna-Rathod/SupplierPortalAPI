@@ -54,6 +54,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriodDocument(reportingPeriodDocumentDto);
         }
 
+        [HttpPost("AddUpdateReportingPeriodSupplierDocument")]
+        public string AddUpdateReportingPeriodSupplierDocument([FromForm] ReportingPeriodSupplierDocumentDto periodSupplierDocumentDto)
+        {
+            return _services.AddUpdateReportingPeriodSupplierDocument(periodSupplierDocumentDto);
+        }
+
         [HttpPut("UpdateReportingPeriodFacilityStatusSubmitted")]
         public string UpdateReportingPeriodFacilityStatusSubmitted(int reportingPeriodId, int supplierId)
         {
@@ -113,6 +119,18 @@ namespace SupplierPortalAPI.Controllers
             return _services.DownloadPeriodFacilityDocument(documentId);
         }
 
+        [HttpGet("GetReportingPeriodSupplierGasSupplyBreakdownAndDocuments")]
+        public ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto(int reportingPeriodId, int supplierId)
+        {
+            return _services.GetPeriodSupplierSupplyBreakdownAndDocumentDto(reportingPeriodId, supplierId);
+        }
+
+        [HttpGet("DownloadReportingPeriodSupplierDocumentById")]
+        public IActionResult DownloadReportingPeriodSupplierDocumentById(int documentId)
+        {
+            return _services.DownloadPeriodSupplierDocument(documentId);
+        }
+
         #endregion
 
         #region Remove Methods
@@ -121,6 +139,12 @@ namespace SupplierPortalAPI.Controllers
         public string RemoveReportingPeriodFacilityDocuments(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int documentId)
         {
             return _services.RemoveReportingPeriodFacilityDocument(reportingPeriodFacilityId, reportingPeriodId, supplierId, documentId);
+        }
+
+        [HttpDelete("RemoveReportingPeriodSupplierDocument")]
+        public string RemoveReportingPeriodSupplierDocument(int reportingPeriodId, int supplierId, int documentId)
+        {
+            return _services.RemoveReportingPeriodSupplierDocument(reportingPeriodId, supplierId, documentId);
         }
 
         #endregion

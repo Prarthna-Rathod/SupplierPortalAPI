@@ -5,7 +5,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
     public class PeriodFacilityDocument
     {
-        public PeriodFacilityDocument(int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+        internal PeriodFacilityDocument(int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
         {
             ReportingPeriodFacilityId = periodFacilityId;
             Version = version;
@@ -18,7 +18,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
            
         }
 
-        public PeriodFacilityDocument(int id, int reportingPeriodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError) : this(reportingPeriodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError)
+        internal PeriodFacilityDocument(int id, int reportingPeriodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError) : this(reportingPeriodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError)
         {
             Id = id;
         }

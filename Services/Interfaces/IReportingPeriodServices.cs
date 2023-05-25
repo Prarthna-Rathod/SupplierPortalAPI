@@ -143,6 +143,16 @@ public interface IReportingPeriodServices
 
     #endregion
 
+    #region ReportingPeriodSupplierDocument
 
+    string AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentDto periodSupplierDocumentDto);
+
+    ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetPeriodSupplierSupplyBreakdownAndDocumentDto(int reportingPeriodId, int supplierId);
+
+    FileContentResult DownloadPeriodSupplierDocument(int documentId);
+
+    string RemoveReportingPeriodSupplierDocument(int reportingPeriodId, int supplierId, int documentId);
+
+    #endregion
 
 }

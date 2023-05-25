@@ -2,8 +2,6 @@
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
-using System.Collections.Generic;
-using System.IO;
 
 namespace UnitTest.ReportingPeriodBusinessLogic
 {
@@ -1133,9 +1131,9 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-               facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+                facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 exceptionCounter++;
                 exceptionMessage = ex.Message;
@@ -1198,7 +1196,6 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.Equal(documentStatusValidated, facilityDocument.DocumentStatus);
             Assert.Equal(null, facilityDocument.ValidationError);
         }
-
 
         /// <summary>
         /// Add ReportingPeriodDocumentSuccess Case3.
@@ -1366,7 +1363,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.NonGHGRP);
             var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
             PeriodFacilityDocument? facilityDocument = null;
-            
+
             try
             {
                 facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, "filename.xlsx", null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
@@ -1420,8 +1417,314 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.NotEqual(0, exceptionCounter);
         }
 
-        
+        [Fact]
+        public void RemovePeriodFacilityDocumentSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var facilityRequiredDocumentTypeVos = GetFacilityRequiredDocumentTypeVOs();
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var displayName = "filename.xlsx";
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+            var facilityDocument = reportingPeriod.AddUpdatePeriodFacilityDocuments(1, 1, displayName, null, documentStatuses, documentType, null, facilityRequiredDocumentTypeVos);
+            facilityDocument.Id = 1;
+            bool isRemoved = false;
+
+            //Update FacilityReportingPeriodDataStatus Submitted
+            var statusSubmitted = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Submitted);
+            var statusComplete = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.Complete);
+            var periodSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == 1);
+            var periodFacility = periodSupplier.PeriodFacilities.First(x => x.Id == 1);
+            periodFacility.FacilityReportingPeriodDataStatus.Id = statusComplete.Id;
+            periodFacility.FacilityReportingPeriodDataStatus.Name = statusComplete.Name;
+            reportingPeriod.UpdateAllPeriodFacilityDataStatus(1, statusSubmitted);
+
+            try
+            {
+                isRemoved = reportingPeriod.RemovePeriodFacilityDocument(1, 1, 1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(true, isRemoved);
+
+        }
 
         #endregion
+
+        #region AddUpdate ReportingPeriodSupplierDocument
+
+        /// <summary>
+        /// AddUpdate ReportingPeriodSupplierDocumentSuccess Case1
+        /// Add new record with DocumentStatus "Processing" where path and validationError should be null
+        /// </summary>
+        [Fact]
+        public void AddUpdateReportingPeriodSupplierDocumentSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            PeriodSupplierDocument? supplierDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Processing);
+
+            try
+            {
+                supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(supplierDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, supplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, supplierDocument.DisplayName);
+            Assert.Equal(1, supplierDocument.Version);
+            Assert.Equal(null, supplierDocument.Path);
+            Assert.Equal(documentType, supplierDocument.DocumentType);
+            Assert.Equal(documentStatusProcessing, supplierDocument.DocumentStatus);
+            Assert.Equal(null, supplierDocument.ValidationError);
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodSupplierDocumentSuccess Case2.
+        /// Update existingRecord from "Processing" to "Validated".
+        /// For update that record set path and validation error null.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodSupplierDocumentSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            PeriodSupplierDocument? supplierDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
+
+            //Add record with status "Processing"
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+
+            //Set path
+            var path = "E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles\\filename.xlsx";
+            try
+            {
+                supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, documentStatuses, documentType, null);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(supplierDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, supplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, supplierDocument.DisplayName);
+            //Assert.Equal(1, supplierDocument.Version);
+            Assert.Equal(path, supplierDocument.Path);
+            Assert.Equal(documentType, supplierDocument.DocumentType);
+            Assert.Equal(documentStatusProcessing, supplierDocument.DocumentStatus);
+            Assert.Equal(null, supplierDocument.ValidationError);
+        }
+
+        /// <summary>
+        /// Add ReportingPeriodSupplierDocumentSuccess Case3
+        /// If any error is occured during fileUpload or checking fileSize, fileType and   fileSignature or upload error then update existingRecord from "Processing" to "HasErrors".
+        /// For update that record set validation error and path is null.
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodSupplierDocumentSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            PeriodSupplierDocument? supplierDocument = null;
+            var displayName = "filename.xlsx";
+            var documentStatusProcessing = documentStatuses.First(x => x.Name == DocumentStatusValues.HasErrors);
+
+            //Add record with status "Processing"
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+
+            //Set validationError
+            string validationError = "Filetype is not matched !!";
+            try
+            {
+                supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, validationError);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(supplierDocument);
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(1, supplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, supplierDocument.DisplayName);
+            //Assert.Equal(1, supplierDocument.Version);
+            Assert.Equal(null, supplierDocument.Path);
+            Assert.Equal(documentType, supplierDocument.DocumentType);
+            Assert.Equal(documentStatusProcessing, supplierDocument.DocumentStatus);
+            Assert.NotNull(supplierDocument.ValidationError);
+        }
+
+        /// <summary>
+        /// AddUpdate ReportingPeriodSupplierDocumentFailure Case1
+        /// If documentType is not "Supplemental" then throw exception
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodSupplierDocumentFailsCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.NonGHGRP);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            PeriodSupplierDocument? supplierDocument = null;
+            var displayName = "filename.xlsx";
+
+            try
+            {
+                supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(supplierDocument);
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+        }
+
+        /// <summary>
+        /// AddUpdate ReportingPeriodSupplierDocumentFailure Case2
+        /// If ReportingPeriod is not closed then throw exception
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodSupplierDocumentFailsCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            PeriodSupplierDocument? supplierDocument = null;
+            var displayName = "filename.xlsx";
+
+            try
+            {
+                supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(supplierDocument);
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+        }
+       
+        /// <summary>
+        /// AddUpdate ReportingPeriodSupplierDocumentFailure Case2
+        /// If SupplierReportingPeriodStatus is locked and existing record path is not null then throw exception
+        /// </summary>
+
+        [Fact]
+        public void AddUpdateReportingPeriodSupplierDocumentFailsCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            PeriodSupplierDocument? supplierDocument = null;
+            var displayName = "filename.xlsx";
+
+            //First add record with documentStatus "Processing"
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+
+            //Set path
+            var path = "E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles\\filename.xlsx";
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, documentStatuses, documentType, null);
+
+            //Update SupplierReportingPeriodStatus Locked
+            var lockedStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+            UpdateSupplierReportingPeriodStatusLocked(reportingPeriod, lockedStatus);
+
+            try
+            {
+                supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, documentStatuses, documentType, null);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(supplierDocument);
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+        }
+
+        [Fact]
+        public void RemovePeriodSupplierDocumentSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            UpdateReportingPeriodClosed(reportingPeriod);
+            var displayName = "filename.xlsx";
+            var supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+            supplierDocument.Id = 1;
+            bool isRemoved = false;
+
+            try
+            {
+                isRemoved = reportingPeriod.RemovePeriodSupplierDocument(1, 1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(true, isRemoved);
+        }
+
+
+        #endregion
+
     }
 }

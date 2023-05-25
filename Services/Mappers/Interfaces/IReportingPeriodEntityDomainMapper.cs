@@ -66,4 +66,10 @@ public interface IReportingPeriodEntityDomainMapper
 
     #endregion
 
+    #region PeriodSupplier Document
+
+    ReportingPeriodSupplierDocumentEntity ConvertPeriodSupplierDocumentDomainToEntity(PeriodSupplierDocument periodSupplierDocument);
+
+    #endregion
+
 }

@@ -210,11 +210,17 @@ namespace Services.Mappers.ReportingPeriodMappers
 
                 gridMixDtos.Add(gridMixDto);
             }
-            var unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
 
+            if (periodFacilityGridMixList.Count() == 0)
+                throw new Exception("ElectricityGridMixes not available !!");
+
+            var unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
             var periodFacilityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodFacility.ReportingPeriodId, supplierId, unitOfMeasure.Id, unitOfMeasure.Name, periodFacility.FercRegion.Id, periodFacility.FercRegion.Name, gridMixDtos);
             return periodFacilityGridMixDto;
         }
+        #endregion
+
+        #region PeriodDocument
 
         public ReportingPeriodFacilityElectricityGridMixAndDocumentDto GetAndConvertPeriodFacilityElectricityGridMixAndDocumentsDomainListToDto(PeriodFacility periodFacility, int supplierId)
         {
@@ -228,7 +234,17 @@ namespace Services.Mappers.ReportingPeriodMappers
 
                 gridMixDtos.Add(gridMixDto);
             }
-            var unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
+
+            UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
+
+            if(periodFacilityGridMixList.Count() == 0)
+            {
+                unitOfMeasure.Id = 0;
+                unitOfMeasure.Name = "";
+            }
+            else
+                unitOfMeasure = periodFacilityGridMixList.First().UnitOfMeasure;
+
 
             //Load PeriodFacilityDocuments
             var periodFacilityDocuments = periodFacility.periodFacilityDocuments;
@@ -245,9 +261,35 @@ namespace Services.Mappers.ReportingPeriodMappers
             return gridMixAndDocumentDto;
         }
 
-        #endregion
 
-        #region PeriodDocument
+        public ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetAndConvertPeriodSupplierGasSupplyBreakdownAndDocumentsDomainListToDto(PeriodSupplier periodSupplier)
+        {
+            var periodFacilities = periodSupplier.PeriodFacilities;
+            var gasSupplyBreakdownDtoList = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+
+            foreach (var periodFacility in periodFacilities)
+            {
+                var gasSupplyBreakdowns = periodFacility.periodFacilityGasSupplyBreakdowns;
+
+                var gasSupplyBreakdownDtos = ConvertPeriodFacilityGasSupplyBreakdownDomainListToDtos(gasSupplyBreakdowns, periodFacility);
+
+                gasSupplyBreakdownDtoList.AddRange(gasSupplyBreakdownDtos);
+            }
+
+            var documentDtoList = new List<GetReportingPeriodSupplierDocumentDto>();
+
+            foreach(var document in periodSupplier.PeriodSupplierDocuments)
+            {
+                var documentDto = new GetReportingPeriodSupplierDocumentDto(document.Id, document.DisplayName, document.Version, document.DocumentStatus.Id, document.DocumentStatus.Name, document.DocumentType.Id, document.DocumentType.Name, document.ValidationError);
+
+                documentDtoList.Add(documentDto);
+            }
+
+            var dto = new ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, gasSupplyBreakdownDtoList, documentDtoList);
+
+            return dto;
+        }
+
         #endregion
 
 

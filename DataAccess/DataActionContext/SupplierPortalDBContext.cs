@@ -422,7 +422,7 @@ public partial class SupplierPortalDBContext : DbContext
 
             entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
 
-            entity.Property(e => e.Version).HasMaxLength(50);
+            //entity.Property(e => e.Version).HasMaxLength(50);
 
             entity.HasOne(d => d.DocumentStatus)
                 .WithMany(p => p.ReportingPeriodSupplierDocumentEntities)

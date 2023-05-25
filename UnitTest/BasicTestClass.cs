@@ -1,5 +1,6 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
@@ -319,6 +320,23 @@ namespace UnitTest
             reportingPeriod.ReportingPeriodStatus.Name = updatePeriodStatus.Name;
 
             return reportingPeriod;
+        }
+
+        public void UpdateReportingPeriodClosed(ReportingPeriod reportingPeriod)
+        {
+            var updatePeriodStatus = GetAndConvertReportingPeriodStatus().First(x => x.Name == ReportingPeriodStatusValues.Close);
+            reportingPeriod.ReportingPeriodStatus.Id = updatePeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = updatePeriodStatus.Name;
+
+        }
+
+        public void UpdateSupplierReportingPeriodStatusLocked(ReportingPeriod reportingPeriod, SupplierReportingPeriodStatus supplierReportingPeriodStatus)
+        {
+            foreach(var periodSupplier in reportingPeriod.PeriodSuppliers)
+            {
+                periodSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPeriodStatus.Id;
+                periodSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPeriodStatus.Name;
+            }
         }
 
 

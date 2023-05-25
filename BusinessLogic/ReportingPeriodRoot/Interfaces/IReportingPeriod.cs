@@ -9,7 +9,7 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
     {
         PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate);
 
-        bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate);
+        bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive);
 
         PeriodFacility AddPeriodFacility(int periodFacilityId, FacilityVO facilityVO, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus, int periodSupplierId, bool facilityIsRelevantForPeriod, FercRegion fercRegion, bool isActive);
 
@@ -32,6 +32,11 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
 
         bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int documentId);
-       
+
+        PeriodSupplierDocument AddUpdatePeriodSupplierDocument(int supplierId, string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError);
+
+        bool LoadPeriodSupplierDocuments(int periodSupplierId, int documentId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError);
+
+        bool RemovePeriodSupplierDocument(int supplierId, int documentId);
     }
 }

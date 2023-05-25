@@ -139,6 +139,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         #endregion
 
         #region PeriodSupplierFacility GasSupplyBreakdown
+       
         [Fact]
         public void ConvertPeriodFacilityGasSupplyBreakdownDtoToValueObject()
         {
@@ -218,6 +219,46 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(domainList.Count(), dto.ReportingPeriodFacilityElectricityGridMixDtos.Count());
            
         }
+
+        #endregion
+
+        #region PeriodSupplierDocument
+
+        [Fact]
+        public void GetAndConvertPeriodSupplierGasSupplyBreakdownAndDocumentsDomainListToDto()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var periodSupplier = reportingPeriod.PeriodSuppliers.First();
+            var periodFacilities = periodSupplier.PeriodFacilities;
+
+            //First add new data for GasSupplyBreakdown
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdownVOs();
+            reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(periodSupplier.Id, gasSupplyBreakdownVos);
+            var facilities = new List<PeriodFacility>();
+
+            foreach (var periodFacility in periodFacilities)
+            {
+                var gasSupplyData = periodFacility.periodFacilityGasSupplyBreakdowns;
+                if (gasSupplyData.Count() != 0)
+                    facilities.Add(periodFacility);
+            }
+
+            //Add data for SupplierDocument
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+            UpdateReportingPeriodClosed(reportingPeriod);
+            var displayName = "filename.xlsx";
+
+            var supplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, documentStatuses, documentType, null);
+
+            var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+
+            var dto = mapper.GetAndConvertPeriodSupplierGasSupplyBreakdownAndDocumentsDomainListToDto(periodSupplier);
+
+            Assert.NotNull(dto);
+            Assert.Equal(periodSupplier.PeriodSupplierDocuments.Count(), dto.PeriodSupplierDocumentDtos.Count());
+
+            }
 
         #endregion
 
