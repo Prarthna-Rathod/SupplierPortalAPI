@@ -10,10 +10,12 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     private readonly SupplierPortalDBContext _context;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
     private readonly string FACILITY_REPORTING_PERIOD_STATUS_SUBMITTED = "Submitted";
+    private readonly IFileUploadDataActions _fileUploadDataActions;
 
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context)
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context, IFileUploadDataActions fileUploadDataActions)
     {
         _context = context;
+        _fileUploadDataActions = fileUploadDataActions;
     }
 
     #region Add Methods
@@ -78,31 +80,38 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         var periodFacilityGridMixes = periodFacility.ReportingPeriodFacilityElectricityGridMixEntities;
 
+        bool isRemovedGridMix = false;
         if (periodFacilityGridMixes.Count() != 0)
-            RemovePeriodFacilityElectricityGridMix(periodFacilityId);
+            isRemovedGridMix = RemovePeriodFacilityElectricityGridMix(periodFacilityId);
 
-        foreach (var entity in periodFacilityElectricityGridMixEntities)
+        if (isRemovedGridMix)
         {
-            entity.CreatedOn = DateTime.UtcNow;
-            entity.CreatedBy = "System";
-            _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
+            foreach (var entity in periodFacilityElectricityGridMixEntities)
+            {
+                entity.CreatedOn = DateTime.UtcNow;
+                entity.CreatedBy = "System";
+                _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
+            }
         }
         _context.SaveChanges();
-        return true;
+        return isRemovedGridMix;
     }
 
     public bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities, int periodSupplierId)
     {
-        RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
+        var isRemovedGasSupply = RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
 
-        foreach (var entity in facilityGasSupplyBreakDownEntities)
+        if (isRemovedGasSupply)
         {
-            entity.CreatedBy = "System";
-            entity.CreatedOn = DateTime.UtcNow;
-            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(entity);
+            foreach (var entity in facilityGasSupplyBreakDownEntities)
+            {
+                entity.CreatedBy = "System";
+                entity.CreatedOn = DateTime.UtcNow;
+                _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(entity);
+            }
         }
         _context.SaveChanges();
-        return true;
+        return isRemovedGasSupply;
     }
 
 
@@ -297,6 +306,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId)
     {
+        bool isRemoved = false;
         var entities = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
 
         foreach (var entity in entities)
@@ -306,13 +316,15 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(entity);
 
+            isRemoved = true;
         }
-        // _context.SaveChanges();
-        return true;
+        _context.SaveChanges();
+        return isRemoved;
     }
 
     public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
     {
+        bool isRemoved = false;
         var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
         var periodFacilityEntities = periodSupplierEntity.ReportingPeriodFacilityEntities;
         var gasSupplyBreakdownEntities = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities;
@@ -323,23 +335,12 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             if (entities.Count() != 0)
                 _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(entities);
+
+            isRemoved = true;
         }
 
-        //_context.SaveChanges();
-        return true;
-    }
-
-    private bool RemoveDocumentFromFolder(string path)
-    {
-        //Delete file from "DocumentFiles" folder
-        FileInfo file = new FileInfo(path);
-        if (file.Exists)
-        {
-            file.Delete();
-            return true;
-        }
-        else
-            return false;
+        _context.SaveChanges();
+        return isRemoved;
     }
 
     public bool RemovePeriodFacilityDocument(int documentId)
@@ -349,7 +350,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         if (documentEntity is null)
             throw new Exception("Document not found !!");
 
-        var fileDeleted = RemoveDocumentFromFolder(documentEntity.Path);
+        var fileDeleted = _fileUploadDataActions.RemoveDocumentFromFolder(documentEntity.Path);
 
         //If file deleted successfully then remove from database
         if (fileDeleted)
@@ -367,15 +368,16 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         if (documentEntity is null)
             throw new Exception("Document not found !!");
 
-        var fileDeleted = RemoveDocumentFromFolder(documentEntity.Path);
+        var fileDeleted = _fileUploadDataActions.RemoveDocumentFromFolder(documentEntity.Path);
 
         //If file deleted successfully then remove from database
         if (fileDeleted)
+        {
             _context.ReportingPeriodSupplierDocumentEntities.Remove(documentEntity);
-
-        _context.SaveChanges();
-
-        return true;
+            _context.SaveChanges();
+            return true;
+        }
+        return false;
     }
 
     #endregion

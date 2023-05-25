@@ -2,7 +2,9 @@ using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
+using Microsoft.VisualBasic.FileIO;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
+using System;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 {
@@ -78,6 +80,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
         private string GeneratedReportingPeriodFacilityDocumentName(string collectionTimePeriod, string documentTypeName, int version, string extension)
         {
+            var fileTypes = new List<string>();
+            fileTypes.Add(".xlsx");
+            fileTypes.Add(".xml");
+
+            var isCorrect = fileTypes.Contains(extension);
+            if (!isCorrect)
+                throw new BadRequestException("FileType should be ExcelSheet or XML !!");
+
             var facilityName = FacilityVO.FacilityName;
             var documentName = facilityName + "-" + collectionTimePeriod + "-" + documentTypeName + "-" + version + extension;
 
@@ -242,12 +252,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             {
                 document = existingData.First();
 
+                var version = document.Version;
+                if (document.DocumentStatus.Name == DocumentStatusValues.HasErrors)
+                    version += 1;
+
                 if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Submitted)
                 {
-                    var versionNumber = document.Version;
-                    var newVersionNumber = versionNumber + 1;
-                    var newStoredName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, newVersionNumber, extension);
-                    document = new PeriodFacilityDocument(Id, newVersionNumber, displayName, newStoredName, null, documentStatusProcessing, documentType, validationError);
+                    var newStoredName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, version, extension);
+                    document = new PeriodFacilityDocument(Id, version, displayName, newStoredName, null, documentStatusProcessing, documentType, validationError);
 
                     _periodFacilityDocuments.Add(document);
                 }
@@ -258,7 +270,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                         throw new Exception("This file already exists in the system. If you wish to upload a new version of the file, please delete existing file and try the upload again.");
 
                     //Update existing versioned data record
-                    var version = document.Version;
                     DocumentStatus? documentStatus = null;
 
                     if (validationError == null)
@@ -275,7 +286,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                     if(validationError == null && path != null)
                     {
                         documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
-                        version += 1;
                     }
 
                     var newStoredName = GeneratedReportingPeriodFacilityDocumentName(collectionTimePeriod, documentType.Name, version, extension);

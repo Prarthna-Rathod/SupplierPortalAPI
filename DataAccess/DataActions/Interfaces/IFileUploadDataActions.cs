@@ -10,7 +10,8 @@ namespace DataAccess.DataActions.Interfaces
 {
     public interface IFileUploadDataActions
     {
-        string UploadReportingPeriodDocument(IFormFile file);
+        string UploadReportingPeriodDocument(IFormFile file, string storedName);
         FileContentResult DownloadDocument(string filePath);
+        bool RemoveDocumentFromFolder(string path);
     }
 }

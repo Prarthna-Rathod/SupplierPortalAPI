@@ -13,7 +13,6 @@ using Services.Factories.Interface;
 using Services.Interfaces;
 using Services.Mappers.Interfaces;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
-using System.Net;
 
 namespace Services;
 
@@ -288,7 +287,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
                 var documentStatus = GetDocumentStatuses().First(x => x.Id == documentEntity.DocumentStatusId);
                 var documentType = GetDocumentTypes().First(x => x.Id == documentEntity.DocumentTypeId);
 
-                reportingPeriodDomain.LoadPeriodSupplierDocuments(periodSupplier.Id, documentEntity.Id,  documentEntity.Version, documentEntity.DisplayName, documentEntity.StoredName, documentEntity.Path, documentStatus, documentType, documentEntity.ValidationError);
+                reportingPeriodDomain.LoadPeriodSupplierDocuments(periodSupplier.Id, documentEntity.Id, documentEntity.Version, documentEntity.DisplayName, documentEntity.StoredName, documentEntity.Path, documentStatus, documentType, documentEntity.ValidationError);
             }
         }
     }
@@ -296,7 +295,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     #endregion
 
     #region Load FacilityGridMixes, GasSupply and Documents
-    
+
     private void GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(ReportingPeriodFacilityEntity periodFacilityEntity, ReportingPeriod reportingPeriodDomain)
     {
         var facilityVO = GetAndConvertFacilityValueObject(periodFacilityEntity.FacilityId);
@@ -359,7 +358,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     #endregion
 
     #region FacilityDocumentsValidations and CheckRequiredDocumentsUploadedOrNot
-    
+
     private bool CheckDocumentsUploadedForFacility(int periodFacilityId)
     {
         bool isDone = false;
@@ -471,13 +470,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private string ValidateFile(string fileType, long fileSize, string path)
     {
         string? error = null;
-        var fileTypes = new List<string>();
+        /*var fileTypes = new List<string>();
         fileTypes.Add(".xlsx");
         fileTypes.Add(".xml");
 
         var isCorrect = fileTypes.Contains(fileType);
         if (!isCorrect)
-            error += "FileType is not match.";
+            error += "FileType is not match.";*/
 
         //Check file signature
         var fileError = CheckFileSignature(path, fileType);
@@ -673,7 +672,10 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         var entities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityElectricityGridMixDomainListToEntities(facilityElectricityGridMixDomainList);
 
-        _reportingPeriodDataActions.AddPeriodFacilityElectricityGridMix(entities, periodFacilityElectricityGridMixDto.ReportingPeriodFacilityId, fercRegion.Id);
+        var isAdded = _reportingPeriodDataActions.AddPeriodFacilityElectricityGridMix(entities, periodFacilityElectricityGridMixDto.ReportingPeriodFacilityId, fercRegion.Id);
+
+        if (!isAdded)
+            return "ElectricityGridMixes not added/Removed !!";
 
         return "ReportingPeriodFacility ElectricityGridMix Components added successfully !!";
     }
@@ -698,7 +700,10 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         var entities = _reportingPeriodEntityDomainMapper.ConvertPeriodFacilityGasSupplyBreakdownDomainListToEntities(domainList);
 
-        _reportingPeriodDataActions.AddRemovePeriodFacilityGasSupplyBreakdown(entities, multiplePeriodSupplierGasSupplyBreakdownDto.ReportingPeriodSupplierId);
+        var isAdded = _reportingPeriodDataActions.AddRemovePeriodFacilityGasSupplyBreakdown(entities, multiplePeriodSupplierGasSupplyBreakdownDto.ReportingPeriodSupplierId);
+
+        if (!isAdded)
+            return "GasSupplyBreakdown not added/removed !!";
 
         return "ReportingPeriodSupplier GasSupplyBreakdown added successfully !!";
     }
@@ -769,9 +774,9 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         //If FacilityReportingPeriodStatus is submitted and user comes to upload document then change FacilityReportingPeriodStatus to InProgess in Domain and Database
         var inProgressDataStatus = GetAndConvertFacilityReportingPeriodDataStatuses().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress);
-        
+
         reportingPeriod.UpdatePeriodFacilityDataStatusSubmittedToInProgress(reportingPeriodDocumentDto.SupplierId, entity.ReportingPeriodFacilityId, inProgressDataStatus);
-        
+
         _reportingPeriodDataActions.CheckAndUpdateReportingPeriodFacilityStatus(periodDocument.ReportingPeriodFacilityId, inProgressDataStatus.Id);
 
         //Upload file
@@ -780,7 +785,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         string? errors = null;
         try
         {
-            path = _fileUploadDataActions.UploadReportingPeriodDocument(reportingPeriodDocumentDto.DocumentFile);
+            path = _fileUploadDataActions.UploadReportingPeriodDocument(reportingPeriodDocumentDto.DocumentFile, entity.StoredName);
         }
         catch (Exception ex)
         {
@@ -840,14 +845,14 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         try
         {
-            path = _fileUploadDataActions.UploadReportingPeriodDocument(periodSupplierDocumentDto.DocumentFile);
+            path = _fileUploadDataActions.UploadReportingPeriodDocument(periodSupplierDocumentDto.DocumentFile, documentEntity.StoredName);
         }
         catch (Exception ex)
         {
             fileUploadError = $"Some error occured during fileUpload !!";
         }
 
-        if(fileUploadError == null)
+        if (fileUploadError == null)
         {
             //Check FileSize and FileType before upload
             FileInfo file = new FileInfo(path);
@@ -866,7 +871,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         _reportingPeriodDataActions.AddUpdateReportingPeriodSupplierDocument(updatedEntity);
 
-        if(errors != null)
+        if (errors != null)
             throw new BadRequestException(errors);
 
         return "ReportingPeriodSupplierDocument uploaded successfully....";
@@ -1020,7 +1025,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var documentEntity = _reportingPeriodDataActions.GetReportingPeriodDocument(documentId);
 
         var filePath = documentEntity.Path;
-        
+
         var file = _fileUploadDataActions.DownloadDocument(filePath);
 
         return file;
@@ -1045,14 +1050,17 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         if (isRemoved)
         {
-            _reportingPeriodDataActions.RemovePeriodFacilityDocument(documentId);
-            var isDone = CheckDocumentsUploadedForFacility(reportingPeriodFacilityId);
-            if (!isDone)
-                _reportingPeriodDataActions.CheckAndUpdateReportingPeriodFacilityStatus(reportingPeriodFacilityId, inProgressDataStatus.Id);
-            return "ReportingPeriodDocument removed successfully..";
+            var hardDelete = _reportingPeriodDataActions.RemovePeriodFacilityDocument(documentId);
+            if (hardDelete)
+            {
+                var isDone = CheckDocumentsUploadedForFacility(reportingPeriodFacilityId);
+                if (!isDone)
+                    _reportingPeriodDataActions.CheckAndUpdateReportingPeriodFacilityStatus(reportingPeriodFacilityId, inProgressDataStatus.Id);
+                return "ReportingPeriodDocument removed successfully..";
+            }
         }
-        else
-            return "ReportingPeriodDocument not removed !!";
+
+        return "ReportingPeriodDocument not removed !!";
 
     }
 
@@ -1112,12 +1120,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         if (isRemoved)
         {
-            _reportingPeriodDataActions.RemovePeriodSupplierDocument(documentId);
-            
-            return "ReportingPeriodSupplierDocument removed successfully..";
+            var hardDelete = _reportingPeriodDataActions.RemovePeriodSupplierDocument(documentId);
+
+            if (hardDelete)
+                return "ReportingPeriodSupplierDocument removed successfully..";
         }
-        else
-            return "ReportingPeriodSupplierDocument not removed !!";
+
+        return "ReportingPeriodSupplierDocument not removed !!";
     }
 }
 

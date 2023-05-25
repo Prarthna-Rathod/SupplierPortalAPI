@@ -6,9 +6,9 @@ namespace DataAccess.DataActions
 {
     public class FileUploadDataActionManager : IFileUploadDataActions
     {
-        public string UploadReportingPeriodDocument(IFormFile file)
+        public string UploadReportingPeriodDocument(IFormFile file, string storedName)
         {
-            var filepath = Path.Combine("E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles", file.FileName);
+            var filepath = Path.Combine("E:\\Sem10_Project\\SupplierPortal_own\\SupplierPortalAPI\\DataAccess\\DocumentFiles", storedName);
 
             using (FileStream fileStream = new FileStream(filepath, FileMode.Create))
             {
@@ -32,6 +32,19 @@ namespace DataAccess.DataActions
             };
 
             return result;
+        }
+
+        public bool RemoveDocumentFromFolder(string path)
+        {
+            //Delete file from "DocumentFiles" folder
+            FileInfo file = new FileInfo(path);
+            if (file.Exists)
+            {
+                file.Delete();
+                return true;
+            }
+            else
+                return false;
         }
 
     }

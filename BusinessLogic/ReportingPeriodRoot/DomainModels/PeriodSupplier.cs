@@ -294,9 +294,15 @@ public class PeriodSupplier
             {
                 document = existingData.First();
 
+                if (document.Path is not null)
+                    throw new Exception("This file already exists in the system. If you wish to upload a new version of the file, please delete existing file and try the upload again.");
+
                 //Update existing versioned data record
                 var version = document.Version;
                 DocumentStatus? documentStatus = null;
+
+                if (document.DocumentStatus.Name == DocumentStatusValues.HasErrors)
+                    version += 1;
 
                 if (validationError == null)
                 {
@@ -312,7 +318,6 @@ public class PeriodSupplier
                 if (validationError == null && path != null)
                 {
                     documentStatus = documentStatuses.First(x => x.Name == DocumentStatusValues.Validated);
-                    version += 1;
                 }
 
                 var newStoredName = GeneratedReportingPeriodSupplierDocumentName(collectionTimePeriod, documentType.Name, version, extension);

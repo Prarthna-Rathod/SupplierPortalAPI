@@ -52,6 +52,7 @@ namespace DataAccess.DataActions.Interfaces
         bool RemovePeriodFacilityDocument(int documentId);
         bool RemovePeriodSupplierDocument(int documentId);
 
+
         #endregion
 
         #region GetAll Methods
