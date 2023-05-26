@@ -1443,7 +1443,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                isRemoved = reportingPeriod.RemovePeriodFacilityDocument(1, 1, 1);
+                isRemoved = reportingPeriod.RemovePeriodFacilityDocument(1, 1);
             }
             catch (Exception ex)
             {
@@ -1723,6 +1723,74 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.Equal(true, isRemoved);
         }
 
+
+        #endregion
+
+        #region Delete methods
+
+        /// <summary>
+        /// Delete ReportingPeriodFacility ElectricityGridMixes
+        /// </summary>
+        [Fact]
+
+        public void DeletePeriodFacilityElectricityGridMix()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+
+            //GridMix
+            var unitOfMeasure = GetUnitOfMeasures().First(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.Custom_Mix);
+            var gridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            var list = reportingPeriod.AddRemoveElectricityGridMixComponents(1, 1, unitOfMeasure, fercRegion, gridMixComponentPercents);
+            int count = 0;
+
+            try
+            {
+                count = reportingPeriod.DeletePeriodFacilityElectricityGridMixes(1, 1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(0, count);
+
+        }
+
+        /// <summary>
+        /// Delete ReportingPeriodSupplier GasSupplyBreakdowns
+        /// </summary>
+
+        [Fact]
+        public void DeletePeriodSupplierGasSupplyBreakdown()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var gasSupplyBreakdownVOs = GetGasSupplyBreakdownVOs();
+            var gasSupplyBreakdowns = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVOs);
+            int count = 0;
+
+            try
+            {
+                count = reportingPeriod.DeletePeriodSupplierGasSupplyBreakdowns(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Equal(0, count);
+            Assert.Null(exceptionMessage);
+        }
 
         #endregion
 

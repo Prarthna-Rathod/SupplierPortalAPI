@@ -512,8 +512,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
-                                .Include(x => x.ReportingPeriodFacilityEntities)
-                                    .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;
@@ -525,7 +523,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.Supplier)
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.SupplierReportingPeriodStatus)
+                                .Include(x => x.ReportingPeriodSupplierDocumentEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
+                                
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }

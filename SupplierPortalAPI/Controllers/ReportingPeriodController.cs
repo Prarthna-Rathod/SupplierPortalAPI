@@ -96,9 +96,9 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpGet("GetReportingPeriodSupplierFacility_GasSupplyBreakdowns")]
-        public MultiplePeriodFacilityGasSupplyBreakdownDto GetPeriodSupplierGasSupplyBreakdown(int reportingPeriodId, int supplierId)
+        public MultiplePeriodFacilityGasSupplyBreakdownDto GetPeriodSupplierGasSupplyBreakdown(int reportingPeriodSupplierId)
         {
-            return _services.GetFacilityGasSupplyBreakdowns(reportingPeriodId, supplierId);
+            return _services.GetFacilityGasSupplyBreakdowns(reportingPeriodSupplierId);
         }
 
         [HttpGet("GetReportingPeriodFacility_ElectricityGridMixes")]
@@ -120,9 +120,9 @@ namespace SupplierPortalAPI.Controllers
         }
 
         [HttpGet("GetReportingPeriodSupplierGasSupplyBreakdownAndDocuments")]
-        public ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto(int reportingPeriodId, int supplierId)
+        public ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto(int reportingPeriodSupplierId)
         {
-            return _services.GetPeriodSupplierSupplyBreakdownAndDocumentDto(reportingPeriodId, supplierId);
+            return _services.GetPeriodSupplierSupplyBreakdownAndDocumentDto(reportingPeriodSupplierId);
         }
 
         [HttpGet("DownloadReportingPeriodSupplierDocumentById")]
@@ -136,18 +136,39 @@ namespace SupplierPortalAPI.Controllers
         #region Remove Methods
 
         [HttpDelete("RemoveReportingPeriodFacilityDocuments")]
-        public string RemoveReportingPeriodFacilityDocuments(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int documentId)
+        public string RemoveReportingPeriodFacilityDocuments(int reportingPeriodFacilityId, int documentId)
         {
-            return _services.RemoveReportingPeriodFacilityDocument(reportingPeriodFacilityId, reportingPeriodId, supplierId, documentId);
+            return _services.RemoveReportingPeriodFacilityDocument(reportingPeriodFacilityId, documentId);
         }
 
         [HttpDelete("RemoveReportingPeriodSupplierDocument")]
-        public string RemoveReportingPeriodSupplierDocument(int reportingPeriodId, int supplierId, int documentId)
+        public string RemoveReportingPeriodSupplierDocument(int reportingPeriodSupplierId, int documentId)
         {
-            return _services.RemoveReportingPeriodSupplierDocument(reportingPeriodId, supplierId, documentId);
+            return _services.RemoveReportingPeriodSupplierDocument(reportingPeriodSupplierId, documentId);
+        }
+
+        [HttpDelete("DeleteReportingPeriodFacilityElectricityGridMixes")]
+        public string DeleteReportingPeriodFacilityElectricityGridMixes(int periodFacilityId)
+        {
+            return _services.DeletePeriodFacilityElectricityGridMixes(periodFacilityId);
+        }
+
+        [HttpDelete("DeleteReportingPeriodSupplierGasSupplyBreakdown")]
+        public string DeleteReportingPeriodSupplierGasSupplyBreakdown(int periodSupplierId)
+        {
+            return _services.DeletePeriodSupplierGasSupplyBreakdowns(periodSupplierId);
         }
 
         #endregion
 
+        #region Send Email
+
+        /*[HttpPost("SendEmail")]
+        public string SendEmailNotification()
+        {
+            return "Email send successfully..";
+        }*/
+
+        #endregion
     }
 }

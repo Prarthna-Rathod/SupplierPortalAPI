@@ -398,15 +398,20 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacilityDocuments(documentId, periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
         }
 
-        public bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int documentId)
+        public bool RemovePeriodFacilityDocument(int periodFacilityId, int documentId)
         {
             CheckReportingPeriodStatus();
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
 
-            if (periodSupplier is null)
-                throw new NotFoundException("PeriodSupplier not found !!");
+            PeriodSupplier? periodSupplierDomain = null;
+            foreach(var periodSupplier in _periodSupplier)
+            {
+                var findFacility = periodSupplier.PeriodFacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+                if (findFacility != null)
+                    periodSupplierDomain = periodSupplier;
+                    break;
+            }
 
-            return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId, documentId);
+            return periodSupplierDomain.RemovePeriodFacilityDocument(periodFacilityId, documentId);
         }
 
         #endregion
@@ -433,15 +438,29 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodSupplierDocuments(documentId, version, displayName, storedName, path, documentStatus, documentType, validationError);
         }
 
-        public bool RemovePeriodSupplierDocument(int supplierId, int documentId)
+        public bool RemovePeriodSupplierDocument(int reportingPeriodSupplierId, int documentId)
         {
             CheckReportingPeriodStatus();
-            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
-
-            if (periodSupplier is null)
-                throw new NotFoundException("PeriodSupplier not found !!");
-
+            var periodSupplier = FindPeriodSupplier(reportingPeriodSupplierId);
             return periodSupplier.RemovePeriodSupplierDocument(documentId);
+        }
+
+        #endregion
+
+        #region Delete methods
+        
+        public int DeletePeriodFacilityElectricityGridMixes(int periodSupplierId, int periodFacilityId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
+            return periodSupplier.DeletePeriodFacilityElectricityGridMixes(periodFacilityId);
+        }
+
+        public int DeletePeriodSupplierGasSupplyBreakdowns(int periodSupplierId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
+            return periodSupplier.DeletePeriodSupplierGasSupplyBreakdowns();
         }
 
         #endregion

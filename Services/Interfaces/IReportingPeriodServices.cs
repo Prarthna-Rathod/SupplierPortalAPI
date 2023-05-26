@@ -61,6 +61,9 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     bool RemovePeriodSupplier(int PeriodSupplierId);
 
+    string DeletePeriodFacilityElectricityGridMixes(int periodFacilityId);
+    string DeletePeriodSupplierGasSupplyBreakdowns(int periodSupplierId);
+
     #endregion
 
     #region PeriodFacilities
@@ -108,7 +111,7 @@ public interface IReportingPeriodServices
     /// <param name="periodSupplierId"></param>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int reportingPeriodId, int supplierId);
+    MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int reportingPeriodSupplierId);
 
     /// <summary>
     /// Update AllReportingPeriodFacilities
@@ -139,7 +142,7 @@ public interface IReportingPeriodServices
 
     FileContentResult DownloadPeriodFacilityDocument(int documentId);
 
-    string RemoveReportingPeriodFacilityDocument(int reportingPeriodFacilityId, int reportingPeriodId, int supplierId, int documentId);
+    string RemoveReportingPeriodFacilityDocument(int reportingPeriodFacilityId,int documentId);
 
     #endregion
 
@@ -147,11 +150,11 @@ public interface IReportingPeriodServices
 
     string AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentDto periodSupplierDocumentDto);
 
-    ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetPeriodSupplierSupplyBreakdownAndDocumentDto(int reportingPeriodId, int supplierId);
+    ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetPeriodSupplierSupplyBreakdownAndDocumentDto(int reportingPeriodSupplierId);
 
     FileContentResult DownloadPeriodSupplierDocument(int documentId);
 
-    string RemoveReportingPeriodSupplierDocument(int reportingPeriodId, int supplierId, int documentId);
+    string RemoveReportingPeriodSupplierDocument(int reportingPeriodSupplierId, int documentId);
 
     #endregion
 

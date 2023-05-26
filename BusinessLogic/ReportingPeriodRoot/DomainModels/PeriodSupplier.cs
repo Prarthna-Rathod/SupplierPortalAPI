@@ -67,6 +67,7 @@ public class PeriodSupplier
         }
     }
 
+    #region Private methods
     internal void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
     {
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
@@ -94,6 +95,7 @@ public class PeriodSupplier
 
         return documentName;
     }
+    #endregion
 
     #region Period Facility
 
@@ -367,4 +369,28 @@ public class PeriodSupplier
     }
 
     #endregion
+
+    #region Delete methods
+
+    internal int DeletePeriodFacilityElectricityGridMixes(int periodFacilityId)
+    {
+        CheckSupplierReportingPeriodStatus();
+        var periodFacility = FindPeriodFacility(periodFacilityId);
+        return periodFacility.DeletePeriodFacilityElectricityGridMixes();
+    }
+
+    internal int DeletePeriodSupplierGasSupplyBreakdowns()
+    {
+        CheckSupplierReportingPeriodStatus();
+        int count = 0;
+        foreach(var periodFacility in _periodfacilities)
+        {
+            count += periodFacility.DeletePeriodSupplierGasSupplyBreakdowns();
+        }
+
+        return count;
+    }
+
+    #endregion
+
 }

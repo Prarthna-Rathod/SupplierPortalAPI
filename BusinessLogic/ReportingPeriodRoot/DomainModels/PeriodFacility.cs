@@ -78,6 +78,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             Id = id;
         }
 
+        #region Private methods and Update facilityMethods
         private string GeneratedReportingPeriodFacilityDocumentName(string collectionTimePeriod, string documentTypeName, int version, string extension)
         {
             var fileTypes = new List<string>();
@@ -125,6 +126,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             if (FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Submitted)
                 FacilityReportingPeriodDataStatus = facilityReportingPeriodDataStatus;
         }
+        #endregion
 
         #region ElectricityGridMixes
 
@@ -319,6 +321,23 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             else
                 return false;
 
+        }
+
+        #endregion
+
+        #region Delete methods
+
+        internal int DeletePeriodFacilityElectricityGridMixes()
+        {
+            _periodFacilityElectricityGridMixes.Clear();
+
+            return _periodFacilityElectricityGridMixes.Count();
+        }
+
+        internal int DeletePeriodSupplierGasSupplyBreakdowns()
+        {
+            _periodSupplierGasSupplyBreakdowns.Clear();
+            return _periodSupplierGasSupplyBreakdowns.Count();
         }
 
         #endregion
