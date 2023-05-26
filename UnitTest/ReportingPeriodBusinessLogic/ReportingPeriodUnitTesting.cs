@@ -539,7 +539,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -577,12 +577,12 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
             var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
-            reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+            reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             var percents = GetElectricityGridMixComponentPercents2();
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, percents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, percents);
             }
             catch (Exception ex)
             {
@@ -613,7 +613,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
             var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
             IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
-            reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+            reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             var changedFercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.None);
 
             var periodSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == 1);
@@ -625,7 +625,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,changedFercRegion, percents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, changedFercRegion, percents);
             }
             catch (Exception ex)
             {
@@ -662,7 +662,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -694,7 +694,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, percents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, percents);
             }
             catch (Exception ex)
             {
@@ -727,7 +727,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercent);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercent);
             }
             catch (Exception ex)
             {
@@ -760,7 +760,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -793,7 +793,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -831,7 +831,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure,fercRegion, electricityGridMixComponentPercents);
+                list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
             }
             catch (Exception ex)
             {
@@ -1120,7 +1120,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             try
             {
-                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName,path, null,documentStatuses,documentType,facilityRequiredDocumentTypeVOs);
+                periodFacilityDocument = reportingPeriod.AddPeriodFacilityDocument(1, 1, displayName, path, null, documentStatuses, documentType, facilityRequiredDocumentTypeVOs);
             }
             catch (Exception ex)
             {
@@ -1133,7 +1133,7 @@ namespace UnitTest.ReportingPeriodBusinessLogic
             Assert.Equal(null, periodFacilityDocument.Path);
             Assert.Equal(null, periodFacilityDocument.ValidationError);
             Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Processing), periodFacilityDocument.DocumentStatus);
-            Assert.Equal(documentType,periodFacilityDocument.DocumentType);
+            Assert.Equal(documentType, periodFacilityDocument.DocumentType);
             Assert.Equal(0, exceptionCounter);
             Assert.Null(exceptionMessage);
         }
@@ -1386,6 +1386,365 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
             Assert.NotEqual(0, exceptionCounter);
             Assert.NotNull(exceptionMessage);
+        }
+
+        #endregion
+
+        #region PeriodSupplierDocument
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument success case1
+        /// existingDocument count is 0
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            var displayName = "abc.xlsx";
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            PeriodSupplierDocument? periodSupplierDocument = null;
+
+            try
+            {
+                periodSupplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, null, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodSupplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, periodSupplierDocument.DisplayName);
+            Assert.Equal(null, periodSupplierDocument.Path);
+            Assert.Equal(null, periodSupplierDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Processing), periodSupplierDocument.DocumentStatus);
+            Assert.Equal(documentType, periodSupplierDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument success case2
+        /// existingDocument is already exists than update the supplierDocument 
+        /// path is not null and validationError is null than update the documentStatus is Validated
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, null, documentStatuses, documentType);
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            PeriodSupplierDocument? periodSupplierDocument = null;
+
+            try
+            {
+                periodSupplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, null, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodSupplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, periodSupplierDocument.DisplayName);
+            Assert.Equal(path, periodSupplierDocument.Path);
+            Assert.Equal(null, periodSupplierDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Validated), periodSupplierDocument.DocumentStatus);
+            Assert.Equal(documentType, periodSupplierDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument success case3
+        /// if SupplierReportingPeriodStatus is locked than update the document displayName
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, null, documentStatuses, documentType);
+
+            var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+            var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+            periodSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPeriodStatus.Id;
+            periodSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPeriodStatus.Name;
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            PeriodSupplierDocument? periodSupplierDocument = null;
+
+            try
+            {
+                periodSupplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, null, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodSupplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, periodSupplierDocument.DisplayName);
+            Assert.Equal(null, periodSupplierDocument.Path);
+            Assert.Equal(null, periodSupplierDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.Processing), periodSupplierDocument.DocumentStatus);
+            Assert.Equal(documentType, periodSupplierDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument success case4
+        /// validation error store and documentstatus is changed in HasError
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentSuccessCase4()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, null, documentStatuses, documentType);
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            var validationError = "Unable to save the uploaded file at this time.Please attempt the upload again later.";
+
+            PeriodSupplierDocument? periodSupplierDocument = null;
+
+            try
+            {
+                periodSupplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, path, validationError, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodSupplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, periodSupplierDocument.DisplayName);
+            Assert.Equal(null, periodSupplierDocument.Path);
+            Assert.Equal(validationError, periodSupplierDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.HasErrors), periodSupplierDocument.DocumentStatus);
+            Assert.Equal(documentType, periodSupplierDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument success case2
+        /// existingDocument is already exists than update the supplierDocument 
+        /// path is null and validationError is null than update the documentStatus is NotValidated
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentSuccessCase5()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            var displayName = "abc.xlsx";
+
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, null, documentStatuses, documentType);
+
+            PeriodSupplierDocument? periodSupplierDocument = null;
+
+            try
+            {
+                periodSupplierDocument = reportingPeriod.AddUpdatePeriodSupplierDocument(1, displayName, null, null, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(1, periodSupplierDocument.ReportingPeriodSupplierId);
+            Assert.Equal(displayName, periodSupplierDocument.DisplayName);
+            Assert.Equal(null, periodSupplierDocument.Path);
+            Assert.Equal(null, periodSupplierDocument.ValidationError);
+            Assert.Equal(documentStatuses.First(x => x.Name == DocumentStatusValues.NotValidated), periodSupplierDocument.DocumentStatus);
+            Assert.Equal(documentType, periodSupplierDocument.DocumentType);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument fail case1
+        /// if file path is already exists in the system and supplierReportingPeriodStatus is locked than throw exception
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentFailCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.Supplemental);
+
+            reportingPeriod.AddUpdatePeriodSupplierDocument(1, "abc.xlsx", null, null, documentStatuses, documentType);
+
+            var path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+            try
+            {
+                reportingPeriod.AddUpdatePeriodSupplierDocument(1, "abc.xlsx", path, null, documentStatuses, documentType);
+
+                var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == 1);
+                var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Locked);
+                periodSupplier.SupplierReportingPeriodStatus.Id = supplierReportingPeriodStatus.Id;
+                periodSupplier.SupplierReportingPeriodStatus.Name = supplierReportingPeriodStatus.Name;
+
+                path = "E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles\\P6-AmazingMartEU2Geo.xlsx";
+
+
+                reportingPeriod.AddUpdatePeriodSupplierDocument(1, "abc.xlsx", path, null, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// AddUpdate PeriodSupplierDocument fail case2
+        /// if documentType is not Supplemental than throw exception
+        /// </summary>
+        [Fact]
+        public void AddUpdatePeriodSupplierDocumentFailCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().First(x => x.Name == DocumentTypeValues.SubpartC);
+
+            try
+            {
+                reportingPeriod.AddUpdatePeriodSupplierDocument(1, "abc.xlsx", null, null, documentStatuses, documentType);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        #endregion
+
+        #region All Remove testcase
+
+        [Fact]
+        public void RemoveElectricityGridMixSuccessCase()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            //ElectricityGridMix
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault(x => x.Id == 1);
+            var fercRegion = GetFercRegions().First(x => x.Name == FercRegionValues.CustomMix);
+            var electricityGridMixComponentPercents = GetElectricityGridMixComponentPercents();
+            IEnumerable<PeriodFacilityElectricityGridMix>? list = null;
+            list = reportingPeriod.AddPeriodFacilityElectricityGridMix(1, 1, unitOfMeasure, fercRegion, electricityGridMixComponentPercents);
+
+            try
+            {
+                reportingPeriod.RemovePeriodFacilityElectricityGridMix(1, 1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(list);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+        }
+
+        [Fact]
+        public void RemoveGasSupplyBreakdownSuccessCase()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var gasSupplyBreakdownVos = GetGasSupplyBreakdowns();
+            IEnumerable<PeriodFacilityGasSupplyBreakdown>? list = null;
+            list = reportingPeriod.AddPeriodFacilityGasSupplyBreakdown(1, gasSupplyBreakdownVos);
+
+            try
+            {
+                reportingPeriod.RemovePeriodFacilityGasSupplyBreakdown(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(list);
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
         }
 
         #endregion

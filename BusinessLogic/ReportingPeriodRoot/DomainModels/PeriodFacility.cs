@@ -76,6 +76,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             Id = id;
         }
 
+        #region private methods
+
         private string GeneratedPeriodFacilityDocumentStoredName(string collectionTimePeriod, DocumentType documentType, int version, string fileName)
         {
             var facilityName = FacilityVO.FacilityName;
@@ -106,6 +108,8 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
             return true;
         }
+
+        #endregion
 
         #region UpdateFacilityDataStatus
 
@@ -184,6 +188,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return true;
         }
 
+        internal bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId)
+        {
+            var periodFacilityElectricityGridMixes = _periodFacilityElectricityGridMixes.Where(x => x.PeriodFacilityId == periodFacilityId).ToList();
+
+            foreach (var periodFacilityElectricityGridMix in periodFacilityElectricityGridMixes)
+            {
+                _periodFacilityElectricityGridMixes.Remove(periodFacilityElectricityGridMix);
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region PeriodFacilityGasSupplyBreakdown
@@ -215,6 +231,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             var periodFacilityGasSupplyBreakdown = new PeriodFacilityGasSupplyBreakdown(Id, site, unitOfMeasure, content);
 
             _periodFacilityGasSupplyBreakdowns.Add(periodFacilityGasSupplyBreakdown);
+
+            return true;
+        }
+
+        internal bool RemovePeriodSupplierGasSupplyBreakdown(int periodFacilityId)
+        {
+            var periodFacilityGasSupplyBreakdowns = _periodFacilityGasSupplyBreakdowns.Where(x => x.PeriodFacilityId == periodFacilityId).ToList();
+
+            foreach (var gasSupply in periodFacilityGasSupplyBreakdowns)
+            {
+                _periodFacilityGasSupplyBreakdowns.Remove(gasSupply);
+            }
 
             return true;
         }
@@ -265,6 +293,9 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
 
                     var version = periodFacilityDocument.Version;
 
+                    if (periodFacilityDocument.DocumentStatus.Name == DocumentStatusValues.HasErrors)
+                        version += 1;
+
                     if (validationError is null)
                         documentStatus = documentStatuses.FirstOrDefault(x => x.Name == DocumentStatusValues.NotValidated);
                     else
@@ -284,7 +315,6 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                     if (path is not null && validationError is null)
                     {
                         documentStatus = documentStatuses.FirstOrDefault(x => x.Name == DocumentStatusValues.Validated);
-                        version += 1;
                     }
 
                     var documentStoredName = GeneratedPeriodFacilityDocumentStoredName(collectionTimePeriod, documentType, version, displayName);
@@ -323,7 +353,7 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                 return true;
             }
             else
-                throw new Exception("FacilityDataStatus is not submitted !!");
+                throw new Exception("Can't remove periodFacilityDocument because facilityDataStatus is not submitted !!");
         }
 
         #endregion

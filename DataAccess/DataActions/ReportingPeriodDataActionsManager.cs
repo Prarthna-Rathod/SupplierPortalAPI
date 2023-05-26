@@ -10,11 +10,13 @@ namespace DataAccess.DataActions;
 public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 {
     private readonly SupplierPortalDBContext _context;
+    private readonly IUploadDocuments _uploadDocuments;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
 
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context)
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context,IUploadDocuments uploadDocuments)
     {
         _context = context;
+        _uploadDocuments = uploadDocuments;
     }
 
     #region ReportingPeriod
@@ -201,7 +203,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
         }
-        //_context.SaveChanges();
+        _context.SaveChanges();
         return true;
     }
 
@@ -279,23 +281,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public FileStreamResult DownloadFile(string path)
-    {
-        FileInfo file = new FileInfo(path);
-        var downloadPath = Path.Combine(Directory.GetCurrentDirectory(), path);
-        var stream = new MemoryStream(System.IO.File.ReadAllBytes(downloadPath));
-
-        return new FileStreamResult(stream, new MediaTypeHeaderValue("application/octet-stream"))
-        {
-            FileDownloadName = file.Name
-        };
-    }
-
     public bool RemovePeriodFacilityDocument(int documentId)
     {
         var periodFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.Id == documentId).FirstOrDefault();
 
-        var isDeletedFile = DeleteFile(periodFacilityDocument.Path);
+        var isDeletedFile = _uploadDocuments.DeleteFile(periodFacilityDocument.Path);
 
         if (isDeletedFile)
         {
@@ -307,58 +297,77 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             throw new Exception("PeriodFacilityDocument is not deleted because file path is not exists !!");
     }
 
-    private bool DeleteFile(string path)
+    #endregion
+
+    #region DownloadAndDeleteFile
+
+    public FileStreamResult DownloadFile(string path)
     {
+        if (path is null)
+            throw new Exception("Can't download document because path is null !!");
+
         FileInfo file = new FileInfo(path);
-        if (file.Exists)
+        var downloadPath = Path.Combine(Directory.GetCurrentDirectory(), path);
+        var stream = new MemoryStream(System.IO.File.ReadAllBytes(downloadPath));
+
+        return new FileStreamResult(stream, new MediaTypeHeaderValue("application/octet-stream"))
         {
-            file.Delete();
-            return true;
-        }
-        else
-            return false;
+            FileDownloadName = file.Name
+        };
     }
 
     #endregion
 
+    #region PeriodSupplierDocument
 
-    public async Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
+    public bool AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocumentEntity)
     {
-        await _context.ReportingPeriodSupplierDocumentEntities.AddAsync(reportingPeriodSupplierDocument);
+        var existingPeriodSupplierDocument = _context.ReportingPeriodSupplierDocumentEntities.Where(x => x.DocumentTypeId == reportingPeriodSupplierDocumentEntity.DocumentTypeId && x.ReportingPeriodSupplierId == reportingPeriodSupplierDocumentEntity.ReportingPeriodSupplierId).FirstOrDefault();
 
-        reportingPeriodSupplierDocument.CreatedBy = "System";
-        reportingPeriodSupplierDocument.CreatedOn = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
-    {
-        var existingsupplierdocument = await _context.ReportingPeriodSupplierDocumentEntities.FirstOrDefaultAsync(x => x.Id == reportingPeriodSupplierDocument.Id);
-
-        if (existingsupplierdocument == null)
+        if (existingPeriodSupplierDocument is null)
         {
-            throw new Exception("Supplier Document Not found");
+            reportingPeriodSupplierDocumentEntity.CreatedOn = DateTime.UtcNow;
+            reportingPeriodSupplierDocumentEntity.CreatedBy = "System";
+            _context.ReportingPeriodSupplierDocumentEntities.Add(reportingPeriodSupplierDocumentEntity);
+        }
+        else
+        {
+            existingPeriodSupplierDocument.ReportingPeriodSupplierId = reportingPeriodSupplierDocumentEntity.ReportingPeriodSupplierId;
+            existingPeriodSupplierDocument.Version = reportingPeriodSupplierDocumentEntity.Version;
+            existingPeriodSupplierDocument.DisplayName = reportingPeriodSupplierDocumentEntity.DisplayName;
+            existingPeriodSupplierDocument.StoredName = reportingPeriodSupplierDocumentEntity.StoredName;
+            existingPeriodSupplierDocument.Path = reportingPeriodSupplierDocumentEntity.Path;
+            existingPeriodSupplierDocument.DocumentStatusId = reportingPeriodSupplierDocumentEntity.DocumentStatusId;
+            existingPeriodSupplierDocument.DocumentTypeId = reportingPeriodSupplierDocumentEntity.DocumentTypeId;
+            existingPeriodSupplierDocument.ValidationError = reportingPeriodSupplierDocumentEntity.ValidationError;
+            existingPeriodSupplierDocument.UpdatedBy = "System";
+            existingPeriodSupplierDocument.UpdatedOn = DateTime.UtcNow;
+
+            _context.ReportingPeriodSupplierDocumentEntities.Update(existingPeriodSupplierDocument);
         }
 
-        existingsupplierdocument.ReportingPeriodSupplierId = reportingPeriodSupplierDocument.ReportingPeriodSupplierId;
-        existingsupplierdocument.Version = reportingPeriodSupplierDocument.Version;
-        existingsupplierdocument.DisplayName = reportingPeriodSupplierDocument.DisplayName;
-        existingsupplierdocument.StoredName = reportingPeriodSupplierDocument.StoredName;
-        existingsupplierdocument.Path = reportingPeriodSupplierDocument.Path;
-        existingsupplierdocument.DocumentStatusId = reportingPeriodSupplierDocument.DocumentStatusId;
-        existingsupplierdocument.DocumentTypeId = reportingPeriodSupplierDocument.DocumentTypeId;
-        existingsupplierdocument.ValidationError = reportingPeriodSupplierDocument.ValidationError;
-        existingsupplierdocument.UpdatedBy = "System";
-        existingsupplierdocument.UpdatedOn = DateTime.UtcNow;
-
-        _context.ReportingPeriodSupplierDocumentEntities.Update(existingsupplierdocument);
-        await _context.SaveChangesAsync();
-
+        _context.SaveChanges();
         return true;
+
     }
 
+    public bool RemovePeriodSupplierDocument(int documentId)
+    {
+        var periodSupplierDocument = _context.ReportingPeriodSupplierDocumentEntities.Where(x => x.Id == documentId).FirstOrDefault();
+
+        var isDeletedFile = _uploadDocuments.DeleteFile(periodSupplierDocument.Path);
+
+        if (isDeletedFile)
+        {
+            _context.ReportingPeriodSupplierDocumentEntities.Remove(periodSupplierDocument);
+            _context.SaveChanges();
+            return true;
+        }
+        else
+            throw new Exception("Can't removed document because path is not exists !!");
+    }
+
+    #endregion
 
     #region GetAll Methods
 
@@ -463,6 +472,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodType)
                                 .Include(x => x.ReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierEntities)
+                                    .ThenInclude(x => x.ReportingPeriodSupplierDocumentEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
@@ -474,32 +484,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return reportingPeriod;
     }
 
-    public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId)
-    {
-        var reportingPeriodType = _context.ReportingPeriodTypeEntities.Where(x => x.Id == reportingPeriodTypeId).ToList();
-
-        return reportingPeriodType;
-    }
-
-    public IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId)
-    {
-        var reportingPeriodStatus = _context.ReportingPeriodStatusEntities.Where(x => x.Id == reportingPeriodStatusId).ToList();
-        return reportingPeriodStatus;
-    }
-
-    public IEnumerable<ReportingPeriodSupplierEntity> GetReportingPeriodSuppliers(int reportingPeriodId)
-    {
-        var reportingPeriodSupplier =
-            _context.ReportingPeriodSupplierEntities
-                                    .Where(x => x.ReportingPeriodId == reportingPeriodId)
-                                    .Include(x => x.Supplier)
-                                    .Include(x => x.ReportingPeriod)
-                                    .Include(x => x.SupplierReportingPeriodStatus)
-                                    .ToList();
-        return reportingPeriodSupplier;
-
-    }
-
     public ReportingPeriodSupplierEntity GetPeriodSupplierById(int periodSupplierId)
     {
         var periodSupplier = _context.ReportingPeriodSupplierEntities
@@ -507,6 +491,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.SupplierReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
+                                .Include(x => x.ReportingPeriodSupplierDocumentEntities)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }
@@ -532,33 +518,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return periodFacilityDocument;
     }
 
-    public async Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId)
+    public ReportingPeriodSupplierDocumentEntity GetReportingPeriodSupplierDocumentById(int documentId)
     {
-        return await _context.ReportingPeriodFacilityEntities
-                                    .Include(x => x.Facility)
-                                    .Include(x => x.FacilityReportingPeriodDataStatus)
-                                    .Include(x => x.ReportingPeriod)
-                                    .Include(x => x.ReportingPeriodSupplier)
-                                    .ToListAsync();
-    }
-
-
-
-    public async Task<IEnumerable<ReportingPeriodSupplierDocumentEntity>> GetReportingPeriodSuppliersDocument(int DocumentId)
-    {
-        return await _context.ReportingPeriodSupplierDocumentEntities
+        var periodSupplierDocument = _context.ReportingPeriodSupplierDocumentEntities
                                     .Include(x => x.ReportingPeriodSupplier)
                                     .Include(x => x.DocumentStatus)
                                     .Include(x => x.DocumentType)
-                                    .ToListAsync();
-    }
-
-    public async Task<IEnumerable<ReportingPeriodEntity>> GetReportingPeriods(int ReportingPeriodId)
-    {
-        return await _context.ReportingPeriodEntities
-                                .Include(x => x.ReportingPeriodType)
-                                .Include(x => x.ReportingPeriodStatus)
-                                .ToListAsync();
+                                    .FirstOrDefault(x => x.Id == documentId);
+        return periodSupplierDocument;
     }
 
     #endregion

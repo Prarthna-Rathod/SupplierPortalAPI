@@ -53,18 +53,24 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity);
 
-        FileStreamResult DownloadFile(string path);
-
         bool RemovePeriodFacilityDocument(int documentId);
 
         #endregion
 
-        
-        Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
+        #region DownloadFile
 
-        Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument);
+        FileStreamResult DownloadFile(string path);
 
-        
+        #endregion
+
+        #region PeriodSupplierDocument
+
+        bool AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocumentEntity);
+
+        bool RemovePeriodSupplierDocument(int documentId);
+
+        #endregion
+
         #region GetAll Methods
 
         IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypes();
@@ -99,8 +105,6 @@ namespace DataAccess.DataActions.Interfaces
 
         #region GetById Methods
 
-        Task<IEnumerable<ReportingPeriodEntity>> GetReportingPeriods(int ReportingPeriodId);
-
         ReportingPeriodEntity GetReportingPeriodById(int reportingPeriodId);
 
         ReportingPeriodSupplierEntity GetPeriodSupplierById(int periodSupplierId);
@@ -109,15 +113,7 @@ namespace DataAccess.DataActions.Interfaces
 
         ReportingPeriodFacilityDocumentEntity GetReportingPeriodFacilityDocumentById(int documentId);
 
-        IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId);
-
-        IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId);
-
-        Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId);
-
-        Task<IEnumerable<ReportingPeriodSupplierDocumentEntity>> GetReportingPeriodSuppliersDocument(int DocumentId);
-
-        IEnumerable<ReportingPeriodSupplierEntity> GetReportingPeriodSuppliers(int ReportingPeriodId);
+        ReportingPeriodSupplierDocumentEntity GetReportingPeriodSupplierDocumentById(int documentId);
 
         #endregion
 

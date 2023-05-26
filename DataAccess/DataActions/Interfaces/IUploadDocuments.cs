@@ -11,9 +11,11 @@ namespace DataAccess.DataActions.Interfaces
     {
         #region UploadFile method
         
-        string UploadFile(IFormFile displayName);
+        string UploadFile(IFormFile displayName,string storedName);
 
         string validationError(IFormFile displayName);
+
+        bool DeleteFile(string path);
 
         #endregion
     }

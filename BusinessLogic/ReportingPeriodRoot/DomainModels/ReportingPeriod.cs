@@ -357,6 +357,15 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacilityElectricityGridMix(periodFacilityId, unitOfMeasure, electricityGridMixComponentPercents);
         }
 
+        public bool RemovePeriodFacilityElectricityGridMix(int supplierId,int periodFacilityId)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            CheckReportingPeriodStatus();
+
+            return periodSupplier.RemovePeriodFacilityElectricityGridMix(periodFacilityId);
+        }
+
         #endregion
 
         #region PeriodSupplierGasSupplyBreakdown
@@ -377,9 +386,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(gasSupplyBreakdownVOs);
         }
 
+        public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
+        {
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
+
+            CheckReportingPeriodStatus();
+
+            return periodSupplier.RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
+        }
+
         #endregion
 
-        #region Period Document
+        #region PeriodFacilityDocument
 
         public PeriodFacilityDocument AddPeriodFacilityDocument(int periodSupplierId, int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
         {
@@ -397,11 +415,38 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             return periodSupplier.LoadPeriodFacilityDocument(periodFacilityDocumentId, periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
         }
 
-        public bool RemovePeriodFacilityDocument(int periodSupplierId,int periodFacilityId,int periodFacilityDocumentId)
+        public bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int periodFacilityDocumentId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+            return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId, periodFacilityDocumentId);
+        }
+
+        #endregion
+
+        #region PeriodSupplierDocument
+
+        public PeriodSupplierDocument AddUpdatePeriodSupplierDocument(int supplierId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType)
+        {
+            CheckReportingPeriodStatus();
+
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            return periodSupplier.AddUpdatePeriodSupplierDocument(displayName, path, validationError, documentStatuses, documentType, CollectionTimePeriod);
+        }
+
+        public bool LoadPeriodSupplierDocument(int periodSupplierDocumentId, int supplierId, int version, string displayName, string storedName, string path, string validationError, DocumentStatus documentStatus, DocumentType documentType)
+        {
+            var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+            return periodSupplier.LoadPeriodSupplierDocument(periodSupplierDocumentId, version, displayName, storedName, path, validationError, documentStatus, documentType);
+        }
+
+        public bool RemovePeriodSupplierDocument(int periodSupplierId, int documentId)
         {
             CheckReportingPeriodStatus();
             var periodSupplier = GetPeriodSupplier(periodSupplierId);
-            return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId,periodFacilityDocumentId);
+            return periodSupplier.RemovePeriodSupplierDocument(documentId);
         }
 
         #endregion

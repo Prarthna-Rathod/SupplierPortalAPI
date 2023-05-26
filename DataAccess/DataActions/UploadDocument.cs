@@ -8,20 +8,15 @@ namespace DataAccess.DataActions
 
         #region UploadFile method
 
-        public string UploadFile(IFormFile displayName)
+        public string UploadFile(IFormFile displayName,string storedName)
         {
-            string path = "";
-
-            path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"E:\Bigscal\ICT_4\SupplierPortalAPI\SupplierPortalAPI\DataAccess\UploadedFiles"));
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            using (var fileStream = new FileStream(Path.Combine(path, displayName.FileName), FileMode.Create))
+            string path = Path.Combine("E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles",storedName);
+            
+            using (var fileStream = new FileStream(path, FileMode.Create))
             {
                 displayName.CopyTo(fileStream);
             }
-            return path + @"\" + displayName.FileName;
+            return path;
         }
 
         public string validationError(IFormFile displayName)
@@ -61,6 +56,21 @@ namespace DataAccess.DataActions
 
             return error;
         }*/
+
+        public bool DeleteFile(string path)
+        {
+            if (path is not null)
+            {
+                FileInfo file = new FileInfo(path);
+                if (file.Exists)
+                    file.Delete();
+                return true;
+            }
+            else
+                return false;
+
+        }
+
 
         #endregion
     }

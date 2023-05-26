@@ -33,7 +33,5 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             Id = id;
         }
 
-
-
     }
 }

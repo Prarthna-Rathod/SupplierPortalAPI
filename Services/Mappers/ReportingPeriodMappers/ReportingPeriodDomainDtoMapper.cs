@@ -260,5 +260,35 @@ namespace Services.Mappers.ReportingPeriodMappers
 
         #endregion
 
+        #region PeriodSupplierDocument
+
+        public ReportingPeriodSupplierGasSupplyAndDocumentDto ConvertPeriodSupplierGasSupplyAndDocumentDomainToDto(IEnumerable<PeriodFacility> periodFacilities, PeriodSupplier periodSupplier)
+        {
+            var gasSupplyDomainList = new List<PeriodFacilityGasSupplyBreakdown>();
+            var gasSupplyDtos = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+
+            foreach (var periodFacility in periodFacilities)
+            {
+                var gasSupplyList = periodFacility.PeriodFacilityGasSupplyBreakdowns;
+                gasSupplyDomainList.AddRange(gasSupplyList);
+
+                gasSupplyDtos.AddRange(ConvertPeriodFacilityGasSupplyDomainToDto(gasSupplyList, periodFacility));
+
+            }
+
+            var periodSupplierDocumentDtos = new List<PeriodSupplierDocumentDto>();
+            foreach(var periodSupplierDocument in periodSupplier.PeriodSupplierDocuments)
+            {
+                var periodSupplierDocumentDto = new PeriodSupplierDocumentDto(periodSupplierDocument.Id,periodSupplierDocument.Version,periodSupplierDocument.DisplayName,periodSupplierDocument.DocumentStatus.Id,periodSupplierDocument.DocumentStatus.Name,periodSupplierDocument.DocumentType.Id,periodSupplierDocument.DocumentType.Name,periodSupplierDocument.ValidationError);
+                periodSupplierDocumentDtos.Add(periodSupplierDocumentDto);
+            }
+
+            var periodFacilityGasSupplyAndDocumentDto = new ReportingPeriodSupplierGasSupplyAndDocumentDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, gasSupplyDtos,periodSupplierDocumentDtos);
+
+            return periodFacilityGasSupplyAndDocumentDto;
+        }
+
+        #endregion
+
     }
 }

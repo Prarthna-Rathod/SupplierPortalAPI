@@ -252,7 +252,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
 
     #endregion
 
-    #region PeriodDocument
+    #region PeriodFacilityDocument
 
     public ReportingPeriodFacilityDocumentEntity ConvertReportingPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument)
     {
@@ -296,6 +296,26 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     public FacilityRequiredDocumentTypeVO ConvertFacilityRequiredDocumentTypeEntityToValueObject(ReportingType reportingType,SupplyChainStage supplyChainStage,DocumentType documentType,DocumentRequiredStatus documentRequiredStatus)
     {
         return new FacilityRequiredDocumentTypeVO(reportingType, supplyChainStage, documentType, documentRequiredStatus);
+    }
+
+    #endregion
+
+    #region PeriodSupplierDocument
+
+    public ReportingPeriodSupplierDocumentEntity ConvertReportingPeriodSupplierDocumentDomainToEntity(PeriodSupplierDocument periodSupplierDocument)
+    {
+        var periodSupplierDocumentEntity = new ReportingPeriodSupplierDocumentEntity();
+        periodSupplierDocumentEntity.Id = periodSupplierDocument.Id;
+        periodSupplierDocumentEntity.ReportingPeriodSupplierId = periodSupplierDocument.ReportingPeriodSupplierId;
+        periodSupplierDocumentEntity.Version = periodSupplierDocument.Version;
+        periodSupplierDocumentEntity.DisplayName = periodSupplierDocument.DisplayName;
+        periodSupplierDocumentEntity.StoredName = periodSupplierDocument.StoredName;
+        periodSupplierDocumentEntity.Path = periodSupplierDocument.Path;
+        periodSupplierDocumentEntity.DocumentStatusId = periodSupplierDocument.DocumentStatus.Id;
+        periodSupplierDocumentEntity.DocumentTypeId = periodSupplierDocument.DocumentType.Id;
+        periodSupplierDocumentEntity.ValidationError = periodSupplierDocument.ValidationError;
+        periodSupplierDocumentEntity.IsActive = true;
+        return periodSupplierDocumentEntity;
     }
 
     #endregion

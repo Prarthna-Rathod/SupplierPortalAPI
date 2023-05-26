@@ -292,5 +292,34 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
         }
 
         #endregion
+
+        #region PeriodSupplierDocument
+
+        [Fact]
+        public void ConvertReportingPeriodSupplierDocumentDomainToEntity()
+        {
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            var documentStatuses = GetDocumentStatuses();
+            var documentType = GetDocumentTypes().FirstOrDefault(x => x.Name == DocumentTypeValues.Supplemental);
+
+            var periodSupplierDocumentDomain = reportingPeriod.AddUpdatePeriodSupplierDocument(1,"abc.xml",null,null,documentStatuses,documentType);
+
+            var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
+            var periodSupplierDocumentEntity = mapper.ConvertReportingPeriodSupplierDocumentDomainToEntity(periodSupplierDocumentDomain);
+
+            Assert.NotNull(periodSupplierDocumentEntity);
+            Assert.Equal(periodSupplierDocumentDomain.Id, periodSupplierDocumentEntity.Id);
+            Assert.Equal(periodSupplierDocumentDomain.ReportingPeriodSupplierId, periodSupplierDocumentEntity.ReportingPeriodSupplierId);
+            Assert.Equal(periodSupplierDocumentDomain.Version, periodSupplierDocumentEntity.Version);
+            Assert.Equal(periodSupplierDocumentDomain.DisplayName, periodSupplierDocumentEntity.DisplayName);
+            Assert.Equal(periodSupplierDocumentDomain.StoredName, periodSupplierDocumentEntity.StoredName);
+            Assert.Equal(periodSupplierDocumentDomain.Path, periodSupplierDocumentEntity.Path);
+            Assert.Equal(periodSupplierDocumentDomain.DocumentStatus.Id, periodSupplierDocumentEntity.DocumentStatusId);
+            Assert.Equal(periodSupplierDocumentDomain.DocumentType.Id, periodSupplierDocumentEntity.DocumentTypeId);
+            Assert.Equal(periodSupplierDocumentDomain.ValidationError, periodSupplierDocumentEntity.ValidationError);
+        }
+
+        #endregion
     }
 }

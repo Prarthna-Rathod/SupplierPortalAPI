@@ -29,6 +29,8 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         bool LoadPeriodFacilityElectricityGridMix(int periodFacilityId, int periodSupplierId, UnitOfMeasure unitOfMeasure, IEnumerable<ElectricityGridMixComponentPercent> electricityGridMixComponentPercents);
 
+        bool RemovePeriodFacilityElectricityGridMix(int supplierId, int periodFacilityId);
+
         #endregion
 
         #region PeriodFacilityGasSupplyBreakDown
@@ -36,6 +38,8 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs);
 
         bool LoadPeriodFacilityGasSupplyBreakdown(int periodSupplierId, IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs);
+
+        bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId);
 
         #endregion
 
@@ -45,7 +49,7 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         bool LoadPeriodFacilityDocument(int periodFacilityDocumentId, int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError);
 
-        bool RemovePeriodFacilityDocument(int periodSupplierId, int periodFacilityId, int periodFacilityDocumentId);
+        bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int periodFacilityDocumentId);
 
         #endregion
 
@@ -54,6 +58,16 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
         IEnumerable<PeriodFacility> UpdatePeriodFacilityDataStatusCompleteToSubmitted(int periodSupplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
 
         bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus);
+
+        #endregion
+
+        #region PeriodSupplierDocument
+
+        PeriodSupplierDocument AddUpdatePeriodSupplierDocument(int supplierId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType);
+
+        bool LoadPeriodSupplierDocument(int periodSupplierDocumentId, int supplierId, int version, string displayName, string storedName, string path, string validationError, DocumentStatus documentStatus, DocumentType documentType);
+
+        bool RemovePeriodSupplierDocument(int periodSupplierId, int documentId);
 
         #endregion
 

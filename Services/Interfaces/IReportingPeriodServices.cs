@@ -38,13 +38,13 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="periodSupplierId"></param>
     /// <returns></returns>
-    string LockUnlockPeriodSupplierStatus(int periodSupplierId);   
+    string LockUnlockPeriodSupplierStatus(int periodSupplierId);
 
     /// <summary>
     /// Get Relevant PeriodSuppliers
     /// </summary>
     /// <returns></returns>
-    IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId);  
+    IEnumerable<ReportingPeriodRelevantSupplierDto> GetRelevantSuppliers(int reportingPeriodId);
 
     #endregion
 
@@ -81,7 +81,14 @@ public interface IReportingPeriodServices
     /// <param name="periodFacilityId"></param>
     /// <param name="reportingPeriodId"></param>
     /// <returns></returns>
-    MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int periodFacilityId);
+    MultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMixes(int supplierId, int periodFacilityId);
+
+    /// <summary>
+    /// Remove PeriodFacilityElectricityGridMix
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    string RemoveReportingPeriodFacilityElectricityGridMix(int supplierId, int periodFacilityId);
 
     #endregion
 
@@ -102,16 +109,23 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     MultiplePeriodFacilityGasSupplyBreakdownDto GetReportingPeriodFacilityGasSupplyBreakdown(int periodSupplierId);
 
+    /// <summary>
+    /// Remove PeriodFacilityGasSupplyBreakdown
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    string RemoveReportingPeriodFacilityGasSupplyBreakdown(int periodSupplierId);
+
     #endregion
 
-    #region ReportingPeriodDocuments
+    #region PeriodFacilityDocuments
 
     /// <summary>
     /// AddUpdate PeriodFacilityDocument
     /// </summary>
-    /// <param name="reportingPeriodDocumentDto"></param>
+    /// <param name="reportingPeriodFacilityDocumentDto"></param>
     /// <returns></returns>
-    string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentDto reportingPeriodDocumentDto);
+    string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentDto reportingPeriodFacilityDocumentDto);
 
     /// <summary>
     /// Get PeriodFacility GridMixes and Documents
@@ -120,7 +134,7 @@ public interface IReportingPeriodServices
     /// <param name="reportingPeriodId"></param>
     /// <param name="supplierId"></param>
     /// <returns></returns>
-    ReportingPeriodFacilityGridMixAndDocumentDto GetReportingPeriodFacilityGridMixAndDocuments(int periodFacilityId);
+    ReportingPeriodFacilityGridMixAndDocumentDto GetReportingPeriodFacilityGridMixAndDocuments(int supplierId, int periodFacilityId);
 
     /// <summary>
     /// Download PeriodFacilityDocument
@@ -134,7 +148,7 @@ public interface IReportingPeriodServices
     /// </summary>
     /// <param name="documentId"></param>
     /// <returns></returns>
-    string RemovePeriodFacilityDocument(int documentId);
+    string RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int documentId);
 
     #endregion
 
@@ -149,6 +163,37 @@ public interface IReportingPeriodServices
 
     #endregion
 
+    #region PeriodSupplierDocument
 
+    /// <summary>
+    /// AddUpdate ReportingPeriodSupplierDocument
+    /// </summary>
+    /// <param name="reportingPeriodSupplierDocumentDto"></param>
+    /// <returns></returns>
+    string AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentDto reportingPeriodSupplierDocumentDto);
+
+    /// <summary>
+    /// Get ReportingPeriodSupplier GasSupply and Documents
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    ReportingPeriodSupplierGasSupplyAndDocumentDto GetReportingPeriodSupplierGasSupplyAndDocuments(int periodSupplierId);
+
+    /// <summary>
+    /// Download PeriodSupplierDocument
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    FileStreamResult GetReportingPeriodSupplierDocumentDownload(int documentId);
+
+    /// <summary>
+    /// Remove PeriodSupplierDocument
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    string RemoveReportingPeriodSupplierDocument(int periodSupplierId, int documentId);
+
+    #endregion
 
 }
