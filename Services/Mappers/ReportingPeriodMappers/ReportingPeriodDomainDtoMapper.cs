@@ -6,6 +6,7 @@ using DataAccess.Entities;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Mappers.Interfaces;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace Services.Mappers.ReportingPeriodMappers
 {
@@ -179,6 +180,7 @@ namespace Services.Mappers.ReportingPeriodMappers
 
 
         #endregion
+
         #region PeriodFacilityElectricityGridMix
 
         public IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> ConvertPeriodFacilityElectricityGridMixDtoToValueObject(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDtos, IEnumerable<ElectricityGridMixComponent> electricityGridMixComponent, IEnumerable<UnitOfMeasure> unitOfMeasure)
@@ -252,18 +254,66 @@ namespace Services.Mappers.ReportingPeriodMappers
             dto.ReportingPeriodFacilityElectricityGridMixDtos = ConvertElectricityGridMixes(reportingPeriodFacilityEntity.ReportingPeriodFacilityElectricityGridMixEntities, unitOfMeasures, electricityGridMixComponents);
 
             return dto;
-            #endregion
-
-
-
-            #region PeriodDocument
-            #endregion
-
-
-
-
-
-
         }
+        #endregion
+
+
+        #region PeriodFacilityGasSupplyBreakdown
+
+            public IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> periodFacilityGasSupplyBreakDownDto, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures)
+            {
+                var reportingPeriodFacilityGasSupplyBreakDownVO = new List<ReportingPeriodFacilityGasSupplyBreakDownVO>();
+
+                foreach (var gasSupplyBreakDown in periodFacilityGasSupplyBreakDownDto)
+                {
+                    var site = sites.FirstOrDefault(x => x.Id == gasSupplyBreakDown.SiteId);
+                    var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.Id == gasSupplyBreakDown.UnitOfMeasureId);
+
+                    reportingPeriodFacilityGasSupplyBreakDownVO.Add(ConvertPeriodFacilityGasSupplyBreakDown(gasSupplyBreakDown, site, unitOfMeasure));
+                }
+
+                return reportingPeriodFacilityGasSupplyBreakDownVO;
+            }
+
+            protected ReportingPeriodFacilityGasSupplyBreakDownVO ConvertPeriodFacilityGasSupplyBreakDown(ReportingPeriodFacilityGasSupplyBreakdownDto gasSupplyBreakDown, Site site, UnitOfMeasure unitOfMeasure)
+            {
+                return new ReportingPeriodFacilityGasSupplyBreakDownVO(0,gasSupplyBreakDown.ReportingPeriodFacilityId,unitOfMeasure,site,gasSupplyBreakDown.Content);
+            }
+
+        public MultiplePeriodFacilityGasSupplyBreakDownDto ConvertReportingPeriodGasSupplyBreakDownDomainListToDto(PeriodSupplier periodSupplier, IEnumerable<PeriodFacility> periodFacilities)
+        {
+            var domainlist = new List<PeriodFacilityGasSupplyBreakDown>();
+            var dtos = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+
+            foreach(var periodFacility in periodFacilities)
+            {
+                var gasSupplyBreakdown = periodFacility.periodFacilityGasSupplyBreakDowns;
+                domainlist.AddRange(gasSupplyBreakdown);
+
+                dtos.AddRange(ConvertPeriodFacilityGasSupplyDomainToDto(gasSupplyBreakdown, periodFacility));
+            }
+
+            var periodFacilityBreakdownDto = new MultiplePeriodFacilityGasSupplyBreakDownDto(periodSupplier.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, periodSupplier.Supplier.Name, dtos);
+
+           return periodFacilityBreakdownDto;
+        }
+        private IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> ConvertPeriodFacilityGasSupplyDomainToDto(IEnumerable<PeriodFacilityGasSupplyBreakDown> facilityGasSupplyBreakdowns, PeriodFacility periodFacility)
+        {
+            var gasSupplyDto = new List<ReportingPeriodFacilityGasSupplyBreakdownDto>();
+            foreach (var gasSupplyBreakdown in facilityGasSupplyBreakdowns)
+            {
+                var gasSupplyBreakdownDto = new ReportingPeriodFacilityGasSupplyBreakdownDto(gasSupplyBreakdown.PeriodFacilityId, periodFacility.FacilityVO.Id, periodFacility.FacilityVO.FacilityName, gasSupplyBreakdown.Site.Id, gasSupplyBreakdown.Site.Name, gasSupplyBreakdown.UnitOfMeasure.Id, gasSupplyBreakdown.UnitOfMeasure.Name, gasSupplyBreakdown.Content);
+                gasSupplyDto.Add(gasSupplyBreakdownDto);
+            }
+            return gasSupplyDto;
+        }
+
+        #endregion
+
+
+
+        #region PeriodDocument
+        #endregion
+
     }
 }

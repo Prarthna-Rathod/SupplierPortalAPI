@@ -42,6 +42,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddPeriodFacilityElectricityGridMix(addMultiplePeriodFacilityElectricityGridMixDto);
         }
 
+        [HttpPost("AddPeriodFacilityGasSupplyBreakdown")]
+        public string AddReportingPeriodFacilityGasSupplyBreakdown(MultiplePeriodFacilityGasSupplyBreakDownDto multiplePeriodFacilityGasSupplyBreakDownDto)
+        {
+            return _services.AddPeriodFacilityGasSupplyBreakdown(multiplePeriodFacilityGasSupplyBreakDownDto);
+        }
+
         [HttpPut("LockUnlockPeriodSupplierStatus")]
         public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
         {
@@ -76,7 +82,27 @@ namespace SupplierPortalAPI.Controllers
             return _services.GetReportingPeriodFacilityElectricityGridMix(periodFacilityId);
         }
 
-        #endregion             
+        [HttpGet("GetPeriodFacilityGasSupplyBreakdown")]
+        public MultiplePeriodFacilityGasSupplyBreakDownDto GetPeriodFaclityGasSupplyBreakDown(int periodSupplierId)
+        {
+            return _services.GetReportingPeriodFacilityGasSupplybreakDown(periodSupplierId);
+        }
+        #endregion
+        #region Remove Methods
+
+        [HttpDelete("RemovePeriodFacilityElectricityGridMix")]
+        public string RemovePeriodFacilityEectricityGridMix(int supplierId,int periodFacilityId)
+        {
+            return _services.RemovePeriodFacilityElectricityGridMix(supplierId,periodFacilityId);
+        }
+
+        [HttpDelete("RemovePeriodFacilityGasSupplyBreakdown")]
+        public string RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
+        {
+            return _services.RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId) ;
+        }
+        #endregion
+
 
     }
 }

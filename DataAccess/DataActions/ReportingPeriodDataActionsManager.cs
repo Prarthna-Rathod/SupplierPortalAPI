@@ -106,22 +106,46 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity,int periodFacilityId,int fercRegionId)
     {
-        // periodFacility = GetReportingPeriodFacility(periodFacilityId);
 
         var electicityGridMixEntities = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId);
 
         var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.FirstOrDefault(x => x.Id == periodFacilityId);
 
+
+
         periodFacilityEntity.FercRegionId=fercRegionId; //Update FercRegionId in PeriodFacility
 
         _context.ReportingPeriodFacilityElectricityGridMixEntities.RemoveRange(electicityGridMixEntities);
-
-        _context.ReportingPeriodFacilityElectricityGridMixEntities.AddRange(periodFacilityElectricityGridMixEntity); 
-
+        _context.ReportingPeriodFacilityElectricityGridMixEntities.AddRange(periodFacilityElectricityGridMixEntity);
         _context.SaveChanges();
 
 
         return true;
+    }
+    public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId)
+    {
+        var periodFacilityEntities = _context.ReportingPeriodFacilityEntities.Where(x=>x.ReportingPeriodSupplierId== periodSupplierId);
+
+      
+        foreach (var periodFacility in periodFacilityEntities)
+         {
+             var existingEntity = periodFacility.ReportingPeriodFacilityGasSupplyBreakdownEntities.Where(x => x.PeriodFacilityId == periodFacility.Id).ToList();
+
+             if (existingEntity.Count() != 0)
+                    _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
+         }
+
+
+        foreach (var gasSupplyBreakdownList in periodFacilityGasSupplyBreakDownEntities)
+        {
+            if (gasSupplyBreakdownList == null)
+                throw new Exception("PeriodFacilityGasSupplyBreakdown is not found !!");
+            _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(gasSupplyBreakdownList);
+        }
+        _context.SaveChanges();
+        return true;
+      
+
     }
 
     public async Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
@@ -261,13 +285,35 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     #region Remove Methods
 
 
-    public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityElectricityGridMixId)
+    public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId)
     {
-        var entity = _context.ReportingPeriodFacilityElectricityGridMixEntities.FirstOrDefault(x => x.Id == periodFacilityElectricityGridMixId);
-        if (entity == null)
-            throw new Exception("RemovePeriodFacilityElectricityGridMix not found !!");
+        var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
+        foreach (var facility in existingFacility)
+        {
+            if (facility == null)
+                throw new Exception("PeriodFacility is not found !!");
 
-        _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(entity);
+            _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
+        }
+        _context.SaveChanges();
+        return true;
+    }
+
+    public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
+    {
+        var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
+        var periodFacilityEntities = periodSupplierEntity.ReportingPeriodFacilityEntities;
+        var periodFacilityGasSupplyBreakdownEntities = _context.ReportingPeriodFacilityGasSupplyBreakDownEntities;
+
+        foreach (var periodFacility in periodFacilityEntities)
+        {
+            var existingEntity = periodFacilityGasSupplyBreakdownEntities.Where(x => x.PeriodFacilityId == periodFacility.Id).ToList();
+
+            if (existingEntity.Count() != 0)
+                _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
+
+        }
+
         _context.SaveChanges();
         return true;
     }
@@ -373,6 +419,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return _context.FercRegionEntities;
     }
 
+    public IEnumerable<SiteEntity> GetSiteEntities()
+    {
+        return _context.SiteEntities;
+    }
+
 
     #endregion
 
@@ -385,7 +436,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
-                                /*.ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)*/
+                                    .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakdownEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;
@@ -424,6 +475,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .Include(x => x.ReportingPeriod)
                                 .Include(x => x.SupplierReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakdownEntities)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }
@@ -505,5 +557,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+   
     #endregion
 }

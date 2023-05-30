@@ -13,8 +13,6 @@ namespace BusinessLogic.ReportingPeriodRoot.ValueObjects
     {
         public int Id { get; set; }
         public int PeriodFacilityId { get; set; }
-
-        public int FacilityId { get; set; }
         public UnitOfMeasure UnitOfMeasure { get; set; }
         public Site Site { get; set; }
         public decimal Content { get; set; }
@@ -24,11 +22,10 @@ namespace BusinessLogic.ReportingPeriodRoot.ValueObjects
 
         }
 
-        public ReportingPeriodFacilityGasSupplyBreakDownVO(int id,int periodFacilityId,int facilityId,UnitOfMeasure unitOfMeasure,Site site,decimal content)
+        public ReportingPeriodFacilityGasSupplyBreakDownVO(int id,int periodFacilityId,UnitOfMeasure unitOfMeasure,Site site,decimal content)
         {
             Id = id;
             PeriodFacilityId = periodFacilityId;
-            FacilityId = facilityId;
             UnitOfMeasure = unitOfMeasure;
             Site = site;
             Content = content;

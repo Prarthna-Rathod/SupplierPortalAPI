@@ -19,7 +19,11 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodSupplierId, int periodFacilityId, IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion);
 
-        bool LoadPeriodFacilityElectricityGridMix(int Id, int Periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure UnitOfMeasure, decimal Content, bool IsActive);
+        bool LoadPeriodFacilityElectricityGridMix(int supplierId, int periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure UnitOfMeasure, decimal Content, bool IsActive);
+
+        public IEnumerable<PeriodFacilityGasSupplyBreakDown> AddPeriodFacilityGasSupplyBreakdown(int ReportingPeriodSupplierId, IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> reportingPeriodFacilityGasSupplyBreakDownVOs);
+
+        bool LoadPeriodFacilityGasSupplyBreakdown(int id, int supplierId, int periodFacilityId, Site site, UnitOfMeasure unitOfMeasure, decimal content);
 
 
 

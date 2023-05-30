@@ -92,5 +92,13 @@ namespace Services.Mappers.ReportingPeriodMappers
                 yield return new SupplyChainStage(item.Id, item.Name);
             }
         }
+
+        public IEnumerable<Site> GetSitesLookUp(IEnumerable<SiteEntity> siteEntities)
+        {
+            foreach(var item in siteEntities)
+            {
+                yield return new Site(item.Id, item.Name);
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             var supplierVo = GetAndConvertSupplierValueObject();
             var supplierReportingPeriodStatus = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
             var periodSuppliersDomain = reportingPeriod.AddRemovePeriodSupplier(createSupplierEntities()).First();
-;
+            ;
 
             var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
             var periodSupplierDto = mapper.ConvertPeriodSupplierDomainToDto(periodSuppliersDomain, reportingPeriod.DisplayName);
@@ -47,7 +47,22 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSuppliersDomain.SupplierReportingPeriodStatus.Id, periodSupplierDto.SupplierReportingPeriodStatusId);
             Assert.Equal(periodSuppliersDomain.InitialDataRequestDate, periodSupplierDto.InitialDataRequestDate);
             Assert.Equal(periodSuppliersDomain.ResendDataRequestDate, periodSupplierDto.ResendDataRequestDate);
-            //Assert.Equal(periodSuppliersDomain.IsActive,periodSupplierDto.Is)
+        }
+
+            [Fact]
+            public void ConvertPeriodFacilityElectricityGridMixEntitiesToValueObjects()
+            {
+            var electricityGridMixComponent = GetElectricityGridMixComponents();
+            var unitOfMeasure = GetUnitOfMeasures();
+            var gridMixEntity = CreateReportingPeriodFacilityElecticityGridMixDto();
+
+
+                var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+                var gridMixVo = mapper.ConvertPeriodFacilityElectricityGridMixDtoToValueObject(gridMixEntity, electricityGridMixComponent,unitOfMeasure);
+
+                Assert.NotNull(gridMixVo);
+                //Assert.Equal(gridMixEntity.Count(), gridMixVo.Count());
+            }
 
 
 
@@ -55,4 +70,4 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
 
         }
     }
-}
+

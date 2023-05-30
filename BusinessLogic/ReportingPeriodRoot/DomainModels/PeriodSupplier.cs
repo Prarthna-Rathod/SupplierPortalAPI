@@ -2,8 +2,10 @@ using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
+using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
+
 
 public class PeriodSupplier
 {
@@ -52,6 +54,16 @@ public class PeriodSupplier
     {
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;
 
+    }
+
+    private PeriodFacility GetPeriodFacility(int periodFacilityId)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        if (periodFacility is null)
+            throw new NotFoundException("PeriodFacility is not found !!");
+
+        return periodFacility;
     }
 
     #region Period Facility
@@ -124,23 +136,91 @@ public class PeriodSupplier
     internal IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodFacilityId, IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
     {
         if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
-            throw new Exception("Supplier ReportingPeriodStatus Should be Unlocked");
+            throw new Exception("Supplier Should be Unlocked");
 
         var periodFacility = _periodfacilities.Where(x => x.Id == periodFacilityId).FirstOrDefault();
-
-        /*periodFacility.FercRegion.Id = fercRegion.Id;
-        periodFacility.FercRegion.Name = fercRegion.Name;*/
 
         return periodFacility.AddElectricityGridMix(reportingPeriodFacilityElectricityGridMixVOs, fercRegion);
 
     }
 
-    internal bool LoadPeriodFacilityElectricityGridMix(int id, int reportingPeriodFacilityId, ElectricityGridMixComponent electricityComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
+    internal bool LoadPeriodFacilityElectricityGridMix(int supplierId, int reportingPeriodFacilityId, ElectricityGridMixComponent electricityComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
     {
         var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == reportingPeriodFacilityId);
 
-        return periodFacility.LoadPeriodFacilityElecticGridMix(id, reportingPeriodFacilityId, electricityComponent, unitOfMeasure, content, isActive);
+        return periodFacility.LoadPeriodFacilityElecticGridMix(reportingPeriodFacilityId, electricityComponent, unitOfMeasure, content, isActive);
     }
+
+    internal bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId)
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked) 
+            throw new Exception("Supplier Should be Unlocked");
+
+        var periodFacility = GetPeriodFacility(periodFacilityId);
+
+        return periodFacility.RemovePeriodFacilityElectricityGridMix(periodFacilityId);
+
+    }
+
     #endregion
 
+    #region PeriodFacilityGasSupplyBreakDown
+    internal IEnumerable<PeriodFacilityGasSupplyBreakDown> AddPeriodFacilityGasSupplyBreakDown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> reportingPeriodFacilityGasSupplyBreakDownVOs)
+    {
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Locked)
+            throw new Exception("Supplier should be Unlocked !!");
+
+        var list = new List<PeriodFacilityGasSupplyBreakDown>();
+
+        var sites = reportingPeriodFacilityGasSupplyBreakDownVOs.GroupBy(x => x.Site.Id);
+
+        foreach(var site in sites)
+        {
+            var siteName = site.Select(x=>x.Site.Name).FirstOrDefault();
+            var contentValue = site.Sum(x=>x.Content);
+
+            if (contentValue != 100)
+                throw new Exception($"Add more contentValues to site {siteName}");
+        }
+
+        var periodFaciities = reportingPeriodFacilityGasSupplyBreakDownVOs.GroupBy(x => x.PeriodFacilityId);
+        foreach(var periodFacility in periodFaciities)
+        {
+            var reportingPeriodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacility.Key);
+
+            if (reportingPeriodFacility is null) throw new Exception("PeriodFacility not found");
+
+            list.AddRange(reportingPeriodFacility.AddPeriodFacilityGasSupplyBreakDown(reportingPeriodFacilityGasSupplyBreakDownVOs));
+
+
+        }
+         return list;
+    }
+
+    internal bool LoadPeriodFacilityGasSupplyBreakdown(int id,int supplierId, int periodFacilityId, Site site, UnitOfMeasure unitOfMeasure, decimal content)
+    {
+        var periodFacility = _periodfacilities.FirstOrDefault(x => x.Id == periodFacilityId);
+
+        return periodFacility.LoadPeriodFacilityGasSupplyBreakdown(id,periodFacilityId,site,unitOfMeasure,content);
+    }
+
+    internal bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
+    {
+        var periodFacilities = _periodfacilities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId).ToList();
+
+        
+
+        foreach (var periodFacility in periodFacilities)
+        {
+            periodFacility.RemovePeriodSupplierGasSupplyBreakdown(periodFacility.Id);
+        }
+
+        return true;
+    }
+    #endregion
 }
+
+
+
+
+

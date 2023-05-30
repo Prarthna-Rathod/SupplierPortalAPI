@@ -5,6 +5,7 @@ using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using DataAccess.Entities;
+using Services.DTOs;
 using Services.Mappers.ReportingPeriodMappers;
 using Services.Mappers.SupplierMappers;
 
@@ -383,9 +384,9 @@ namespace UnitTest
 
             activeSupplierEntities.Add(new ReportingPeriodActiveSupplierVO()
             {
-                ReportingPeriodSupplierId = 1020,
+                ReportingPeriodSupplierId = 1,
                 Supplier = GetAndConvertSupplierValueObject(),
-                PeriodId = 2,
+                PeriodId = 1,
                 SupplierPeriodStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked),
                 InitialDataRequestDate = null,
                 ResendDataRequestDate = null,
@@ -407,7 +408,7 @@ namespace UnitTest
             periodFacilityEntity.Add(new ReportingPeriodRelevantFacilityVO()
             {
                 ReportingPeriodFacilityId = 1,
-                ReportingPeriodId = 2,
+                ReportingPeriodId = 1,
                 FacilityVO = GetAndConvertFacilityValueObject(),
                 SupplierId = 1,
                 SupplierName="",
@@ -439,11 +440,24 @@ namespace UnitTest
             }) ;
             return periodFacilityElectricityGridMixVO;
         }
+
+        protected AddMultiplePeriodFacilityElectricityGridMixDto CreateReportingPeriodFacilityElecticityGridMixDto()
+        {
+            var electricityGridMixDto = new AddMultiplePeriodFacilityElectricityGridMixDto();
+
+            electricityGridMixDto.ReportingPeriodId = 1;
+            electricityGridMixDto.ReportingPeriodFacilityId = 1;
+            electricityGridMixDto.ReportingPeriodSupplierId= 1;
+            electricityGridMixDto.FercRegionId = 12;
+
+
+            return electricityGridMixDto;
+        }
         #endregion
 
-        #region All ValueObjects methods
+    #region All ValueObjects methods
 
-        protected SupplierVO GetAndConvertSupplierValueObject()
+    protected SupplierVO GetAndConvertSupplierValueObject()
     {
         var supplierEntity = CreateSupplierEntity();
         var reportingTypes = GenerateReportingType();
@@ -465,21 +479,34 @@ namespace UnitTest
         return facilityVO;
     }
 
-    //protected ReportingPeriodActiveSupplier GetReportingPeriodActiveSupplier()
-    //{
-    //    var supplierEntity = CreateSupplierEntity();
-    //    var reportingTypes = GenerateReportingType();
-    //    var supplyChainStages = GenerateSupplyChainStage();
-    //    var mapper = CreateInstanceOfReportingPeriodEntityDomainMapper();
-    //    var reportingPeriodActiveSuppliers = mapper.ConvertSupplierEntityToSupplierValueObjectList(supplierEntity, supplyChainStages, reportingTypes);
-    //    return reportingPeriodActiveSuppliers;
-    //}
+        protected ReportingPeriod AddPeriodSupplierAndPeriodFacilityForReportingPeriod()
+        {
+            var reportingPeriod = GetReportingPeriodDomain();
+
+            //Get PeriodSupplier Domain
+            var supplierVO = GetAndConvertSupplierValueObject();
+            var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
+            var periodSupplier = reportingPeriod.AddRemovePeriodSupplier(createPeriodSupplierEntities());
+
+            //Add PeriodFacility
+            var facilityVO = GetAndConvertFacilityValueObject();
+            var facilityReportingPeriodStatus = GetFacilityReportingPeriodDataStatus()/*.First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress)*/;
+            var fercRegion = GetFercRegions();
+            var periodFacility = reportingPeriod.AddRemoveUpdatePeriodFacility(createFacilityEntities(), fercRegion, facilityReportingPeriodStatus,periodSupplier.FirstOrDefault());
+
+            //Update reportingPeriodStatus InActive to Open
+            var reportingPeriodStatus = GetAndConvertReportingPeriodStatus().FirstOrDefault(x => x.Name == ReportingPeriodStatusValues.Open);
+            reportingPeriod.ReportingPeriodStatus.Id = reportingPeriodStatus.Id;
+            reportingPeriod.ReportingPeriodStatus.Name = reportingPeriodStatus.Name;
+
+            return reportingPeriod;
+        }
 
 
-    #endregion
+        #endregion
 
 
-    protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
+        protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
     {
         return new ReportingPeriodEntityDomainMapper();
     }

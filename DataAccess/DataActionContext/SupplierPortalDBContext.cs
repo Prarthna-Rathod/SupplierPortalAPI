@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Entities;
@@ -32,12 +32,14 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<ReportingPeriodFacilityDocumentEntity> ReportingPeriodFacilityDocumentEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityElectricityGridMixEntity> ReportingPeriodFacilityElectricityGridMixEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityEntity> ReportingPeriodFacilityEntities { get; set; } = null!;
+    public virtual DbSet<ReportingPeriodFacilityGasSupplyBreakdownEntity> ReportingPeriodFacilityGasSupplyBreakDownEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodStatusEntity> ReportingPeriodStatusEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodSupplierDocumentEntity> ReportingPeriodSupplierDocumentEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodSupplierEntity> ReportingPeriodSupplierEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodTypeEntity> ReportingPeriodTypeEntities { get; set; } = null!;
     public virtual DbSet<ReportingTypeEntity> ReportingTypeEntities { get; set; } = null!;
     public virtual DbSet<RoleEntity> RoleEntities { get; set; } = null!;
+    public virtual DbSet<SiteEntity> SiteEntities { get; set; } = null!;
     public virtual DbSet<SupplierEntity> SupplierEntities { get; set; } = null!;
     public virtual DbSet<SupplierReportingPeriodStatusEntity> SupplierReportingPeriodStatusEntities { get; set; } = null!;
     public virtual DbSet<SupplyChainStageEntity> SupplyChainStageEntities { get; set; } = null!;
@@ -339,6 +341,12 @@ public partial class SupplierPortalDBContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacility_FacilityReportingPeriodDataStatus");
 
+            entity.HasOne(d => d.FercRegion)
+                .WithMany(p => p.ReportingPeriodFacilityEntities)
+                .HasForeignKey(d => d.FercRegionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityEntity_FercRegionEntity");
+
             entity.HasOne(d => d.ReportingPeriod)
                 .WithMany(p => p.ReportingPeriodFacilityEntities)
                 .HasForeignKey(d => d.ReportingPeriodId)
@@ -362,6 +370,35 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasForeignKey(d => d.SupplyChainStageId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacilityEntity_SupplyChainStage");
+        });
+
+        modelBuilder.Entity<ReportingPeriodFacilityGasSupplyBreakdownEntity>(entity =>
+        {
+            entity.ToTable("ReportingPeriodFacilityGasSupplyBreakDownEntity");
+
+            entity.Property(e => e.Content).HasColumnType("decimal(30, 20)");
+
+            entity.Property(e => e.CreatedBy).HasMaxLength(50);
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+
+            entity.HasOne(d => d.PeriodFacility)
+                .WithMany(p => p.ReportingPeriodFacilityGasSupplyBreakdownEntities)
+                .HasForeignKey(d => d.PeriodFacilityId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityGasSupplyBreakDownEntity_ReportingPeriodFacilityEntity");
+
+            entity.HasOne(d => d.Site)
+                .WithMany(p => p.ReportingPeriodFacilityGasSupplyBreakdownEntities  )
+                .HasForeignKey(d => d.SiteId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityGasSupplyBreakDownEntity_SiteEntity");
+
+            entity.HasOne(d => d.UnitOfMeasure)
+                .WithMany(p => p.ReportingPeriodFacilityGasSupplyBreakdownEntities)
+                .HasForeignKey(d => d.UnitOfMeasureId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportingPeriodFacilityGasSupplyBreakDownEntity_UnitOfMeasureEntity");
         });
 
         modelBuilder.Entity<ReportingPeriodStatusEntity>(entity =>
@@ -454,6 +491,13 @@ public partial class SupplierPortalDBContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<SiteEntity>(entity =>
+        {
+            entity.ToTable("SiteEntity");
+
+            entity.Property(e => e.Name).HasMaxLength(100);
         });
 
         modelBuilder.Entity<SupplierEntity>(entity =>

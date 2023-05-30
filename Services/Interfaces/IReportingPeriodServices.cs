@@ -112,6 +112,40 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     AddMultiplePeriodFacilityElectricityGridMixDto GetReportingPeriodFacilityElectricityGridMix(int periodFacilityId);
 
+    /// <summary>
+    /// Remove PeriodFacilityElectricityGrid Mix
+    /// </summary>
+    /// <param name="supplierId"></param>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    string RemovePeriodFacilityElectricityGridMix(int supplierId, int periodFacilityId);
+    #endregion
+
+    #region PeriodFacilityGasSupplyBreakdown
+
+    /// <summary>
+    /// AddPeriodfacilityGasSupplyBreakdown
+    /// </summary>
+    /// <param name="multiplePeriodFacilityGasSupplyBreakDownDto"></param>
+    /// <returns></returns>
+    string AddPeriodFacilityGasSupplyBreakdown(MultiplePeriodFacilityGasSupplyBreakDownDto multiplePeriodFacilityGasSupplyBreakDownDto);
+
+    /// <summary>
+    /// GetPeriodFacilityGasSupplyBreakdown
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    MultiplePeriodFacilityGasSupplyBreakDownDto GetReportingPeriodFacilityGasSupplybreakDown(int periodSupplierId);
+
+    /// <summary>
+    ///RemovePeriodFacilityGasSupplyBreakdown 
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    string RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId);
+
+
+
     #endregion
 
     #region ReportingPeriodDocuments

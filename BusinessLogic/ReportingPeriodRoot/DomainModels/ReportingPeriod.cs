@@ -43,10 +43,7 @@ public class ReportingPeriod : IReportingPeriod
     public bool IsActive { get; private set; }
 
     public ReportingPeriodType ReportingPeriodType { get; private set; }
-
     public ReportingPeriodStatus ReportingPeriodStatus { get; private set; }
-
-
     public IEnumerable<PeriodSupplier> PeriodSuppliers
     {
         get
@@ -335,23 +332,65 @@ public class ReportingPeriod : IReportingPeriod
     public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodSupplierId, int periodFacilityId,IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
     {
 
-        if (ReportingPeriodStatus.Name != ReportingPeriodStatusValues.Open && ReportingPeriodStatus.Name !=ReportingPeriodStatusValues.Close)
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name==ReportingPeriodStatusValues.Complete) 
             
-            throw new Exception("Reporting period Should Be Open or Close..!");
+            throw new Exception("Reporting period Should Be Open");
 
         var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();
 
         return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId,reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
     }
 
-    public bool LoadPeriodFacilityElectricityGridMix(int Id,int Periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
+    public bool LoadPeriodFacilityElectricityGridMix(int supplierId,int periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
     {
-        var periodSupplier = _periodSupplier.Where(x => x.ReportingPeriodId==Id ).FirstOrDefault();
-        return periodSupplier.LoadPeriodFacilityElectricityGridMix(Id,Periodfacilityid,electricityGridMixComponent,unitOfMeasure,content,isActive);
+        var periodSupplier = _periodSupplier.Where(x => x.Supplier.Id== supplierId ).FirstOrDefault();
+        return periodSupplier.LoadPeriodFacilityElectricityGridMix(supplierId,periodfacilityid,electricityGridMixComponent,unitOfMeasure,content,isActive);
+    }
+
+    public bool RemovePeriodFacilityElectricityGridMix(int supplierId, int periodFacilityId)
+    {
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete) throw new Exception("Reporting Period should be Open or close");
+
+        return periodSupplier.RemovePeriodFacilityElectricityGridMix(periodFacilityId);
     }
 
 
+    #endregion
 
+    #region PeriodFacilityGasSupplyBreakDown
+    public IEnumerable<PeriodFacilityGasSupplyBreakDown> AddPeriodFacilityGasSupplyBreakdown(int ReportingPeriodSupplierId, IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> reportingPeriodFacilityGasSupplyBreakDownVOs)
+    {
+       var periodSupplier = _periodSupplier.Where(x=>x.Id==ReportingPeriodSupplierId).FirstOrDefault();
+
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close !!");
+
+        return periodSupplier.AddPeriodFacilityGasSupplyBreakDown(reportingPeriodFacilityGasSupplyBreakDownVOs);
+
+
+    }
+
+    public bool LoadPeriodFacilityGasSupplyBreakdown(int id,int supplierId, int periodFacilityId, Site site, UnitOfMeasure unitOfMeasure, decimal content)
+    {
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id==supplierId);
+
+        return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(id,supplierId,periodFacilityId,site,unitOfMeasure,content);
+    }
+
+    public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
+    { 
+
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        if (periodSupplier is null)
+            throw new NotFoundException("PeriodSupplier is not found !!");
+
+        return periodSupplier.RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
+    }
+
+    
     #endregion
 
     #region Period Document
@@ -388,7 +427,5 @@ public class ReportingPeriod : IReportingPeriod
     */
 
     #endregion
-
-
 }
 
