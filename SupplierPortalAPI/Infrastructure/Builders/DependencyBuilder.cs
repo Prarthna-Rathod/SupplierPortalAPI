@@ -30,6 +30,7 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             //ReportingPeriod
             services.AddScoped<IReportingPeriod, ReportingPeriod>();
             services.AddScoped<IReportingPeriodServices, ReportingPeriodServices>();
+            services.AddScoped<ISendEmailServices,SendEmailServices>();
             services.AddScoped<IReportingPeriodDataActions, ReportingPeriodDataActionsManager>();
             services.AddScoped<IUploadDocuments, UploadDocument>();
             services.AddScoped<IReportingPeriodFactory, ReportingPeriodFactory>();

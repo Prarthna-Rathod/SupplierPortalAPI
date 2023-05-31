@@ -109,7 +109,14 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
             facilityVOs.Add(new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType));
 
         }
-        var supplierVO = new SupplierVO(supplierEntity.Id, supplierEntity.Name, supplierEntity.IsActive, facilityVOs);
+
+        var userVOs = new List<UserVO>();
+        foreach(var contactEntity in supplierEntity.ContactEntities)
+        {
+            userVOs.Add(new UserVO(contactEntity.User.Id,contactEntity.User.Name,contactEntity.User.Email,contactEntity.User.ContactNo,contactEntity.User.IsActive));
+        }
+
+        var supplierVO = new SupplierVO(supplierEntity.Id, supplierEntity.Name, supplierEntity.IsActive, facilityVOs,userVOs);
         return supplierVO;
     }
 

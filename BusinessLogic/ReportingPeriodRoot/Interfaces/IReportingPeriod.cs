@@ -9,9 +9,9 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
     {
         #region PeriodSupplier
 
-        PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate);
+        PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate);
 
-        bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate);
+        bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate);
 
         #endregion
 
@@ -71,6 +71,11 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         #endregion
 
+        #region SendEmail
+
+        List<string> CheckInitialAndResendDataRequest(int periodSupplierId);
+
+        #endregion
 
         /*
 

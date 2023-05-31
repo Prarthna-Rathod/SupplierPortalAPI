@@ -12,8 +12,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     private readonly SupplierPortalDBContext _context;
     private readonly IUploadDocuments _uploadDocuments;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
+    private readonly string INITIALDATAREQUEST = "InitialDataRequest";
 
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context,IUploadDocuments uploadDocuments)
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context, IUploadDocuments uploadDocuments)
     {
         _context = context;
         _uploadDocuments = uploadDocuments;
@@ -107,6 +108,24 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         _context.SaveChanges();
         return updatedReportingPeriodSuppliers;
+    }
+
+    public bool SendEmailInitialAndResendDataRequest(int periodSupplierId)
+    {
+        var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
+
+        if (periodSupplierEntity is null)
+            throw new Exception("PeriodSupplierEntity is not found !!");
+
+        if (periodSupplierEntity.InitialDataRequestDate is null)
+            periodSupplierEntity.InitialDataRequestDate = DateTime.UtcNow;
+        else
+            periodSupplierEntity.ResendDataRequestDate = DateTime.UtcNow;
+
+        _context.ReportingPeriodSupplierEntities.Update(periodSupplierEntity);
+        _context.SaveChanges();
+        return true;
+
     }
 
     #endregion
@@ -461,6 +480,12 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     {
         return _context.SiteEntities;
     }
+
+    public IEnumerable<EmailTemplateEntity> GetEmailTemplateBynameCode()
+    {
+        return _context.EmailTemplateEntities;
+    }
+
 
     #endregion
 

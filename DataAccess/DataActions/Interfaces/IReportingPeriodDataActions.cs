@@ -21,6 +21,8 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
 
+        bool SendEmailInitialAndResendDataRequest(int periodSupplierId);
+
         #endregion
 
         #region PeriodFacility
@@ -100,6 +102,7 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentTypeEntities();
 
+        IEnumerable<EmailTemplateEntity> GetEmailTemplateBynameCode();
 
         #endregion
 
@@ -113,7 +116,7 @@ namespace DataAccess.DataActions.Interfaces
 
         ReportingPeriodFacilityDocumentEntity GetReportingPeriodFacilityDocumentById(int documentId);
 
-        ReportingPeriodSupplierDocumentEntity GetReportingPeriodSupplierDocumentById(int documentId);
+        ReportingPeriodSupplierDocumentEntity GetReportingPeriodSupplierDocumentById(int documentId);        
 
         #endregion
 

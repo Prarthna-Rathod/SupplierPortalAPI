@@ -24,8 +24,8 @@ namespace UnitTest
         private int reportingPeriodId = 1;
         private string displayName = "Reporting Period Data Year 2022";
         private string collectionTimePeriod = "2022";
-        private DateTime startDate = new DateTime(2023, 04, 12);
-        private DateTime? endDate = null;
+        private DateTime startDate = new DateTime(2022, 04, 12);
+        private DateTime? endDate = new DateTime(2023,04,12);
         private bool isActive = true;
 
         #region Supplier
@@ -328,7 +328,7 @@ namespace UnitTest
             //Get PeriodSupplier Domain
             var supplierVO = GetAndConvertSupplierValueObject();
             var supplierReportingPerionStatus = GetSupplierReportingPeriodStatuses().FirstOrDefault(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked);
-            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2024, 02, 11), new DateTime(2024, 02, 11));
+            var periodSupplier = reportingPeriod.AddPeriodSupplier(1, supplierVO, supplierReportingPerionStatus, new DateTime(2023, 05, 31), null);
 
             //Add PeriodFacility
             var facilityVO = GetAndConvertFacilityValueObject();
@@ -380,22 +380,6 @@ namespace UnitTest
         protected ReportingPeriodDomainDtoMapper CreateInstanceOfReportingPeriodDomainDtoMapper()
         {
             return new ReportingPeriodDomainDtoMapper();
-        }
-
-        #endregion
-
-        #region PeriodSupplier
-
-        protected ReportingPeriodSupplierEntity CreateReportingPeriodSupplierEntity()
-        {
-            var periodSupplierEntity = new ReportingPeriodSupplierEntity();
-            periodSupplierEntity.Id = 1;
-            periodSupplierEntity.SupplierId = 1;
-            periodSupplierEntity.ReportingPeriodId = 1;
-            periodSupplierEntity.SupplierReportingPeriodStatusId = GetSupplierReportingPeriodStatuses().First(x => x.Name == SupplierReportingPeriodStatusValues.Unlocked).Id;
-            periodSupplierEntity.IsActive = true;
-
-            return periodSupplierEntity;
         }
 
         #endregion

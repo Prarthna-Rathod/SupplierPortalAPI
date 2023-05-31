@@ -8,10 +8,10 @@
         public int SupplierReportingPeriodStatusId { get; set; }
         public string SupplierReportingPeriodStatusName { get; set; }
         public IEnumerable<int> SupplierIds { get; set; }
-        public DateTime InitialDataRequestDate { get; set; }
-        public DateTime ResendDataRequestDate { get; set; }
+        public DateTime? InitialDataRequestDate { get; set; }
+        public DateTime? ResendDataRequestDate { get; set; }
 
-        public MultiplePeriodSuppliersDto(int id, int reportingPeriodId, string reportingPeriodName, int supplierReportingPeriodStatusId, string supplierReportingPeriodStatusName, IEnumerable<int> supplierIds,DateTime initialDataRequestDate,DateTime resendDataRequestDate)
+        public MultiplePeriodSuppliersDto(int id, int reportingPeriodId, string reportingPeriodName, int supplierReportingPeriodStatusId, string supplierReportingPeriodStatusName, IEnumerable<int> supplierIds,DateTime? initialDataRequestDate,DateTime? resendDataRequestDate)
         {
             Id = id;
             ReportingPeriodId = reportingPeriodId;

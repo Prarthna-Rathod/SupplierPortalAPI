@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
@@ -193,6 +194,12 @@ public interface IReportingPeriodServices
     /// <param name="documentId"></param>
     /// <returns></returns>
     string RemoveReportingPeriodSupplierDocument(int periodSupplierId, int documentId);
+
+    #endregion
+
+    #region SendEmail
+
+    string SendEmailInitialAndResendDataRequest(int periodSupplierId, string? CCEmail, string? BCCEmail);
 
     #endregion
 

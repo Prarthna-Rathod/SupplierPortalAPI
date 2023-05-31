@@ -15,8 +15,8 @@ namespace DataAccess.Entities
         public int SupplierId { get; set; }
         public int ReportingPeriodId { get; set; }
         public int SupplierReportingPeriodStatusId { get; set; }
-        public DateTime InitialDataRequestDate { get; set; }
-        public DateTime ResendDataRequestDate { get; set; }
+        public DateTime? InitialDataRequestDate { get; set; }
+        public DateTime? ResendDataRequestDate { get; set; }
         public bool IsActive { get; set; }
 
         public virtual ReportingPeriodEntity ReportingPeriod { get; set; } = null!;

@@ -60,6 +60,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriodSupplierDocument(reportingPeriodSupplierDocumentDto);
         }
 
+        [HttpPost("SendEmailInitialOrResendDataRequest")]
+        public string SendEmailInitialAndResendDataRequest(int periodSupplierId,string? CCEmail,string? BCCEmail)
+        {
+            return _services.SendEmailInitialAndResendDataRequest(periodSupplierId, CCEmail, BCCEmail);
+        }
+
         #endregion
 
         #region Update methods

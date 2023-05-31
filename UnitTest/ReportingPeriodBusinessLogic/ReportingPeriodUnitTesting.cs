@@ -1748,5 +1748,220 @@ namespace UnitTest.ReportingPeriodBusinessLogic
         }
 
         #endregion
+
+        #region SendMail
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest success case1
+        /// if initialDataRequest is null than return emails
+        /// set InitialDateRequestDate should be null - AddPeriodSupplierAndPeriodFacilityForReportingPeriod() method
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+            Assert.NotEqual(0, list.Count());
+        }
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest success case2
+        /// reminder send mail after deadline {timelimit}
+        /// set endDate should be null - CreateReportingPeriodEntity() method
+        /// set ResendDataRequestDate should be null - AddPeriodSupplierAndPeriodFacilityForReportingPeriod() method
+        /// set InitialDataRequestDate is one month pastdate
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+            Assert.NotEqual(0, list.Count());
+        }
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest success case3
+        /// reminder send mail after deadline {timelimit}
+        /// set endDate should be notNull - CreateReportingPeriodEntity() method
+        /// set ResendDataRequestDate should be null - AddPeriodSupplierAndPeriodFacilityForReportingPeriod() method
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Equal(0, exceptionCounter);
+            Assert.Null(exceptionMessage);
+            Assert.NotEqual(0, list.Count());
+        }
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest fail case1
+        /// reminder send mail after deadline {timelimit}
+        /// if endDate is null and timelimit is greaterthan currentDate than throw exception
+        /// set null endDate - CreateReportingPeriodEntity() method
+        /// set null ResendDataRequestDate - AddPeriodSupplierAndPeriodFacilityForReportingPeriod() method
+        /// set InitialDataRequestDate is currentDate
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestFailCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest fail case2
+        /// reminder send mail after deadline {endDate}
+        /// if endDate is not null and endDate is greaterthan currentDate than throw exception
+        /// set endDate - CreateReportingPeriodEntity() method
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestFailCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            try
+            {
+                reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest fail case3
+        /// InitialDataRequest and ResendDataRequest mail is already send
+        /// if InitialDateRequest and ResendDataRequest date is not null than throw exception
+        /// set InitialDateRequestDate and ResendDataRequestDate - AddPeriodSupplierAndPeriodFacilityForReportingPeriod() method
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestFailCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            try
+            {
+                reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        /// <summary>
+        /// SendEmailInitialAndResendDataRequest fail case4
+        /// if emails count is 0 than throw exception
+        /// set isActive false - GenerateContactEntitiesForSupplier() method
+        /// </summary>
+        [Fact]
+        public void SendEmailInitialAndResendDataRequestFailCase4()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForReportingPeriod();
+
+            try
+            {
+                reportingPeriod.CheckInitialAndResendDataRequest(1);
+            }
+
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.NotNull(exceptionMessage);
+        }
+
+        #endregion
     }
 }

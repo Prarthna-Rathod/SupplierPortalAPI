@@ -249,14 +249,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #endregion
 
         #region Period Supplier
-        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate)
         {
             var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
-        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate)
         {
             var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate);
 
@@ -447,6 +447,18 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
             CheckReportingPeriodStatus();
             var periodSupplier = GetPeriodSupplier(periodSupplierId);
             return periodSupplier.RemovePeriodSupplierDocument(documentId);
+        }
+
+        #endregion
+
+        #region SendEmail
+
+        public List<string> CheckInitialAndResendDataRequest
+(int periodSupplierId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = GetPeriodSupplier(periodSupplierId);
+            return periodSupplier.CheckInitialAndResendDataRequest(EndDate);
         }
 
         #endregion

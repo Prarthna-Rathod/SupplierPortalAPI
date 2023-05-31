@@ -11,7 +11,7 @@ public class PeriodSupplier
     private HashSet<PeriodFacility> _periodfacilities;
     private HashSet<PeriodSupplierDocument> _periodSupplierDocuments;
 
-    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
@@ -22,7 +22,7 @@ public class PeriodSupplier
         _periodSupplierDocuments = new HashSet<PeriodSupplierDocument>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate)
     {
         Id = id;
     }
@@ -34,8 +34,8 @@ public class PeriodSupplier
     public SupplierVO Supplier { get; private set; }
     public int ReportingPeriodId { get; private set; }
     public SupplierReportingPeriodStatus SupplierReportingPeriodStatus { get; private set; }
-    public DateTime InitialDataRequestDate { get; private set; }
-    public DateTime ResendDataRequestDate { get; private set; }
+    public DateTime? InitialDataRequestDate { get; private set; }
+    public DateTime? ResendDataRequestDate { get; private set; }
     public bool IsActive { get; private set; }
 
     public IEnumerable<PeriodFacility> PeriodFacilities
@@ -264,7 +264,7 @@ public class PeriodSupplier
 
         CheckPeriodSupplierStatus();
 
-        foreach(var periodFacility in periodFacilities)
+        foreach (var periodFacility in periodFacilities)
         {
             periodFacility.RemovePeriodSupplierGasSupplyBreakdown(periodFacility.Id);
         }
@@ -404,4 +404,44 @@ public class PeriodSupplier
 
     #endregion
 
+    #region SendEmail
+
+    internal List<string> CheckInitialAndResendDataRequest(DateTime? endDate)
+    {
+        var emails = Supplier.Users.Where(x => x.IsActive == true).Select(x => x.Email).ToList();
+
+        if (emails.Count() == 0)
+            throw new NotFoundException("Supplier contact is not found !!");
+
+        if (InitialDataRequestDate is null)
+            return emails;
+
+        else if (ResendDataRequestDate is null)
+        {
+            if (endDate is null)
+            {
+                var timeLimit = InitialDataRequestDate.Value.AddDays(30);
+
+                //DateTime checkDate = new DateTime(2023, 6, 30);
+
+                if (timeLimit.Date > DateTime.UtcNow.Date)
+                    throw new BadRequestException($"Please reminder send mail after deadline {timeLimit}.");
+            }
+            else
+            {
+                //DateTime checkDate = new DateTime(2024, 4, 12);
+                if (endDate.Value.Date > DateTime.UtcNow.Date)
+                    throw new BadRequestException($"Please reminder send mail after deadline {endDate}.");
+            }
+            return emails;
+        }
+        else
+            throw new BadRequestException("InitialDataRequest and ResendDataRequest mail is already send !!");
+        
+    }
+
+    #endregion
+
 }
+
+
