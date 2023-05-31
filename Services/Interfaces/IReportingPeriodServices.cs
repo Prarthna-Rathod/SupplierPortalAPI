@@ -158,4 +158,10 @@ public interface IReportingPeriodServices
 
     #endregion
 
+    #region SendEmailNotification
+
+    string SendInitialOrResendDataRequestEmailNotification(int periodSupplierId, string? ccMailId, string? bccMailId);
+   
+    #endregion
+
 }

@@ -1,12 +1,11 @@
 using BusinessLogic.ReferenceLookups;
+using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
-using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
-using System;
-using System.Reflection.Metadata;
-using System.Security.Cryptography.X509Certificates;
+using System.Net;
+using System.Net.Mail;
 
 namespace BusinessLogic.ReportingPeriodRoot.DomainModels;
 
@@ -15,7 +14,7 @@ public class PeriodSupplier
     private HashSet<PeriodFacility> _periodfacilities;
     private HashSet<PeriodSupplierDocument> _periodSupplierDocuments;
 
-    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive)
+    internal PeriodSupplier(SupplierVO supplier, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive)
     {
         Supplier = supplier;
         ReportingPeriodId = reportingPeriodId;
@@ -27,7 +26,7 @@ public class PeriodSupplier
         _periodSupplierDocuments = new HashSet<PeriodSupplierDocument>();
     }
 
-    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive)
+    internal PeriodSupplier(int id, SupplierVO supplierVO, int reportingPeriodId, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive) : this(supplierVO, reportingPeriodId, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive)
     {
         Id = id;
     }
@@ -39,8 +38,8 @@ public class PeriodSupplier
     public SupplierVO Supplier { get; private set; }
     public int ReportingPeriodId { get; private set; }
     public SupplierReportingPeriodStatus SupplierReportingPeriodStatus { get; private set; }
-    public DateTime InitialDataRequestDate { get; private set; }
-    public DateTime ResendDataRequestDate { get; private set; }
+    public DateTime? InitialDataRequestDate { get; private set; }
+    public DateTime? ResendDataRequestDate { get; private set; }
     public bool IsActive { get; private set; }
 
     public IEnumerable<PeriodFacility> PeriodFacilities
@@ -159,8 +158,8 @@ public class PeriodSupplier
     internal IEnumerable<PeriodFacility> UpdatePeriodFacilityDataStatus(FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
     {
         var periodFacilities = _periodfacilities.Where(x => x.FacilityReportingPeriodDataStatus.Name == FacilityReportingPeriodDataStatusValues.Complete).ToList();
-       
-        foreach(var periodFacility in periodFacilities)
+
+        foreach (var periodFacility in periodFacilities)
         {
             periodFacility.UpdatePeriodFacilityDataStatus(facilityReportingPeriodDataStatus);
         }
@@ -197,8 +196,8 @@ public class PeriodSupplier
     internal IEnumerable<PeriodFacilityGasSupplyBreakdown> AddPeriodFacilityGasSupplyBreakdown(IEnumerable<GasSupplyBreakdownVO> gasSupplyBreakdownVOs)
     {
         CheckSupplierReportingPeriodStatus();
-         var list = new List<PeriodFacilityGasSupplyBreakdown>();
-        
+        var list = new List<PeriodFacilityGasSupplyBreakdown>();
+
         //Check total content values 100
         var groupBySiteData = gasSupplyBreakdownVOs.GroupBy(x => x.Site.Id);
         foreach (var singleSiteData in groupBySiteData)
@@ -212,7 +211,7 @@ public class PeriodSupplier
         //Add GasSupplyBreakdown data in periodFacility
         var groupByFacility = gasSupplyBreakdownVOs.GroupBy(x => x.PeriodFacilityId);
 
-        foreach(var facilityData in groupByFacility)
+        foreach (var facilityData in groupByFacility)
         {
             var periodFacility = FindPeriodFacility(facilityData.Key);
 
@@ -237,7 +236,7 @@ public class PeriodSupplier
 
     #region PeriodDocument
 
-    internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(int periodFacilityId, string displayName, string? path, IEnumerable< DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
+    internal PeriodFacilityDocument AddUpdatePeriodFacilityDocument(int periodFacilityId, string displayName, string? path, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, string? validationError, string collectionTimePeriod, IEnumerable<FacilityRequiredDocumentTypeVO> facilityRequiredDocumentTypeVOs)
     {
         CheckSupplierReportingPeriodStatus();
         var periodFacility = FindPeriodFacility(periodFacilityId);
@@ -282,7 +281,7 @@ public class PeriodSupplier
 
         PeriodSupplierDocument? document = null;
 
-        if(SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
+        if (SupplierReportingPeriodStatus.Name == SupplierReportingPeriodStatusValues.Unlocked)
         {
             if (existingData.Count() == 0)
             {
@@ -383,12 +382,50 @@ public class PeriodSupplier
     {
         CheckSupplierReportingPeriodStatus();
         int count = 0;
-        foreach(var periodFacility in _periodfacilities)
+        foreach (var periodFacility in _periodfacilities)
         {
             count += periodFacility.DeletePeriodSupplierGasSupplyBreakdowns();
         }
 
         return count;
+    }
+
+    #endregion
+
+    #region SendMailNotification
+
+    internal List<string> CheckInitialOrResendDataRequestDateAndGetContactEmails(DateTime? endDate)
+    {
+        var contactsEmails = Supplier.Contacts.Where(x => x.IsActive).Select(x => x.Email).ToList();
+
+        if(contactsEmails.Count() == 0)
+            throw new NotFoundException("Supplier contacts not found !!");
+
+        if (InitialDataRequestDate is null)
+        {
+            return contactsEmails;
+        }
+        else if(ResendDataRequestDate is null)
+        {
+            if (endDate is null)
+            {
+                var timeLimit = InitialDataRequestDate.Value.Date.AddDays(30);
+                //InitialDataRequestDate : 31-05-2023
+                //Added 30 days timelimitDate : 30-06-2023
+                //CurrentDate : 1-6-2023
+                if (timeLimit.Date > DateTime.UtcNow.Date)
+                    throw new Exception($"You can send reminder DataRequest mail after the deadline {timeLimit.Date}!!");
+            }
+            else
+            {
+                if(endDate.Value.Date > DateTime.UtcNow.Date)
+                    throw new Exception($"You can send reminder DataRequest mail after the deadline {endDate.Value.Date}!!");
+
+            }
+            return contactsEmails;
+        }
+        else
+            throw new BadRequestException("Already sended mail for InitialDataRequest and ResendDataRequest !!");
     }
 
     #endregion

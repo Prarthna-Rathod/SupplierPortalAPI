@@ -60,6 +60,12 @@ namespace SupplierPortalAPI.Controllers
             return _services.AddUpdateReportingPeriodSupplierDocument(periodSupplierDocumentDto);
         }
 
+        [HttpPut("SendEmailForInitialDataRequestOrResendDataRequest")]
+        public string SendDataRequestEmailNotification(int periodSupplierId, string? ccMailId, string? bccMailId)
+        {
+            return _services.SendInitialOrResendDataRequestEmailNotification(periodSupplierId, ccMailId, bccMailId);
+        }
+
         [HttpPut("UpdateReportingPeriodFacilityStatusSubmitted")]
         public string UpdateReportingPeriodFacilityStatusSubmitted(int reportingPeriodId, int supplierId)
         {
@@ -161,14 +167,6 @@ namespace SupplierPortalAPI.Controllers
 
         #endregion
 
-        #region Send Email
-
-        /*[HttpPost("SendEmail")]
-        public string SendEmailNotification()
-        {
-            return "Email send successfully..";
-        }*/
-
-        #endregion
+        
     }
 }

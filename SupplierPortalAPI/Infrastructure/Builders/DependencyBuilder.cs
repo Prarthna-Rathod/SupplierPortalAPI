@@ -32,12 +32,12 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddScoped<IReportingPeriodServices, ReportingPeriodServices>();
             services.AddScoped<IReportingPeriodDataActions, ReportingPeriodDataActionsManager>();
             services.AddScoped<IFileUploadDataActions, FileUploadDataActionManager>();
+            services.AddScoped<ISendEmailService, SendEmailService>();
             services.AddScoped<IReportingPeriodFactory, ReportingPeriodFactory>();
             services.AddSingleton<IReportingPeriodDomainDtoMapper, ReportingPeriodDomainDtoMapper>();
             services.AddSingleton<IReportingPeriodEntityDomainMapper, ReportingPeriodEntityDomainMapper>();
             services.AddSingleton<IReadOnlyEntityToDtoMapper, ReadOnlyEntityToDtoMapper>();
             services.AddSingleton<IReferenceLookUpMapper, ReferenceLookupMapper>();
-            //services.AddScoped<IServiceCollection, ServiceCollection>();    
         }
 
     }

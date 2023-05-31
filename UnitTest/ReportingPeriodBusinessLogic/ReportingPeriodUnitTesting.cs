@@ -1794,5 +1794,223 @@ namespace UnitTest.ReportingPeriodBusinessLogic
 
         #endregion
 
+        #region SendMail
+        /// <summary>
+        /// Check InitialDataRequestDate null or not success Case1.
+        /// If InitialDataRequestDate is null then it will return the SupplierContact EmailIds list
+        /// InitialDataRequestDate and ResendDataRequestDate should be null.
+        /// </summary>
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsSuccessCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch(Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.NotEqual(0, list.Count());
+        }
+
+        /// <summary>
+        /// Check InitialDataRequestDate null or not success Case2.
+        /// If ResendDataRequestDate is null and ReportingPeriodEndDate is null then check for ResendDataRequest mail can send or not.
+        /// If timelimitDate is less than CurrentDate then return contactEmailsList.
+        /// For this UnitTesting set InitialDataRequestDate to one month PastDate in BasicTestClass -> AddPeriodSupplierAndPeriodFacilityForPeriod() -> AddPeriodSupplier(....)
+        /// ReportingPeriodEndDate and ResendDataRequestDate should be null by default.
+        /// </summary>
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsSuccessCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.NotEqual(0, list.Count());
+        }
+
+        /// <summary>
+        /// Check InitialDataRequestDate null or not success Case3.
+        /// If ResendDataRequestDate is null and ReportingPeriodEndDate is not null then check for ResendDataRequest mail can send or not.
+        /// If endDate is less than CurrentDate then return contactEmailsList.
+        /// For this UnitTesting set InitialDataRequestDate to one month PastDate in BasicTestClass -> AddPeriodSupplierAndPeriodFacilityForPeriod() -> AddPeriodSupplier(....)
+        /// ReportingPeriodEndDate should be in past.
+        /// ResendDataRequestDate should be null by default.
+        /// </summary>
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsSuccessCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.Null(exceptionMessage);
+            Assert.Equal(0, exceptionCounter);
+            Assert.NotEqual(0, list.Count());
+        }
+
+        /// <summary>
+        /// Check ResendDataRequestDate null or not failure Case1.
+        /// If supplier contacts not found then throw exception.
+        /// For this UnitTesting set IsActive = False in BasicTestClass --> GenerateContactEntitiesForSupplier() method
+        /// </summary>
+
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsFailureCase1()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.Equal(0, list.Count());
+        }
+
+        /// <summary>
+        /// Check ResendDataRequestDate null or not failure Case2.
+        /// If ResendDataRequest date is null and ReportingPeriodEndDate is null then check for ResendDataRequest mail can send or not.
+        /// If timelimitDate is greater than CurrentDate then throw exception.
+        /// For this UnitTesting set InitialDataRequestDate to currentDate in BasicTestClass -> AddPeriodSupplierAndPeriodFacilityForPeriod() -> AddPeriodSupplier(....)
+        /// InitialDataRequestDate should be currentDate
+        /// </summary>
+
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsFailureCase2()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.Equal(0, list.Count());
+        }
+
+        /// <summary>
+        /// Check ResendDataRequestDate null or not failure Case3.
+        /// If ResendDataRequest date is null and ReportingPeriodEndDate is not null then check for ResendDataRequest mail can send or not.
+        /// If endDate is greater than CurrentDate then throw exception.
+        /// For this UnitTesting set InitialDataRequestDate to currentDate in BasicTestClass -> AddPeriodSupplierAndPeriodFacilityForPeriod() -> AddPeriodSupplier(....)
+        /// ReportingPeriodEndDate in BasicTestClass -> set endDate variable (top of the code) should be in future
+        /// </summary>
+
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsFailureCase3()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.Equal(0, list.Count());
+        }
+
+        /// <summary>
+        /// Check ResendDataRequestDate null or not failure Case4.
+        /// If ResendDataRequest date and InitialDataRequestDate both are not null then throw exception.
+        /// For this UnitTesting set InitialDataRequestDate & ResendDataRequestDate in BasicTestClass -> AddPeriodSupplierAndPeriodFacilityForPeriod() -> AddPeriodSupplier(....)
+        /// </summary>
+
+        [Fact]
+        public void CheckInitialOrResendDataRequestDateAndGetContactEmailsFailureCase4()
+        {
+            int exceptionCounter = 0;
+            string? exceptionMessage = null;
+
+            var reportingPeriod = AddPeriodSupplierAndPeriodFacilityForPeriod();
+            var list = new List<string>();
+
+            try
+            {
+                list = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(1);
+            }
+            catch (Exception ex)
+            {
+                exceptionCounter++;
+                exceptionMessage = ex.Message;
+            }
+
+            Assert.NotNull(exceptionMessage);
+            Assert.NotEqual(0, exceptionCounter);
+            Assert.Equal(0, list.Count());
+        }
+
+        #endregion
     }
 }

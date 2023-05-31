@@ -249,14 +249,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
         #endregion
 
         #region Period Supplier
-        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate, bool isActive)
+        public bool LoadPeriodSupplier(int reportingPeriodSupplierId, SupplierVO supplierVO, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate, bool isActive)
         {
             var reportingPeriodSupplier = new PeriodSupplier(reportingPeriodSupplierId, supplierVO, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, isActive);
 
             return _periodSupplier.Add(reportingPeriodSupplier);
         }
 
-        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+        public PeriodSupplier AddPeriodSupplier(int periodSupplierId, SupplierVO supplier, SupplierReportingPeriodStatus supplierReportingPeriodStatus, DateTime? initialDataRequestDate, DateTime? resendDataRequestDate)
         {
             var reportingPeriodSupplier = new PeriodSupplier(periodSupplierId, supplier, Id, supplierReportingPeriodStatus, initialDataRequestDate, resendDataRequestDate, true);
 
@@ -300,6 +300,14 @@ namespace BusinessLogic.ReportingPeriodRoot.DomainModels
                 }
             }
             return periodSupplier;
+        }
+
+        //SendMail
+        public List<string> CheckInitialOrResendDataRequestDateAndGetContactEmails(int periodSupplierId)
+        {
+            CheckReportingPeriodStatus();
+            var periodSupplier = FindPeriodSupplier(periodSupplierId);
+            return periodSupplier.CheckInitialOrResendDataRequestDateAndGetContactEmails(EndDate);
         }
 
         #endregion

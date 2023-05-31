@@ -29,13 +29,14 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private IReadOnlyEntityToDtoMapper _readOnlyEntityToDtoMapper;
     private IReportingPeriodDomainDtoMapper _reportingPeriodDomainDtoMapper;
     private IFileUploadDataActions _fileUploadDataActions;
+    private ISendEmailService _sendEmailService;
 
     public ReportingPeriodServices(IReportingPeriodFactory reportingPeriodFactory, ILoggerFactory loggerFactory, IReportingPeriodEntityDomainMapper reportingPeriodEntityDomainMapper,
             ISupplierEntityDomainMapper supplierEntityDomainMapper,
             ISupplierDomainDtoMapper supplierDomainDtoMapper,
            IReportingPeriodDataActions reportingPeriodDataActions, ISupplierDataActions supplierDataActions, IReferenceLookUpMapper referenceLookUpMapper,
            IReadOnlyEntityToDtoMapper readOnlyEntityToDtoMapper,
-           IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper, IFileUploadDataActions fileUploadDataActions)
+           IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper, IFileUploadDataActions fileUploadDataActions, ISendEmailService sendEmailService)
     {
         _reportingPeriodFactory = reportingPeriodFactory;
         _logger = loggerFactory.CreateLogger<SupplierServices>();
@@ -48,6 +49,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         _readOnlyEntityToDtoMapper = readOnlyEntityToDtoMapper;
         _reportingPeriodDomainDtoMapper = reportingPeriodDomainDtoMapper;
         _fileUploadDataActions = fileUploadDataActions;
+        _sendEmailService = sendEmailService;
     }
 
     #region Private Methods
@@ -203,9 +205,9 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriodDomain = ConfigureReportingPeriod(reportingPeriodEntity, reportingPeriodTypes, reportingPeriodStatus);
 
         //Load PeriodSupplier
-       /* var supplierVO = GetAndConvertSupplierValueObject(periodFacilityEntity.ReportingPeriodSupplier.SupplierId);
-        var supplierReportingPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplier.SupplierReportingPeriodStatusId);
-        reportingPeriodDomain.LoadPeriodSupplier(periodFacilityEntity.ReportingPeriodSupplierId, supplierVO, supplierReportingPeriodStatus, periodFacilityEntity.ReportingPeriodSupplier.InitialDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.ResendDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.IsActive);*/
+        /* var supplierVO = GetAndConvertSupplierValueObject(periodFacilityEntity.ReportingPeriodSupplier.SupplierId);
+         var supplierReportingPeriodStatus = GetAndConvertSupplierPeriodStatuses().FirstOrDefault(x => x.Id == periodFacilityEntity.ReportingPeriodSupplier.SupplierReportingPeriodStatusId);
+         reportingPeriodDomain.LoadPeriodSupplier(periodFacilityEntity.ReportingPeriodSupplierId, supplierVO, supplierReportingPeriodStatus, periodFacilityEntity.ReportingPeriodSupplier.InitialDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.ResendDataRequestDate, periodFacilityEntity.ReportingPeriodSupplier.IsActive);*/
 
         GetAndLoadPeriodSupplierDocuments(periodFacilityEntity.ReportingPeriodSupplier, reportingPeriodDomain);
 
@@ -353,7 +355,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         }
     }
 
-    private ReportingPeriod RetrieveAndConvertReportingPeriodSupplier(int periodSupplierId)
+    private ReportingPeriod RetrieveAndConvertReportingPeriodSupplier(int periodSupplierId, bool isNeededToLoadFacility)
     {
         var periodSupplier = _reportingPeriodDataActions.GetPeriodSupplierById(periodSupplierId);
 
@@ -366,12 +368,14 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriodDomain = ConfigureReportingPeriod(periodSupplier.ReportingPeriod, reportingPeriodTypes, reportingPeriodStatus);
 
         GetAndLoadPeriodSupplierDocuments(periodSupplier, reportingPeriodDomain);
-        
-        foreach(var periodFacility in periodSupplier.ReportingPeriodFacilityEntities)
-        {
-            GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(periodFacility, reportingPeriodDomain);
-        }
 
+        if (isNeededToLoadFacility)
+        {
+            foreach (var periodFacility in periodSupplier.ReportingPeriodFacilityEntities)
+            {
+                GetAndLoadPeriodFacilityWithGridMixesAndGasSupplyData(periodFacility, reportingPeriodDomain);
+            }
+        }
         return reportingPeriodDomain;
     }
 
@@ -490,7 +494,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private string ValidateFile(string fileType, long fileSize, string path)
     {
         string? error = null;
-        
+
         //Check file signature
         var fileError = CheckFileSignature(path, fileType);
         if (fileError != null)
@@ -556,7 +560,6 @@ public class ReportingPeriodServices : IReportingPeriodServices
             //Convert domain to entity
             var entity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodDomainToEntity(reportingPeriod);
             _reportingPeriodDataActions.UpdateReportingPeriod(entity);
-
         }
 
         return "ReportingPeriod added or updated successfully !!";
@@ -776,7 +779,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
     public string DeletePeriodSupplierGasSupplyBreakdowns(int periodSupplierId)
     {
-        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId);
+        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId, true);
 
         int count = reportingPeriod.DeletePeriodSupplierGasSupplyBreakdowns(periodSupplierId);
 
@@ -1053,7 +1056,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     /// <returns></returns>
     public MultiplePeriodFacilityGasSupplyBreakdownDto GetFacilityGasSupplyBreakdowns(int periodSupplierId)
     {
-        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId);
+        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId, true);
         var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == periodSupplierId);
         if (periodSupplier == null)
             throw new NotFoundException("ReportingPeriodSupplier not found !!");
@@ -1147,7 +1150,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
     public ReportingPeriodSupplierGasSupplyBreakdownAndDocumentDto GetPeriodSupplierSupplyBreakdownAndDocumentDto(int reportingPeriodSupplierId)
     {
-        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(reportingPeriodSupplierId);
+        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(reportingPeriodSupplierId, true);
 
         var periodSupplier = reportingPeriod.PeriodSuppliers.FirstOrDefault(x => x.Id == reportingPeriodSupplierId);
         if (periodSupplier == null)
@@ -1185,7 +1188,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     /// <returns></returns>
     public string RemoveReportingPeriodSupplierDocument(int reportingPeriodSupplierId, int documentId)
     {
-        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(reportingPeriodSupplierId);
+        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(reportingPeriodSupplierId, false);
 
         var isRemoved = reportingPeriod.RemovePeriodSupplierDocument(reportingPeriodSupplierId, documentId);
 
@@ -1199,7 +1202,56 @@ public class ReportingPeriodServices : IReportingPeriodServices
 
         return "ReportingPeriodSupplierDocument not removed !!";
     }
-}
+    #endregion
 
-#endregion
+    #region SendEmailNotifications
+
+    private (string,string,string?) FindEmailTemplateAndSetValues(string emailNameCode, ReportingPeriod reportingPeriod, string supplierName)
+    {
+        var emailTemplates = _reportingPeriodDataActions.GetEmailTemplateEntities();
+        var emailTemplate = emailTemplates.First(x => x.NameCode == emailNameCode);
+        var emailBody = emailTemplate.Body;
+
+        var endDate = (reportingPeriod.EndDate != null ? reportingPeriod.EndDate.Value.Date : DateTime.UtcNow.Date.AddDays(30));
+
+        emailBody = emailBody.Replace("<<supplierName>>", supplierName).Replace("<<endDate>>", endDate.ToString()).Replace("<<reportingPeriodName>>", reportingPeriod.DisplayName);
+
+        return (emailBody, emailTemplate.Subject, emailTemplate.DocumentPath);
+    }
+
+    public string SendInitialOrResendDataRequestEmailNotification(int periodSupplierId, string? ccMail, string? bccMail)
+    {
+        var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId, false);
+
+        var contactEmails = reportingPeriod.CheckInitialOrResendDataRequestDateAndGetContactEmails(periodSupplierId);
+
+        var periodSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == periodSupplierId);
+
+        (string body, string subject, string? filePath) bodyAndSubject = (periodSupplier.InitialDataRequestDate is null ? FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.InitialDataRequest, reportingPeriod, periodSupplier.Supplier.Name) : FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.ReminderDataRequest, reportingPeriod, periodSupplier.Supplier.Name));
+/*
+        //(string body, string subject, string? filePath) bodyAndSubject = ("","","");
+        if (initialDataRequestDate == null)
+        {
+            bodyAndSubject = FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.InitialDataRequest, reportingPeriod, supplierName);
+        }
+        else
+        {
+            bodyAndSubject = FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.ReminderDataRequest, reportingPeriod, supplierName);
+        }*/
+        
+        var isSend = _sendEmailService.SendMail(contactEmails, ccMail, bccMail, bodyAndSubject.body, bodyAndSubject.subject, bodyAndSubject.filePath);
+
+        if (isSend)
+        {
+            var isInitialDataRequestDateSet = _reportingPeriodDataActions.UpdatePeriodSupplierInitialDataRequestDate(periodSupplierId);
+
+            if (isInitialDataRequestDateSet)
+                return "InitialDataRequest/ResendDataRequest Email notification send successfully ...";
+        }
+
+        return "Email not send !!";
+
+    }
+    #endregion
+}
 

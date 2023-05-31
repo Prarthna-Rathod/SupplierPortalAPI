@@ -106,10 +106,20 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
             var selectedSupplyChainStage = supplyChainStages.First(x => x.Id == facilityEntity.SupplyChainStageId);
             var selectedReprtingType = reportingTypes.First(x => x.Id == facilityEntity.ReportingTypeId);
 
-            facilityVOs.Add(new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType));
+            var facilityVo = new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType);
+            facilityVOs.Add(facilityVo);
 
         }
-        var supplierVO = new SupplierVO(supplierEntity.Id, supplierEntity.Name, supplierEntity.IsActive, facilityVOs);
+
+        var contactVOs = new List<UserVO>();
+
+        foreach (var contactEntity in supplierEntity.ContactEntities)
+        {
+            var userVo = new UserVO(contactEntity.User.Id, contactEntity.User.Name, contactEntity.User.Email, contactEntity.User.ContactNo, contactEntity.User.IsActive);
+            contactVOs.Add(userVo);
+        }
+
+        var supplierVO = new SupplierVO(supplierEntity.Id, supplierEntity.Name, supplierEntity.IsActive, facilityVOs, contactVOs);
         return supplierVO;
     }
 

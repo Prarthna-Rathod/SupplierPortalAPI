@@ -9,10 +9,10 @@ namespace Services.DTOs
         public string ReportingPeriodName { get; set; }
         public int SupplierReportingPeriodStatusId { get; set; }
         public string SupplierReportingPeriodStatusName { get; set; }
-        public DateTime InitialDataRequestDate { get; set; }
-        public DateTime ResendDataRequestDate { get; set; }
+        public DateTime? InitialDataRequestDate { get; set; }
+        public DateTime? ResendDataRequestDate { get; set; }
 
-        public ReportingPeriodSupplierDto(int id, int supplierId, string supplierName, int reportingPeriodId, string reportingPeriodName, int supplierReportingPeriodStatusId, string supplierReportingPeriodStatusName,DateTime initialDataRequestDate, DateTime resendDataRequestDate)
+        public ReportingPeriodSupplierDto(int id, int supplierId, string supplierName, int reportingPeriodId, string reportingPeriodName, int supplierReportingPeriodStatusId, string supplierReportingPeriodStatusName,DateTime? initialDataRequestDate, DateTime? resendDataRequestDate)
         {
             Id = id;
             SupplierId = supplierId;

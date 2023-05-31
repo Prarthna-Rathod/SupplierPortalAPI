@@ -23,6 +23,7 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<DocumentStatusEntity> DocumentStatusEntities { get; set; } = null!;
     public virtual DbSet<DocumentTypeEntity> DocumentTypeEntities { get; set; } = null!;
     public virtual DbSet<ElectricityGridMixComponentEntity> ElectricityGridMixComponentEntities { get; set; } = null!;
+    public virtual DbSet<EmailTemplateEntity> EmailTemplateEntities { get; set; } = null!;
     public virtual DbSet<FacilityEntity> FacilityEntities { get; set; } = null!;
     public virtual DbSet<FacilityReportingPeriodDataStatusEntity> FacilityReportingPeriodDataStatusEntities { get; set; } = null!;
     public virtual DbSet<FacilityRequiredDocumentTypeEntity> FacilityRequiredDocumentTypeEntities { get; set; } = null!;
@@ -126,6 +127,15 @@ public partial class SupplierPortalDBContext : DbContext
             entity.ToTable("ElectricityGridMixComponentEntity");
 
             entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<EmailTemplateEntity>(entity =>
+        {
+            entity.ToTable("EmailTemplateEntity");
+
+            entity.Property(e => e.NameCode).HasMaxLength(50);
+
+            entity.Property(e => e.Subject).HasMaxLength(50);
         });
 
         modelBuilder.Entity<FacilityEntity>(entity =>
@@ -270,8 +280,6 @@ public partial class SupplierPortalDBContext : DbContext
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
 
             entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
-
-            //entity.Property(e => e.Version).HasMaxLength(50);
 
             entity.HasOne(d => d.DocumentStatus)
                 .WithMany(p => p.ReportingPeriodFacilityDocumentEntities)
@@ -421,8 +429,6 @@ public partial class SupplierPortalDBContext : DbContext
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
 
             entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
-
-            //entity.Property(e => e.Version).HasMaxLength(50);
 
             entity.HasOne(d => d.DocumentStatus)
                 .WithMany(p => p.ReportingPeriodSupplierDocumentEntities)
@@ -576,5 +582,4 @@ public partial class SupplierPortalDBContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-
 

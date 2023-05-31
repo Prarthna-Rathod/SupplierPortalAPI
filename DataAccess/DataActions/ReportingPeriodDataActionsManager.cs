@@ -234,32 +234,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public async Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
-    {
-        var existingsupplierdocument = await _context.ReportingPeriodSupplierDocumentEntities.FirstOrDefaultAsync(x => x.Id == reportingPeriodSupplierDocument.Id);
-
-        if (existingsupplierdocument == null)
-        {
-            throw new Exception("Supplier Document Not found");
-        }
-
-        existingsupplierdocument.ReportingPeriodSupplierId = reportingPeriodSupplierDocument.ReportingPeriodSupplierId;
-        existingsupplierdocument.Version = reportingPeriodSupplierDocument.Version;
-        existingsupplierdocument.DisplayName = reportingPeriodSupplierDocument.DisplayName;
-        existingsupplierdocument.StoredName = reportingPeriodSupplierDocument.StoredName;
-        existingsupplierdocument.Path = reportingPeriodSupplierDocument.Path;
-        existingsupplierdocument.DocumentStatusId = reportingPeriodSupplierDocument.DocumentStatusId;
-        existingsupplierdocument.DocumentTypeId = reportingPeriodSupplierDocument.DocumentTypeId;
-        existingsupplierdocument.ValidationError = reportingPeriodSupplierDocument.ValidationError;
-        existingsupplierdocument.UpdatedBy = "System";
-        existingsupplierdocument.UpdatedOn = DateTime.UtcNow;
-
-        _context.ReportingPeriodSupplierDocumentEntities.Update(existingsupplierdocument);
-        await _context.SaveChangesAsync();
-
-        return true;
-    }
-
     public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
@@ -284,6 +258,21 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return updatedReportingPeriodSuppliers;
     }
 
+    public bool UpdatePeriodSupplierInitialDataRequestDate(int periodSupplierId)
+    {
+        var periodSupplier = _context.ReportingPeriodSupplierEntities.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        if (periodSupplier is null)
+            throw new Exception("ReportingPeriodSupplierEntity not found !!");
+
+        if (periodSupplier.InitialDataRequestDate == null)
+            periodSupplier.InitialDataRequestDate = DateTime.UtcNow;
+        else
+            periodSupplier.ResendDataRequestDate = DateTime.UtcNow;
+
+        _context.SaveChanges();
+        return true;
+    }
     #endregion
 
     #region Remove Methods
@@ -495,6 +484,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return faciltityRequiredDocumentTypes;
     }
 
+    public IEnumerable<EmailTemplateEntity> GetEmailTemplateEntities()
+    {
+        return _context.EmailTemplateEntities;
+    }
+
     #endregion
 
     #region GetById
@@ -512,6 +506,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
+                                .AsSplitQuery()
                                 .FirstOrDefault();
 
         return reportingPeriod;
@@ -522,7 +517,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         var periodSupplier = _context.ReportingPeriodSupplierEntities
                                 .Include(x => x.Supplier)
                                 .Include(x => x.ReportingPeriod)
-                                .Include(x => x.SupplierReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierDocumentEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
@@ -530,7 +524,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
-                                
+                                .AsSplitQuery()
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }
