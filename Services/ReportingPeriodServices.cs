@@ -1147,6 +1147,13 @@ public class ReportingPeriodServices : IReportingPeriodServices
         return (emailTemplate.Subject, emailBody, emailTemplate.DocumentPath);
     }
 
+    /// <summary>
+    /// SendMail for InitialDataRequest Or ResendDataRequest notification for users
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="CCEmail"></param>
+    /// <param name="BCCEmail"></param>
+    /// <returns></returns>
     public string SendEmailInitialAndResendDataRequest(int periodSupplierId, string? CCEmail, string? BCCEmail)
     {
         var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId);

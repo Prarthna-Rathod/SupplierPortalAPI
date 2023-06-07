@@ -2,17 +2,22 @@
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Serilog.Context;
+using DataAccess.Logger;
 
 namespace DataAccess.DataActions
 {
     public class SupplierDataActionsManager : ISupplierDataActions
     {
         private readonly SupplierPortalDBContext _context;
+        private readonly ISerilog _logger;
         private readonly string REPORTING_TYPE_GHGRP = "GHGRP";
 
-        public SupplierDataActionsManager(SupplierPortalDBContext context)
+        public SupplierDataActionsManager(SupplierPortalDBContext context,ISerilog logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         #region Dispose Methods
@@ -49,7 +54,9 @@ namespace DataAccess.DataActions
             userEntity.CreatedBy = "System";
 
             _context.UserEntities.Add(userEntity);
-            _context.SaveChanges();
+
+            _context.LogExtensionMethod(_logger);
+
             return userEntity;
         }
 
@@ -60,7 +67,9 @@ namespace DataAccess.DataActions
             supplier.CreatedOn = DateTime.UtcNow;
             supplier.CreatedBy = "System";
             _context.SupplierEntities.Add(supplier);
-            _context.SaveChanges();
+
+            _context.LogExtensionMethod(_logger);
+            
             return true;
         }
 
@@ -82,7 +91,10 @@ namespace DataAccess.DataActions
             contact.UserId = user.Id;
 
             _context.ContactEntities.Add(contact);
-            _context.SaveChanges();
+
+            //_logger.LogPush(_context.ChangeTracker.Entries());
+            _context.LogExtensionMethod(_logger);
+
             return true;
         }
 
@@ -128,7 +140,7 @@ namespace DataAccess.DataActions
             facility.CreatedOn = DateTime.UtcNow;
             facility.CreatedBy = "System";
             _context.FacilityEntities.Add(facility);
-            _context.SaveChanges();
+            _context.LogExtensionMethod(_logger);
             return true;
         }
 
@@ -140,7 +152,7 @@ namespace DataAccess.DataActions
             associatePipeline.CreatedOn = DateTime.UtcNow;
             associatePipeline.CreatedBy = "System";
             _context.AssociatePipelineEntities.Add(associatePipeline);
-            _context.SaveChanges();
+            _context.LogExtensionMethod(_logger);
             return associatePipeline;
         }
         #endregion
@@ -265,9 +277,9 @@ namespace DataAccess.DataActions
                 throw new Exception("User not found !!");
             }
 
-            var isUnique = IsUniqueEmail(userEntity.Email, "User");
             if (userEntity.Email != entity.Email)
             {
+                var isUnique = IsUniqueEmail(userEntity.Email, "User");
                 if (isUnique == false)
                 {
                     throw new Exception("Email-Id is already exists !!");
@@ -289,7 +301,7 @@ namespace DataAccess.DataActions
                 entity.UpdatedBy = "System";
 
                 _context.UserEntities.Update(entity);
-                _context.SaveChanges();
+                _context.LogExtensionMethod(_logger);
                 return entity;
             }
         }
@@ -299,10 +311,9 @@ namespace DataAccess.DataActions
             var supplierEntity = _context.SupplierEntities.Where(x => x.Id == supplier.Id)
                                                     .FirstOrDefault();
 
-            var isUnique = IsUniqueEmail(supplier.Email, "Supplier");
-
             if (supplier.Email != supplierEntity.Email)
             {
+                var isUnique = IsUniqueEmail(supplier.Email, "Supplier");
                 if (isUnique == false)
                 {
                     throw new Exception("Email-Id is already exists !!");
@@ -324,7 +335,7 @@ namespace DataAccess.DataActions
                 supplierEntity.UpdatedBy = "System";
 
                 _context.SupplierEntities.Update(supplierEntity);
-                _context.SaveChanges();
+                _context.LogExtensionMethod(_logger);
                 return true;
             }
         }
@@ -360,11 +371,12 @@ namespace DataAccess.DataActions
             contactEntity.UpdatedBy = "System";
 
             _context.ContactEntities.Update(contactEntity);
-            _context.SaveChanges();
+
+            _context.LogExtensionMethod(_logger);
+
             return true;
         }
 
-       
         public bool UpdateAllFacilities(IEnumerable<FacilityEntity> facilityEntities)
         {
             var supplierId = facilityEntities.First().SupplierId;
@@ -401,21 +413,10 @@ namespace DataAccess.DataActions
                 facilityEntity.UpdatedBy = "System";
             }
 
-            _context.SaveChanges();
+            _context.LogExtensionMethod(_logger);
             return true;
         }
 
-      /*  private FacilityEntity FindExistingFacility(string? ghgrpFacilityId)
-        {
-            var existingFacility = _context.FacilityEntities.Where(x =>
-                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
-                        x.GhgrpfacilityId == ghgrpFacilityId &&
-                        x.IsPrimary && x.IsActive)
-                        .FirstOrDefault();
-
-            return existingFacility;
-        }
-*/
         public bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId)
         {
             var associatePipelineEntity = _context.AssociatePipelineEntities.Where(x => x.Id == associatePipelineId).FirstOrDefault();
@@ -424,7 +425,7 @@ namespace DataAccess.DataActions
             associatePipelineEntity.UpdatedBy = "System";
 
             _context.AssociatePipelineEntities.Update(associatePipelineEntity);
-            _context.SaveChanges();
+            _context.LogExtensionMethod(_logger);
             return true;
 
         }

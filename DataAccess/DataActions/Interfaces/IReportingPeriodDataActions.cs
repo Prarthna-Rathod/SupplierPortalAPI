@@ -1,5 +1,4 @@
 ﻿using DataAccess.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataAccess.DataActions.Interfaces
@@ -91,7 +90,7 @@ namespace DataAccess.DataActions.Interfaces
 
         IEnumerable<DocumentStatusEntity> GetDocumentStatusEntities();
         IEnumerable<DocumentTypeEntity> GetDocumentTypeEntities();
-        
+
         IEnumerable<ReportingTypeEntity> GetReportingTypes();
 
         IEnumerable<ElectricityGridMixComponentEntity> GetElectricityGridMixComponentEntities();
@@ -116,7 +115,7 @@ namespace DataAccess.DataActions.Interfaces
 
         ReportingPeriodFacilityDocumentEntity GetReportingPeriodFacilityDocumentById(int documentId);
 
-        ReportingPeriodSupplierDocumentEntity GetReportingPeriodSupplierDocumentById(int documentId);        
+        ReportingPeriodSupplierDocumentEntity GetReportingPeriodSupplierDocumentById(int documentId);
 
         #endregion
 

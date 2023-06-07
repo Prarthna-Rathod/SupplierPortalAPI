@@ -148,16 +148,20 @@ namespace Services.Mappers.ReportingPeriodMappers
         {
             var gridMixDtos = new List<ReportingPeriodFacilityElectricityGridMixDto>();
 
-            if (periodFacilityElectricityGridMixes.Count() == 0)
-                throw new Exception("PeriodFacilityElectricityGridMix is not connetcted !!");
-
             foreach (var electricityGridMix in periodFacilityElectricityGridMixes)
             {
                 var electricityGridMixDto = new ReportingPeriodFacilityElectricityGridMixDto(electricityGridMix.ElectricityGridMixComponent.Id,electricityGridMix.ElectricityGridMixComponent.Name,electricityGridMix.Content);
                 gridMixDtos.Add(electricityGridMixDto);
             }
 
-            var unitOfMeasure = periodFacilityElectricityGridMixes.First().UnitOfMeasure;
+            UnitOfMeasure unitOfMeasure = new UnitOfMeasure();
+            if (periodFacility.periodFacilityElectricityGridMixes.Count() == 0)
+            {
+                unitOfMeasure.Id = 0;
+                unitOfMeasure.Name = "";
+            }
+            else
+                unitOfMeasure = periodFacility.periodFacilityElectricityGridMixes.First().UnitOfMeasure;
 
             var periodFacilityElectricityGridMixDto = new MultiplePeriodFacilityElectricityGridMixDto(periodFacility.Id, periodSupplier.ReportingPeriodId, periodSupplier.Supplier.Id, unitOfMeasure.Id, unitOfMeasure.Name,periodFacility.FercRegion.Id,periodFacility.FercRegion.Name, gridMixDtos);
             return periodFacilityElectricityGridMixDto;

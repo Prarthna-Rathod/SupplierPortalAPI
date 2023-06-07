@@ -33,6 +33,7 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddScoped<ISendEmailServices,SendEmailServices>();
             services.AddScoped<IReportingPeriodDataActions, ReportingPeriodDataActionsManager>();
             services.AddScoped<IUploadDocuments, UploadDocument>();
+            services.AddScoped<ISerilog,SerilogFunction>();
             services.AddScoped<IReportingPeriodFactory, ReportingPeriodFactory>();
             services.AddSingleton<IReportingPeriodDomainDtoMapper, ReportingPeriodDomainDtoMapper>();
             services.AddSingleton<IReportingPeriodEntityDomainMapper, ReportingPeriodEntityDomainMapper>();

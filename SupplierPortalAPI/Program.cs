@@ -1,5 +1,4 @@
-using DataAccess.DataActionContext;
-using Microsoft.EntityFrameworkCore;
+using DataAccess.Logger;
 using Serilog;
 using SupplierPortalAPI.Infrastructure.Builders;
 using SupplierPortalAPI.Infrastructure.Middleware;
@@ -20,13 +19,9 @@ builder.SecutitySchema();
 builder.AddSwaggerBuilder();
 builder.Services.ConfigureCors();
 builder.Services.AddDependancy(builder.Configuration);
-
-//serilog
-var _loggrer = new LoggerConfiguration()
-.ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext()
-.CreateLogger();
-builder.Logging.AddSerilog(_loggrer);
-//Serilog
+//builder.SerilogConfiguration();
+serilog.InitializeLoggers(builder.Configuration);
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 

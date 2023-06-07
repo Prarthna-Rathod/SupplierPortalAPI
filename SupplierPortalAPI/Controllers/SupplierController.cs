@@ -45,6 +45,7 @@ namespace SupplierPortalAPI.Controllers
         [HttpGet("GetSupplierById")]
         public SupplierDto GetSupplierById(int supplierId) 
         {
+            
             return _service.GetSupplierById(supplierId);
         }
 
