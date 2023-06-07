@@ -1,4 +1,5 @@
 using DataAccess.DataActionContext;
+using DataAccess.LoggingFiles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SupplierPortalAPI.Infrastructure.Builders;
@@ -22,10 +23,9 @@ builder.Services.ConfigureCors();
 builder.Services.AddDependancy(builder.Configuration);
 
 //serilog
-var _loggrer = new LoggerConfiguration()
-.ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext()
-.CreateLogger();
-builder.Logging.AddSerilog(_loggrer);
+
+LoggerClass.InitializeLoggers(builder.Configuration);
+builder.Host.UseSerilog();
 //Serilog
 
 var app = builder.Build();

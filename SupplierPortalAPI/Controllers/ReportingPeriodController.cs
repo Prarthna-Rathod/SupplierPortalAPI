@@ -2,6 +2,7 @@
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using Services.Interfaces;
+using System;
 
 namespace SupplierPortalAPI.Controllers
 {
@@ -10,9 +11,11 @@ namespace SupplierPortalAPI.Controllers
     public class ReportingPeriodController : ControllerBase
     {
         private IReportingPeriodServices _services;
+        private readonly ILogger _logger;
 
-        public ReportingPeriodController(IReportingPeriodServices services)
+        public ReportingPeriodController(ILoggerFactory loggerFactory, IReportingPeriodServices services)
         {
+            _logger = loggerFactory.CreateLogger<SupplierController>();
             _services = services;
         }
 
@@ -98,6 +101,7 @@ namespace SupplierPortalAPI.Controllers
         [HttpGet("GetReportingPeriodFacilities")]
         public ReportingPeriodSupplierFacilitiesDto GetReportingPeriodFacilities(int periodSupplierId)
         {
+           
             return _services.GetReportingPeriodFacilities(periodSupplierId);
         }
 

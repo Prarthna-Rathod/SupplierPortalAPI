@@ -10,6 +10,7 @@ using Services.Mappers.SupplierMappers;
 using Services.Mappers.ReportingPeriodMappers;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using DataAccess.LoggingFiles;
 
 namespace SupplierPortalAPI.Infrastructure.Builders
 {
@@ -38,6 +39,9 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddSingleton<IReportingPeriodEntityDomainMapper, ReportingPeriodEntityDomainMapper>();
             services.AddSingleton<IReadOnlyEntityToDtoMapper, ReadOnlyEntityToDtoMapper>();
             services.AddSingleton<IReferenceLookUpMapper, ReferenceLookupMapper>();
+
+            //Serilog
+            services.AddScoped<ISerilog, SerilogFunction>();
         }
 
     }

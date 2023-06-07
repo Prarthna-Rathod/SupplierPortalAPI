@@ -1,7 +1,12 @@
 ﻿using DataAccess.DataActionContext;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
+using DataAccess.Extensions;
+using DataAccess.LoggingFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
+using Serilog.Context;
 
 namespace DataAccess.DataActions
 {
@@ -9,9 +14,11 @@ namespace DataAccess.DataActions
     {
         private readonly SupplierPortalDBContext _context;
         private readonly string REPORTING_TYPE_GHGRP = "GHGRP";
+        private readonly ISerilog _logger;
 
-        public SupplierDataActionsManager(SupplierPortalDBContext context)
+        public SupplierDataActionsManager(ISerilog logger , SupplierPortalDBContext context)
         {
+            _logger = logger;
             _context = context;
         }
 
@@ -49,7 +56,8 @@ namespace DataAccess.DataActions
             userEntity.CreatedBy = "System";
 
             _context.UserEntities.Add(userEntity);
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
+
             return userEntity;
         }
 
@@ -60,7 +68,7 @@ namespace DataAccess.DataActions
             supplier.CreatedOn = DateTime.UtcNow;
             supplier.CreatedBy = "System";
             _context.SupplierEntities.Add(supplier);
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
             return true;
         }
 
@@ -82,7 +90,7 @@ namespace DataAccess.DataActions
             contact.UserId = user.Id;
 
             _context.ContactEntities.Add(contact);
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
             return true;
         }
 
@@ -128,7 +136,7 @@ namespace DataAccess.DataActions
             facility.CreatedOn = DateTime.UtcNow;
             facility.CreatedBy = "System";
             _context.FacilityEntities.Add(facility);
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
             return true;
         }
 
@@ -140,7 +148,7 @@ namespace DataAccess.DataActions
             associatePipeline.CreatedOn = DateTime.UtcNow;
             associatePipeline.CreatedBy = "System";
             _context.AssociatePipelineEntities.Add(associatePipeline);
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
             return associatePipeline;
         }
         #endregion
@@ -265,9 +273,9 @@ namespace DataAccess.DataActions
                 throw new Exception("User not found !!");
             }
 
-            var isUnique = IsUniqueEmail(userEntity.Email, "User");
             if (userEntity.Email != entity.Email)
             {
+                var isUnique = IsUniqueEmail(userEntity.Email, "User");
                 if (isUnique == false)
                 {
                     throw new Exception("Email-Id is already exists !!");
@@ -289,20 +297,19 @@ namespace DataAccess.DataActions
                 entity.UpdatedBy = "System";
 
                 _context.UserEntities.Update(entity);
-                _context.SaveChanges();
+                _context.LogEntryAndSaveChanges(_logger);
                 return entity;
             }
         }
 
         public bool UpdateSupplier(SupplierEntity supplier)
         {
-            var supplierEntity = _context.SupplierEntities.Where(x => x.Id == supplier.Id)
-                                                    .FirstOrDefault();
+            var supplierEntity = _context.SupplierEntities.Where(x => x.Id == supplier.Id).FirstOrDefault();
 
-            var isUnique = IsUniqueEmail(supplier.Email, "Supplier");
 
             if (supplier.Email != supplierEntity.Email)
             {
+                var isUnique = IsUniqueEmail(supplier.Email, "Supplier");
                 if (isUnique == false)
                 {
                     throw new Exception("Email-Id is already exists !!");
@@ -324,7 +331,7 @@ namespace DataAccess.DataActions
                 supplierEntity.UpdatedBy = "System";
 
                 _context.SupplierEntities.Update(supplierEntity);
-                _context.SaveChanges();
+                _context.LogEntryAndSaveChanges(_logger);
                 return true;
             }
         }
@@ -334,15 +341,16 @@ namespace DataAccess.DataActions
             var contactEntity = _context.ContactEntities.Where(x => x.Id == contact
             .Id).FirstOrDefault();
 
+            var oldEntity = new ContactEntity();
+            oldEntity = contactEntity;
+
             if (contactEntity == null)
-            {
                 throw new Exception("Contact not found !!");
-            }
 
             if (contactEntity.SupplierId != contact.SupplierId)
-            {
                 throw new Exception("Supplier cannot be changed !!");
-            }
+
+            //_logger.BeginScope(LogContext.PushProperty("PreviousValue", contactEntity.User));
 
             var user = UpdateUser(new UserEntity
             {
@@ -360,7 +368,14 @@ namespace DataAccess.DataActions
             contactEntity.UpdatedBy = "System";
 
             _context.ContactEntities.Update(contactEntity);
-            _context.SaveChanges();
+            _logger.PushSerilog(_context.ChangeTracker.Entries());
+            _context.LogEntryAndSaveChanges(_logger);
+
+            //Logging Entry
+            // _logger.BeginScope(LogContext.PushProperty("UpdatedValue", contact.User));
+            // _logger.LogInformation($"Update ContactEntity value changed {contact.User}");
+
+
             return true;
         }
 
@@ -401,21 +416,10 @@ namespace DataAccess.DataActions
                 facilityEntity.UpdatedBy = "System";
             }
 
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
             return true;
         }
 
-      /*  private FacilityEntity FindExistingFacility(string? ghgrpFacilityId)
-        {
-            var existingFacility = _context.FacilityEntities.Where(x =>
-                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
-                        x.GhgrpfacilityId == ghgrpFacilityId &&
-                        x.IsPrimary && x.IsActive)
-                        .FirstOrDefault();
-
-            return existingFacility;
-        }
-*/
         public bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId)
         {
             var associatePipelineEntity = _context.AssociatePipelineEntities.Where(x => x.Id == associatePipelineId).FirstOrDefault();
@@ -424,7 +428,7 @@ namespace DataAccess.DataActions
             associatePipelineEntity.UpdatedBy = "System";
 
             _context.AssociatePipelineEntities.Update(associatePipelineEntity);
-            _context.SaveChanges();
+            _context.LogEntryAndSaveChanges(_logger);
             return true;
 
         }
@@ -438,7 +442,7 @@ namespace DataAccess.DataActions
             {
                 var allEmailId = _context.UserEntities.Where(x => x.Email == email).ToList();
 
-                if (allEmailId.Count != 0)
+                if (allEmailId.Count() != 0)
                     throw new Exception("Email-Id is already exists !!");
                 else
                     return true;

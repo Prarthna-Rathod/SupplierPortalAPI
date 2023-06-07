@@ -63,7 +63,7 @@ namespace Services
                 _persister.UpdateSupplier(entity);
 
             }
-            return "Supplier added successfully....";
+            return "Supplier added/updated successfully....";
         }
 
         private Supplier RetrieveAndConvertSupplier(int supplierId)
@@ -122,6 +122,7 @@ namespace Services
                 var contact = supplier.UpdateSupplierContact(contactDto.Id, contactDto.UserId, contactDto.UserName, contactDto.UserEmail, contactDto.UserContactNo, contactDto.IsActive);
 
                 var contactEntity = _supplierEntityDomainMapper.ConvertContactDomainToEntity(contact);
+
                 _persister.UpdateContact(contactEntity);
 
             }
