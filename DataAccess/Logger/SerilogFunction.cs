@@ -19,20 +19,6 @@ namespace DataAccess.DataActions
             _logger = logger;
         }
 
-        /*public void PushSerilog(object previousValue, object updatedValue)
-        {
-            var entries = _context.ChangeTracker.Entries().ToList();
-            entries.ForEach(entry =>
-            {
-                LogLevel level = LogLevel.Information;
-                var messageTemplate = "Entity was added/modified";
-                //using (LogContext.PushProperty("PreviousStatus", previousValue.GetType().GetProperties().Select(x => x.GetValue(previousValue))))
-                using (LogContext.PushProperty("PreviousStatus", previousValue.GetType().Name))
-                using (LogContext.PushProperty("UpdatedStatus", updatedValue.GetType().Name))
-                    _logger.Log(level,messageTemplate, entry.Metadata.GetTableName(), entry.State.ToString());
-            });
-        }*/
-
         public void LogPush(IEnumerable<EntityEntry> entityEntries)
         {
             foreach(var entry in entityEntries)

@@ -642,11 +642,11 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriod = RetrieveAndConvertReportingPeriodSupplier(periodSupplierId);
         var periodSupplierStatus = GetAndConvertSupplierPeriodStatuses();
 
-        reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplierId, periodSupplierStatus);
+        var periodSupplier = reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplierId, periodSupplierStatus);
 
-        var entities = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSuppliersDomainToEntity(reportingPeriod.PeriodSuppliers);
+        var entity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSupplierDomainToEntity(periodSupplier);
 
-        _reportingPeriodDataActions.UpdateReportingPeriodSuppliers(entities);
+        _reportingPeriodDataActions.UpdateReportingPeriodSupplierLockUnlockStatus(entity);
 
         return "PeriodSupplierStatus is updated successfully...";
     }

@@ -10,17 +10,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-//Infrastructure=>Builder
 
 builder.BuilderDbContext();
+
+//Authentication
 builder.SecutitySchema();
+
+//Authorization
 builder.AddSwaggerBuilder();
+
 builder.Services.ConfigureCors();
+
 builder.Services.AddDependancy(builder.Configuration);
+
 //builder.SerilogConfiguration();
 serilog.InitializeLoggers(builder.Configuration);
+
 builder.Host.UseSerilog();
 
 var app = builder.Build();

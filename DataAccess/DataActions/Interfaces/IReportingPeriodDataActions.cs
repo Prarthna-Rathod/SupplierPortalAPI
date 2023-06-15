@@ -18,7 +18,9 @@ namespace DataAccess.DataActions.Interfaces
 
         bool AddPeriodSupplier(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
 
-        IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
+        IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSupplierLockUnlockStatuses(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
+
+        bool UpdateReportingPeriodSupplierLockUnlockStatus(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity);
 
         bool SendEmailInitialAndResendDataRequest(int periodSupplierId);
 

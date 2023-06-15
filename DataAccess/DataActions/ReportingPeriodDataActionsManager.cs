@@ -1,11 +1,12 @@
 using DataAccess.DataActionContext;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
-using DataAccess.Logger;
+using DataAccess.Extension;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace DataAccess.DataActions;
 
@@ -16,15 +17,73 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     private readonly ISerilog _logger;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
     private readonly string INITIALDATAREQUEST = "InitialDataRequest";
+    private readonly IHttpContextAccessor _httpContext;
 
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context, IUploadDocuments uploadDocuments, ISerilog logger)
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context, IUploadDocuments uploadDocuments, ISerilog logger, IHttpContextAccessor httpContext)
     {
         _context = context;
         _uploadDocuments = uploadDocuments;
         _logger = logger;
+        _httpContext = httpContext;
     }
 
     #region ReportingPeriod
+
+    private string FindLoggedUser()
+    {
+        return _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+
+   /* private void FindFacilityAndCheckSupplierContactLoginOrNot(int periodFacilityId)
+    {
+        var periodFacility = _context.ReportingPeriodFacilityEntities
+                                    .Where(x => x.Id == periodFacilityId)
+                                    .Include(x => x.ReportingPeriodSupplier)
+                                        .ThenInclude(x => x.Supplier)
+                                            .ThenInclude(x => x.ContactEntities)
+                                                .ThenInclude(x => x.User)
+                                    .FirstOrDefault();
+
+        var allContacts = periodFacility.ReportingPeriodSupplier.Supplier.ContactEntities;
+
+        //Get details for LoggedIn person
+        var loginUserRoleName = _httpContext.HttpContext.FindLoginUserRoleName();
+        var loginUserEmail = _httpContext.HttpContext.FindLoginUserEmail();
+
+        if (loginUserRoleName == USER_ROLE_EXTERNAL)
+        {
+            var loginUserSupplierName = _context.FindLoginUserSupplierName(loginUserEmail);
+            var isLoginUser = allContacts.Any(x => x.User.Email == loginUserEmail);
+
+            if (!isLoginUser)
+                throw new Exception($"You have LoggedIn for Supplier {loginUserSupplierName} !! Can't add/update FacilityDocument data for other Supplier !!");
+        }
+    }
+
+    private void FindSupplierAndCheckSupplierContactLoginOrNot(int periodSupplierId)
+    {
+        var periodSupplier = _context.ReportingPeriodSupplierEntities
+                                    .Where(x => x.Id == periodSupplierId)
+                                    .Include(x => x.Supplier)
+                                        .ThenInclude(x => x.ContactEntities)
+                                            .ThenInclude(x => x.User)
+                                    .FirstOrDefault();
+
+        var allContacts = periodSupplier.Supplier.ContactEntities;
+
+        //Get details for LoggedIn person
+        var loginUserRoleName = _httpContext.HttpContext.FindLoginUserRoleName();
+        var loginUserEmail = _httpContext.HttpContext.FindLoginUserEmail();
+
+        if (loginUserRoleName == USER_ROLE_EXTERNAL)
+        {
+            var loginUserSupplierName = _context.FindLoginUserSupplierName(loginUserEmail);
+            var isLoginUser = allContacts.Any(x => x.User.Email == loginUserEmail);
+
+            if (!isLoginUser)
+                throw new Exception($"You have LoggedIn for Supplier {loginUserSupplierName} !! Can't add/update SupplierDocument data for other Supplier !!");
+        }
+    }*/
 
     public bool AddReportingPeriod(ReportingPeriodEntity reportingPeriod)
     {
@@ -42,7 +101,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         entity.StartDate = reportingPeriod.StartDate.Date;
         entity.EndDate = reportingPeriod.EndDate;
         entity.IsActive = reportingPeriod.IsActive;
-        entity.CreatedBy = "System";
+        entity.CreatedBy = FindLoggedUser();
         entity.CreatedOn = DateTime.UtcNow;
 
         _context.ReportingPeriodEntities.Add(entity);
@@ -67,11 +126,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         if (reportingPeriod.ReportingPeriodStatus.Name == REPORTING_PERIOD_STATUS_CLOSE)
         {
-            reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSuppliers(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
+            reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSupplierLockUnlockStatuses(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
         }
 
         reportingPeriodEntity.UpdatedOn = DateTime.UtcNow;
-        reportingPeriodEntity.UpdatedBy = "System";
+        reportingPeriodEntity.UpdatedBy = FindLoggedUser();
 
         _context.ReportingPeriodEntities.Update(reportingPeriodEntity);
         _context.LogExtensionMethod(_logger);
@@ -90,7 +149,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
+    public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSupplierLockUnlockStatuses(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
 
@@ -112,6 +171,20 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         _context.LogExtensionMethod(_logger);
         return updatedReportingPeriodSuppliers;
+    }
+
+    public bool UpdateReportingPeriodSupplierLockUnlockStatus(ReportingPeriodSupplierEntity reportingPeriodSupplierEntity)
+    {
+        var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == reportingPeriodSupplierEntity.Id).FirstOrDefault();
+
+        if (periodSupplierEntity == null)
+            throw new Exception("ReportingPeirodSupplierEntity not found for update !!");
+
+        periodSupplierEntity.SupplierReportingPeriodStatusId = reportingPeriodSupplierEntity.SupplierReportingPeriodStatusId;
+
+        _context.LogExtensionMethod(_logger);
+        return true;
+
     }
 
     public bool SendEmailInitialAndResendDataRequest(int periodSupplierId)
@@ -196,6 +269,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId, int fercRegionId)
     {
+        FindPeriodFacilityAndCheckSupplierContactLoginOrNot(periodFacilityId);
+
         var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities).FirstOrDefault();
 
         periodFacilityEntity.FercRegionId = fercRegionId;
@@ -207,7 +282,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         foreach (var gridMixEntity in periodFacilityElectricityGridMixEntities)
         {
-            gridMixEntity.CreatedBy = "System";
+            gridMixEntity.CreatedBy = FindLoggedUser();
             gridMixEntity.CreatedOn = DateTime.UtcNow;
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(gridMixEntity);
         }
@@ -236,6 +311,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId)
     {
+        FindSupplierAndCheckSupplierContactLoginOrNot(periodSupplierId);
+
         RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
 
         foreach (var gasSupplyBreakdown in periodFacilityGasSupplyBreakDownEntities)
@@ -244,7 +321,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 throw new Exception("GasSupplyBreakdownEntity is not found !!");
 
             gasSupplyBreakdown.CreatedOn = DateTime.UtcNow;
-            gasSupplyBreakdown.CreatedBy = "System";
+            gasSupplyBreakdown.CreatedBy = FindLoggedUser();
             _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(gasSupplyBreakdown);
         }
         _context.LogExtensionMethod(_logger);
@@ -274,14 +351,27 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #region PeriodFacilityDocument
 
+    private void FindPeriodFacilityAndCheckSupplierContactLoginOrNot(int periodFacilityId)
+    {
+        var periodFacility = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).Include(x => x.ReportingPeriodSupplier).ThenInclude(x => x.Supplier).FirstOrDefault();
+        var loginUser = FindLoggedUser();
+        var contacts = periodFacility.ReportingPeriodSupplier.Supplier.ContactEntities;
+
+        var isUserExists = contacts.Any(x => x.User.Email == loginUser);
+        if (!isUserExists)
+            throw new Exception($"You are not authorized for {periodFacility.ReportingPeriodSupplier.Supplier.Name} !!");
+    }
+
     public bool AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocumentEntity)
     {
+        FindPeriodFacilityAndCheckSupplierContactLoginOrNot(reportingPeriodFacilityDocumentEntity.ReportingPeriodFacilityId);
+
         var existingPeriodFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.DocumentTypeId == reportingPeriodFacilityDocumentEntity.DocumentTypeId && x.ReportingPeriodFacilityId == reportingPeriodFacilityDocumentEntity.ReportingPeriodFacilityId).FirstOrDefault();
 
         if (existingPeriodFacilityDocument is null)
         {
-            reportingPeriodFacilityDocumentEntity.CreatedBy = "System";
-            reportingPeriodFacilityDocumentEntity.CreatedOn = DateTime.UtcNow;
+            reportingPeriodFacilityDocumentEntity.CreatedBy = FindLoggedUser();
+            reportingPeriodFacilityDocumentEntity.CreatedOn = DateTime.UtcNow;            
             _context.ReportingPeriodFacilityDocumentEntities.Add(reportingPeriodFacilityDocumentEntity);
         }
         else
@@ -294,7 +384,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             existingPeriodFacilityDocument.DocumentStatusId = reportingPeriodFacilityDocumentEntity.DocumentStatusId;
             existingPeriodFacilityDocument.DocumentTypeId = reportingPeriodFacilityDocumentEntity.DocumentTypeId;
             existingPeriodFacilityDocument.ValidationError = reportingPeriodFacilityDocumentEntity.ValidationError;
-            existingPeriodFacilityDocument.UpdatedBy = "System";
+            existingPeriodFacilityDocument.UpdatedBy = FindLoggedUser();
             existingPeriodFacilityDocument.UpdatedOn = DateTime.UtcNow;
 
             _context.ReportingPeriodFacilityDocumentEntities.Update(existingPeriodFacilityDocument);
@@ -343,14 +433,27 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     #region PeriodSupplierDocument
 
+    private void FindSupplierAndCheckSupplierContactLoginOrNot(int periodSupplierId)
+    {
+        var periodSupplier = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).Include(x => x.Supplier).FirstOrDefault();
+        var loginUser = FindLoggedUser();
+        var contacts = periodSupplier.Supplier.ContactEntities;
+
+        var isUserExists = contacts.Any(x => x.User.Email == loginUser);
+        if (!isUserExists)
+            throw new Exception($"You are not authorized for {periodSupplier.Supplier.Name} !!");
+    }
+
     public bool AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocumentEntity)
     {
+        FindSupplierAndCheckSupplierContactLoginOrNot(reportingPeriodSupplierDocumentEntity.ReportingPeriodSupplierId);
+
         var existingPeriodSupplierDocument = _context.ReportingPeriodSupplierDocumentEntities.Where(x => x.DocumentTypeId == reportingPeriodSupplierDocumentEntity.DocumentTypeId && x.ReportingPeriodSupplierId == reportingPeriodSupplierDocumentEntity.ReportingPeriodSupplierId).FirstOrDefault();
 
         if (existingPeriodSupplierDocument is null)
         {
             reportingPeriodSupplierDocumentEntity.CreatedOn = DateTime.UtcNow;
-            reportingPeriodSupplierDocumentEntity.CreatedBy = "System";
+            reportingPeriodSupplierDocumentEntity.CreatedBy = FindLoggedUser();
             _context.ReportingPeriodSupplierDocumentEntities.Add(reportingPeriodSupplierDocumentEntity);
         }
         else
@@ -363,7 +466,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             existingPeriodSupplierDocument.DocumentStatusId = reportingPeriodSupplierDocumentEntity.DocumentStatusId;
             existingPeriodSupplierDocument.DocumentTypeId = reportingPeriodSupplierDocumentEntity.DocumentTypeId;
             existingPeriodSupplierDocument.ValidationError = reportingPeriodSupplierDocumentEntity.ValidationError;
-            existingPeriodSupplierDocument.UpdatedBy = "System";
+            existingPeriodSupplierDocument.UpdatedBy = FindLoggedUser();
             existingPeriodSupplierDocument.UpdatedOn = DateTime.UtcNow;
 
             _context.ReportingPeriodSupplierDocumentEntities.Update(existingPeriodSupplierDocument);
@@ -508,6 +611,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakDownEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
+                                .AsSplitQuery()
                                 .FirstOrDefault();
 
         return reportingPeriod;

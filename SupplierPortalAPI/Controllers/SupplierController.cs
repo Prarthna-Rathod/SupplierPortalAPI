@@ -5,7 +5,7 @@ using Services.Interfaces;
 
 namespace SupplierPortalAPI.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Internal")]
     [Route("api/[controller]")]
     [ApiController]
     public class SupplierController : ControllerBase
@@ -45,7 +45,6 @@ namespace SupplierPortalAPI.Controllers
         [HttpGet("GetSupplierById")]
         public SupplierDto GetSupplierById(int supplierId) 
         {
-            
             return _service.GetSupplierById(supplierId);
         }
 

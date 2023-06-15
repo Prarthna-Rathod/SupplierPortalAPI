@@ -10,7 +10,7 @@ namespace DataAccess.DataActions
 
         public string UploadFile(IFormFile displayName,string storedName)
         {
-            string path = Path.Combine("E:\\Bigscal\\ICT_4\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles",storedName);
+            string path = Path.Combine("C:\\Bigscal-Dhruvi Katrodiya\\SupplierPortalAPI\\SupplierPortalAPI\\DataAccess\\UploadedFiles", storedName);
             
             using (var fileStream = new FileStream(path, FileMode.Create))
             {

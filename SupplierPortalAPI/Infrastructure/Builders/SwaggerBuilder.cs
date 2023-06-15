@@ -8,7 +8,7 @@ namespace SupplierPortalAPI.Infrastructure.Builders
         {
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "SupplierPortalAPI", Version = "v1" });
+                /*c.SwaggerDoc("v1", new OpenApiInfo { Title = "SupplierPortalAPI", Version = "v1" });
                 c.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.OAuth2,
@@ -35,8 +35,34 @@ namespace SupplierPortalAPI.Infrastructure.Builders
                         new string[]{}
                     }
 
+                });*/
+
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SupplierPortal", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer Scheme."
                 });
-               
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+
             });
             return builder;
         }
