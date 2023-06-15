@@ -26,6 +26,9 @@ namespace DataAccess.DataActions.Interfaces
 
         #region GetById Methods
         UserEntity GetUserById(int userId);
+
+        UserEntity GetUserByEmailId(string emailId);
+
         SupplierEntity GetSupplierById(int supplierId);
         ContactEntity GetContactById(int contactId);
         FacilityEntity GetFacilityById(int facilityId);

@@ -16,11 +16,8 @@ namespace SupplierPortalAPI.Infrastructure.Builders
 {
     public static class DependencyBuilder
     {
-
         public static void AddDependancy(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddScoped<ISupplierServices, SupplierServices>();
-
             //Supplier
             services.AddScoped<ISupplierServices, SupplierServices>();
             services.AddScoped<ISupplierDataActions, SupplierDataActionsManager>();
@@ -42,6 +39,9 @@ namespace SupplierPortalAPI.Infrastructure.Builders
 
             //Serilog
             services.AddScoped<ISerilog, SerilogFunction>();
+            services.AddHttpContextAccessor();
+            //Authorization
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
         }
 
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
@@ -5,7 +6,7 @@ using Services.Interfaces;
 
 namespace SupplierPortalAPI.Controllers
 {
-    //[Authorize]
+    [Authorize(Roles = "Internal")]
     [Route("api/[controller]")]
     [ApiController]
     public class SupplierController : ControllerBase

@@ -37,7 +37,9 @@ namespace DataAccess.DataActions.Interfaces
 
         bool CheckAndUpdateReportingPeriodFacilityStatus(int periodFacilityId, int facilityStatusInProgressId);
 
-        IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
+        IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliersLockUnlockStatuses(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers);
+
+        bool UpdateReportingPeriodSupplierLockUnlockStatus(ReportingPeriodSupplierEntity periodSupplierEntity);
 
         bool UpdatePeriodSupplierInitialDataRequestDate(int periodSupplierId);
 

@@ -3,8 +3,8 @@ using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Extensions;
 using DataAccess.LoggingFiles;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DataAccess.DataActions;
 
@@ -13,14 +13,73 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     private readonly SupplierPortalDBContext _context;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
     private readonly string FACILITY_REPORTING_PERIOD_STATUS_SUBMITTED = "Submitted";
+    private readonly string USER_ROLE_EXTERNAL = "External";
     private readonly IFileUploadDataActions _fileUploadDataActions;
     private readonly ISerilog _logger;
+    private readonly IHttpContextAccessor _httpContext;
 
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context, IFileUploadDataActions fileUploadDataActions, ISerilog logger)
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context, IFileUploadDataActions fileUploadDataActions, ISerilog logger, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _fileUploadDataActions = fileUploadDataActions;
         _logger = logger;
+        _httpContext = httpContextAccessor;
+    }
+
+    private void FindFacilityAndCheckSupplierContactLoginOrNot(int periodFacilityId)
+    {
+        var periodFacility = _context.ReportingPeriodFacilityEntities
+                                    .Where(x => x.Id == periodFacilityId)
+                                    .Include(x => x.ReportingPeriodSupplier)
+                                        .ThenInclude(x => x.Supplier)
+                                            .ThenInclude(x => x.ContactEntities)
+                                                .ThenInclude(x => x.User)
+                                    .FirstOrDefault();
+
+        var allContacts = periodFacility.ReportingPeriodSupplier.Supplier.ContactEntities;
+
+        //Get details for LoggedIn person
+        var loginUserRoleName = _httpContext.HttpContext.FindLoginUserRoleName();
+        var loginUserEmail = _httpContext.HttpContext.FindLoginUserEmail();
+
+        if (loginUserRoleName == USER_ROLE_EXTERNAL)
+        {
+            var loginUserSupplierName = _context.FindLoginUserSupplierName(loginUserEmail);
+            var isLoginUser = allContacts.Any(x => x.User.Email == loginUserEmail);
+
+            if (!isLoginUser)
+                throw new Exception($"You have LoggedIn for Supplier {loginUserSupplierName} !! Can't add/update FacilityDocument data for other Supplier !!");
+        }
+    }
+
+    private void FindSupplierAndCheckSupplierContactLoginOrNot(int periodSupplierId)
+    {
+        var periodSupplier = _context.ReportingPeriodSupplierEntities
+                                    .Where(x => x.Id == periodSupplierId)
+                                    .Include(x => x.Supplier)
+                                        .ThenInclude(x => x.ContactEntities)
+                                            .ThenInclude(x => x.User)
+                                    .FirstOrDefault();
+
+        var allContacts = periodSupplier.Supplier.ContactEntities;
+
+        //Get details for LoggedIn person
+        var loginUserRoleName = _httpContext.HttpContext.FindLoginUserRoleName();
+        var loginUserEmail = _httpContext.HttpContext.FindLoginUserEmail();
+
+        if (loginUserRoleName == USER_ROLE_EXTERNAL)
+        {
+            var loginUserSupplierName = _context.FindLoginUserSupplierName(loginUserEmail);
+            var isLoginUser = allContacts.Any(x => x.User.Email == loginUserEmail);
+
+            if (!isLoginUser)
+                throw new Exception($"You have LoggedIn for Supplier {loginUserSupplierName} !! Can't add/update SupplierDocument data for other Supplier !!");
+        }
+    }
+
+    private string CreatedOrUpdatedByUser()
+    {
+        return _httpContext.HttpContext.FindLoginUserEmail();
     }
 
     #region Add Methods
@@ -40,7 +99,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         entity.StartDate = reportingPeriod.StartDate.Date;
         entity.EndDate = reportingPeriod.EndDate;
         entity.IsActive = reportingPeriod.IsActive;
-        entity.CreatedBy = "System";
+        entity.CreatedBy = CreatedOrUpdatedByUser();
         entity.CreatedOn = DateTime.UtcNow;
 
         _context.ReportingPeriodEntities.Add(entity);
@@ -76,6 +135,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntities, int periodFacilityId, int fercRegionId)
     {
+        FindFacilityAndCheckSupplierContactLoginOrNot(periodFacilityId);
         var periodFacility = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities).FirstOrDefault();
 
         if (periodFacility is null)
@@ -94,7 +154,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             foreach (var entity in periodFacilityElectricityGridMixEntities)
             {
                 entity.CreatedOn = DateTime.UtcNow;
-                entity.CreatedBy = "System";
+                entity.CreatedBy = CreatedOrUpdatedByUser();
                 _context.ReportingPeriodFacilityElectricityGridMixEntities.Add(entity);
             }
         }
@@ -104,13 +164,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddRemovePeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownEntity> facilityGasSupplyBreakDownEntities, int periodSupplierId)
     {
+        FindSupplierAndCheckSupplierContactLoginOrNot(periodSupplierId);
         var isRemovedGasSupply = RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
 
         if (isRemovedGasSupply)
         {
             foreach (var entity in facilityGasSupplyBreakDownEntities)
             {
-                entity.CreatedBy = "System";
+                entity.CreatedBy = CreatedOrUpdatedByUser();
                 entity.CreatedOn = DateTime.UtcNow;
                 _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(entity);
             }
@@ -119,14 +180,15 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return isRemovedGasSupply;
     }
 
-
     public int AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity periodFacilityDocument)
     {
+        FindFacilityAndCheckSupplierContactLoginOrNot(periodFacilityDocument.ReportingPeriodFacilityId);
+
         var existingFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.DocumentTypeId == periodFacilityDocument.DocumentTypeId && x.ReportingPeriodFacilityId == periodFacilityDocument.ReportingPeriodFacilityId).FirstOrDefault();
 
         if (existingFacilityDocument is null)
         {
-            periodFacilityDocument.CreatedBy = "System";
+            periodFacilityDocument.CreatedBy = CreatedOrUpdatedByUser();
             periodFacilityDocument.CreatedOn = DateTime.UtcNow;
 
             _context.ReportingPeriodFacilityDocumentEntities.Add(periodFacilityDocument);
@@ -141,7 +203,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             existingFacilityDocument.DocumentStatusId = periodFacilityDocument.DocumentStatusId;
             existingFacilityDocument.DocumentTypeId = periodFacilityDocument.DocumentTypeId;
             existingFacilityDocument.ValidationError = periodFacilityDocument.ValidationError;
-            existingFacilityDocument.UpdatedBy = "System";
+            existingFacilityDocument.UpdatedBy = CreatedOrUpdatedByUser();
             existingFacilityDocument.UpdatedOn = DateTime.UtcNow;
         }
         _context.LogEntryAndSaveChanges(_logger);
@@ -151,12 +213,13 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity periodSupplierDocument)
     {
+        FindSupplierAndCheckSupplierContactLoginOrNot(periodSupplierDocument.ReportingPeriodSupplierId);
 
         var existingSupplierDocument = _context.ReportingPeriodSupplierDocumentEntities.Where(x => x.DocumentTypeId == periodSupplierDocument.DocumentTypeId && x.ReportingPeriodSupplierId == periodSupplierDocument.ReportingPeriodSupplierId).FirstOrDefault();
 
         if (existingSupplierDocument is null)
         {
-            periodSupplierDocument.CreatedBy = "System";
+            periodSupplierDocument.CreatedBy = CreatedOrUpdatedByUser();
             periodSupplierDocument.CreatedOn = DateTime.UtcNow;
 
             _context.ReportingPeriodSupplierDocumentEntities.Add(periodSupplierDocument);
@@ -172,7 +235,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             existingSupplierDocument.DocumentTypeId = periodSupplierDocument.DocumentTypeId;
             existingSupplierDocument.ValidationError = periodSupplierDocument.ValidationError;
             existingSupplierDocument.IsActive = periodSupplierDocument.IsActive;
-            existingSupplierDocument.UpdatedBy = "System";
+            existingSupplierDocument.UpdatedBy = CreatedOrUpdatedByUser();
             existingSupplierDocument.UpdatedOn = DateTime.UtcNow;
 
         }
@@ -201,11 +264,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         if (reportingPeriod.ReportingPeriodStatus.Name == REPORTING_PERIOD_STATUS_CLOSE)
         {
-            reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSuppliers(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
+            reportingPeriodEntity.ReportingPeriodSupplierEntities = UpdateReportingPeriodSuppliersLockUnlockStatuses(reportingPeriod.ReportingPeriodSupplierEntities).ToList();
         }
 
         reportingPeriodEntity.UpdatedOn = DateTime.UtcNow;
-        reportingPeriodEntity.UpdatedBy = "System";
+        reportingPeriodEntity.UpdatedBy = CreatedOrUpdatedByUser();
 
         _context.ReportingPeriodEntities.Update(reportingPeriodEntity);
         _context.LogEntryAndSaveChanges(_logger);
@@ -239,7 +302,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         return true;
     }
 
-    public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
+    public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliersLockUnlockStatuses(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
 
@@ -261,6 +324,20 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         _context.LogEntryAndSaveChanges(_logger);
         return updatedReportingPeriodSuppliers;
+    }
+
+    public bool UpdateReportingPeriodSupplierLockUnlockStatus(ReportingPeriodSupplierEntity periodSupplierEntity)
+    {
+        FindSupplierAndCheckSupplierContactLoginOrNot(periodSupplierEntity.Id);
+        var periodSupplier = _context.ReportingPeriodSupplierEntities.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
+
+        if (periodSupplier == null)
+            throw new Exception("ReportingPeriodSupplierEntity not found !!");
+
+        periodSupplier.SupplierReportingPeriodStatusId = periodSupplierEntity.SupplierReportingPeriodStatusId;
+
+        _context.LogEntryAndSaveChanges(_logger);
+        return true;
     }
 
     public bool UpdatePeriodSupplierInitialDataRequestDate(int periodSupplierId)

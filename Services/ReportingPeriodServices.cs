@@ -641,11 +641,11 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var reportingPeriod = RetrieveAndConvertReportingPeriod(periodSupplierEntity.ReportingPeriodId);
         var periodSupplierStatus = GetAndConvertSupplierPeriodStatuses();
 
-        reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplierId, periodSupplierStatus);
+        var periodSupplier = reportingPeriod.UpdateLockUnlockPeriodSupplierStatus(periodSupplierId, periodSupplierStatus);
 
-        var entities = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSuppliersDomainToEntity(reportingPeriod.PeriodSuppliers);
+        var entity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodSupplierDomainToEntity(periodSupplier);
 
-        _reportingPeriodDataActions.UpdateReportingPeriodSuppliers(entities);
+        _reportingPeriodDataActions.UpdateReportingPeriodSupplierLockUnlockStatus(entity);
 
         return "PeriodSupplierStatus is updated successfully...";
     }
@@ -1228,17 +1228,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         var periodSupplier = reportingPeriod.PeriodSuppliers.First(x => x.Id == periodSupplierId);
 
         (string body, string subject, string? filePath) bodyAndSubject = (periodSupplier.InitialDataRequestDate is null ? FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.InitialDataRequest, reportingPeriod, periodSupplier.Supplier.Name) : FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.ReminderDataRequest, reportingPeriod, periodSupplier.Supplier.Name));
-/*
-        //(string body, string subject, string? filePath) bodyAndSubject = ("","","");
-        if (initialDataRequestDate == null)
-        {
-            bodyAndSubject = FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.InitialDataRequest, reportingPeriod, supplierName);
-        }
-        else
-        {
-            bodyAndSubject = FindEmailTemplateAndSetValues(EmailTemplateNameCodeValues.ReminderDataRequest, reportingPeriod, supplierName);
-        }*/
-        
+
         var isSend = _sendEmailService.SendMail(contactEmails, ccMail, bccMail, bodyAndSubject.body, bodyAndSubject.subject, bodyAndSubject.filePath);
 
         if (isSend)

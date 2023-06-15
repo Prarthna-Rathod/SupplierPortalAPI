@@ -3,6 +3,7 @@ using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
+using DataAccess.Extensions;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
 using System.Net;
 using System.Net.Mail;
@@ -32,7 +33,8 @@ public class PeriodSupplier
     }
 
     private PeriodSupplier()
-    { }
+    {
+    }
 
     public int Id { get; private set; }
     public SupplierVO Supplier { get; private set; }
@@ -67,6 +69,7 @@ public class PeriodSupplier
     }
 
     #region Private methods
+
     internal void UpdateSupplierReportingPeriodStatus(SupplierReportingPeriodStatus supplierReportingPeriodStatus)
     {
         SupplierReportingPeriodStatus = supplierReportingPeriodStatus;

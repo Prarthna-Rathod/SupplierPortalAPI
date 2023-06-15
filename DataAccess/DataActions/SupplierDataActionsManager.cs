@@ -3,10 +3,8 @@ using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Extensions;
 using DataAccess.LoggingFiles;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Logging;
-using Serilog.Context;
 
 namespace DataAccess.DataActions
 {
@@ -15,11 +13,19 @@ namespace DataAccess.DataActions
         private readonly SupplierPortalDBContext _context;
         private readonly string REPORTING_TYPE_GHGRP = "GHGRP";
         private readonly ISerilog _logger;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public SupplierDataActionsManager(ISerilog logger , SupplierPortalDBContext context)
+        public SupplierDataActionsManager(ISerilog logger, SupplierPortalDBContext context, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _context = context;
+            _httpContext = httpContextAccessor;
+        }
+
+        private string CreatedOrUpdatedByUser()
+        {
+            var email = _httpContext.HttpContext.FindLoginUserEmail();
+            return email;
         }
 
         #region Dispose Methods
@@ -53,7 +59,7 @@ namespace DataAccess.DataActions
             var roles = _context.RoleEntities.Where(x => x.Name == "External").FirstOrDefault();
             userEntity.RoleId = roles.Id;
             userEntity.CreatedOn = DateTime.UtcNow;
-            userEntity.CreatedBy = "System";
+            userEntity.CreatedBy = CreatedOrUpdatedByUser();
 
             _context.UserEntities.Add(userEntity);
             _context.LogEntryAndSaveChanges(_logger);
@@ -66,7 +72,7 @@ namespace DataAccess.DataActions
         {
             IsUniqueEmail(supplier.Email, "Supplier");
             supplier.CreatedOn = DateTime.UtcNow;
-            supplier.CreatedBy = "System";
+            supplier.CreatedBy = CreatedOrUpdatedByUser();
             _context.SupplierEntities.Add(supplier);
             _context.LogEntryAndSaveChanges(_logger);
             return true;
@@ -85,7 +91,7 @@ namespace DataAccess.DataActions
             });
 
             contact.CreatedOn = DateTime.UtcNow;
-            contact.CreatedBy = "System";
+            contact.CreatedBy = CreatedOrUpdatedByUser();
             contact.User = user;
             contact.UserId = user.Id;
 
@@ -134,7 +140,7 @@ namespace DataAccess.DataActions
 
 
             facility.CreatedOn = DateTime.UtcNow;
-            facility.CreatedBy = "System";
+            facility.CreatedBy = CreatedOrUpdatedByUser();
             _context.FacilityEntities.Add(facility);
             _context.LogEntryAndSaveChanges(_logger);
             return true;
@@ -146,7 +152,7 @@ namespace DataAccess.DataActions
             var associatePipeline = new AssociatePipelineEntity();
             associatePipeline.Name = associatePipelineName;
             associatePipeline.CreatedOn = DateTime.UtcNow;
-            associatePipeline.CreatedBy = "System";
+            associatePipeline.CreatedBy = CreatedOrUpdatedByUser();
             _context.AssociatePipelineEntities.Add(associatePipeline);
             _context.LogEntryAndSaveChanges(_logger);
             return associatePipeline;
@@ -225,6 +231,19 @@ namespace DataAccess.DataActions
 
             return user;
         }
+
+        public UserEntity GetUserByEmailId(string emailId)
+        {
+            var user = _context.UserEntities.Where(x => x.Email == emailId)
+                                            .Include(x => x.Role)
+                                            .FirstOrDefault();
+
+            if (user == null)
+                throw new Exception("Invalid EmailId !!");
+
+            return user;
+        }
+
         public SupplierEntity GetSupplierById(int supplierId)
         {
             var supplier =
@@ -294,7 +313,7 @@ namespace DataAccess.DataActions
                 entity.RoleId = entity.RoleId;
                 entity.IsActive = userEntity.IsActive;
                 entity.UpdatedOn = DateTime.UtcNow;
-                entity.UpdatedBy = "System";
+                entity.UpdatedBy = CreatedOrUpdatedByUser();
 
                 _context.UserEntities.Update(entity);
                 _context.LogEntryAndSaveChanges(_logger);
@@ -328,7 +347,7 @@ namespace DataAccess.DataActions
                 supplierEntity.ContactNo = supplier.ContactNo;
                 supplierEntity.IsActive = supplier.IsActive;
                 supplierEntity.UpdatedOn = DateTime.UtcNow;
-                supplierEntity.UpdatedBy = "System";
+                supplierEntity.UpdatedBy = CreatedOrUpdatedByUser();
 
                 _context.SupplierEntities.Update(supplierEntity);
                 _context.LogEntryAndSaveChanges(_logger);
@@ -365,21 +384,16 @@ namespace DataAccess.DataActions
             contactEntity.User = user;
             contactEntity.UserId = user.Id;
             contactEntity.UpdatedOn = DateTime.UtcNow;
-            contactEntity.UpdatedBy = "System";
+            contactEntity.UpdatedBy = CreatedOrUpdatedByUser();
 
             _context.ContactEntities.Update(contactEntity);
             _logger.PushSerilog(_context.ChangeTracker.Entries());
             _context.LogEntryAndSaveChanges(_logger);
 
-            //Logging Entry
-            // _logger.BeginScope(LogContext.PushProperty("UpdatedValue", contact.User));
-            // _logger.LogInformation($"Update ContactEntity value changed {contact.User}");
-
-
             return true;
         }
 
-       
+
         public bool UpdateAllFacilities(IEnumerable<FacilityEntity> facilityEntities)
         {
             var supplierId = facilityEntities.First().SupplierId;
@@ -413,7 +427,7 @@ namespace DataAccess.DataActions
                 facilityEntity.SupplyChainStageId = updateFacility.SupplyChainStageId;
                 facilityEntity.IsActive = updateFacility.IsActive;
                 facilityEntity.UpdatedOn = DateTime.UtcNow;
-                facilityEntity.UpdatedBy = "System";
+                facilityEntity.UpdatedBy = CreatedOrUpdatedByUser();
             }
 
             _context.LogEntryAndSaveChanges(_logger);
@@ -425,7 +439,7 @@ namespace DataAccess.DataActions
             var associatePipelineEntity = _context.AssociatePipelineEntities.Where(x => x.Id == associatePipelineId).FirstOrDefault();
             associatePipelineEntity.Name = associatePipeline.Name;
             associatePipelineEntity.UpdatedOn = DateTime.UtcNow;
-            associatePipelineEntity.UpdatedBy = "System";
+            associatePipelineEntity.UpdatedBy = CreatedOrUpdatedByUser();
 
             _context.AssociatePipelineEntities.Update(associatePipelineEntity);
             _context.LogEntryAndSaveChanges(_logger);
