@@ -31,6 +31,8 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddScoped<IReportingPeriod, ReportingPeriod>();
             services.AddScoped<IReportingPeriodServices, ReportingPeriodServices>();
             services.AddScoped<IReportingPeriodDataActions, ReportingPeriodDataActionsManager>();
+            services.AddScoped<IUploadDocumentDataActions,UploadDocumentDataActionManager>();
+            services.AddScoped<ISendEmailService, SendEmailService>();
             services.AddScoped<IReportingPeriodFactory, ReportingPeriodFactory>();
             services.AddSingleton<IReportingPeriodDomainDtoMapper, ReportingPeriodDomainDtoMapper>();
             services.AddSingleton<IReportingPeriodEntityDomainMapper, ReportingPeriodEntityDomainMapper>();

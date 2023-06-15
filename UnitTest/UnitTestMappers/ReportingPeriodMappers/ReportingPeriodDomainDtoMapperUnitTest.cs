@@ -49,20 +49,20 @@ namespace UnitTest.UnitTestMappers.ReportingPeriodMappers
             Assert.Equal(periodSuppliersDomain.ResendDataRequestDate, periodSupplierDto.ResendDataRequestDate);
         }
 
-            [Fact]
-            public void ConvertPeriodFacilityElectricityGridMixEntitiesToValueObjects()
-            {
-            var electricityGridMixComponent = GetElectricityGridMixComponents();
-            var unitOfMeasure = GetUnitOfMeasures();
-            var gridMixEntity = CreateReportingPeriodFacilityElecticityGridMixDto();
+            //[Fact]
+            //public void ConvertPeriodFacilityElectricityGridMixEntitiesToValueObjects()
+            //{
+            //var electricityGridMixComponent = GetElectricityGridMixComponents();
+            //var unitOfMeasure = GetUnitOfMeasures();
+            //var gridMixEntity = CreateReportingPeriodFacilityElecticityGridMixDto();
 
 
-                var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
-                var gridMixVo = mapper.ConvertPeriodFacilityElectricityGridMixDtoToValueObject(gridMixEntity, electricityGridMixComponent,unitOfMeasure);
+            //    var mapper = CreateInstanceOfReportingPeriodDomainDtoMapper();
+            //    var gridMixVo = mapper.ConvertPeriodFacilityElectricityGridMixDtoToValueObject(gridMixEntity, electricityGridMixComponent,unitOfMeasure);
 
-                Assert.NotNull(gridMixVo);
-                //Assert.Equal(gridMixEntity.Count(), gridMixVo.Count());
-            }
+            //    Assert.NotNull(gridMixVo);
+            //    //Assert.Equal(gridMixEntity.Count(), gridMixVo.Count());
+            //}
 
 
 

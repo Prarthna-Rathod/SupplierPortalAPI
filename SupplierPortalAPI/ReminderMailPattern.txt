@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+</head>
+<body>
+    
+    <p>Hello,<<supplierName>> </p>
+    <p>
+        Greetings from Indian Petronet <br>
+        ReportingPeriod is open now. Please submit your data collection before the deadline <<ReportingPeriodCloseDate>>.
+        Submit necessary data for <<ReportingPeriodName>>.                  
+    </p>        
+    <p>Thank You</p>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+</head>
+<body>
+    
+    <p>Hello,<<supplierName>> </p>
+    <p>
+        Greetings from Indian Petronet <br>
+        <b>This is the Reminder Message for submit data collection.</b>
+        ReportingPeriod is open now. Please submit your data collection  before the deadline <<ReportingPeriodCloseDate>>. 
+        Submit necessary data for <<ReportingPeriodName>>.                 
+    </p>        
+    <p>Thank You</p>
+</body>
+</html>

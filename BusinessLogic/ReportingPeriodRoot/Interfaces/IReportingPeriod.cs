@@ -21,11 +21,16 @@ namespace BusinessLogic.ReportingPeriodRoot.Interfaces
 
         bool LoadPeriodFacilityElectricityGridMix(int supplierId, int periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure UnitOfMeasure, decimal Content, bool IsActive);
 
+
         public IEnumerable<PeriodFacilityGasSupplyBreakDown> AddPeriodFacilityGasSupplyBreakdown(int ReportingPeriodSupplierId, IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> reportingPeriodFacilityGasSupplyBreakDownVOs);
 
         bool LoadPeriodFacilityGasSupplyBreakdown(int id, int supplierId, int periodFacilityId, Site site, UnitOfMeasure unitOfMeasure, decimal content);
 
+        public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int periodSupplierId, int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, IEnumerable<FacilityRequiredDocumentType> facilityRequiredDocumentTypes);
 
+        bool LoadPeriodFacilityDocument(int periodFacilityDocumentId, int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError);
+
+        bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int periodFacilityDocumentId);
 
 
         /*

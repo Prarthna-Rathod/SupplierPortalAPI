@@ -47,7 +47,7 @@ public interface IReportingPeriodDomainDtoMapper
     #region PeriodFacilityElectricityGridMix
     IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> ConvertPeriodFacilityElectricityGridMixDtoToValueObject(AddMultiplePeriodFacilityElectricityGridMixDto addMultiplePeriodFacilityElectricityGridMixDtos, IEnumerable<ElectricityGridMixComponent> electricityGridMixComponent, IEnumerable<UnitOfMeasure> unitOfMeasure);
 
-    AddMultiplePeriodFacilityElectricityGridMixDto ConvertReportingPeriodFacilityEntityToDto(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, IEnumerable<UnitOfMeasure> unitOfMeasures, IEnumerable<ElectricityGridMixComponent> electricityGridMixComponents);
+    AddMultiplePeriodFacilityElectricityGridMixDto ConvertReportingPeriodFacilityElectricityGridMixEntityToDto(ReportingPeriodFacilityEntity reportingPeriodFacilityEntity, IEnumerable<UnitOfMeasure> unitOfMeasures, IEnumerable<ElectricityGridMixComponent> electricityGridMixComponents);
 
     #endregion
 
@@ -55,9 +55,12 @@ public interface IReportingPeriodDomainDtoMapper
 
     IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> ConvertPeriodFacilityGasSupplyBreakDownDtoToValueObject(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownDto> periodFacilityGasSupplyBreakDownDto, IEnumerable<Site> sites, IEnumerable<UnitOfMeasure> unitOfMeasures);
     MultiplePeriodFacilityGasSupplyBreakDownDto ConvertReportingPeriodGasSupplyBreakDownDomainListToDto(PeriodSupplier periodSupplier, IEnumerable<PeriodFacility> periodFacility);
+
     #endregion
 
     #region PeriodDocument
+    ReportingPeriodFacilityGridMixAndDocumentDto ConvertPeriodFacilityElectricityGridMixAndDocumentDomainListToDto(PeriodFacility periodFacility, PeriodSupplier periodSupplier);
+    ReportingPeriodSupplierGasSupplyAndDocumentDto ConvertPeriodSupplierGasSupplyAndDocumentDomainListToDto(IEnumerable<PeriodFacility> periodFacilities, PeriodSupplier periodSupplier);
     #endregion
 
 

@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
+using BusinessLogic.ReportingPeriodRoot.ValueObjects;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using DataAccess.Entities;
 using Services.Mappers.Interfaces;
@@ -99,6 +100,7 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     public SupplierVO ConvertSupplierEntityToSupplierValueObject(SupplierEntity supplierEntity, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<ReportingType> reportingTypes)
     {
         var facilityVOs = new List<FacilityVO>();
+        var userVOs = new List<UserVO>();   
 
         foreach (var facilityEntity in supplierEntity.FacilityEntities)
         {
@@ -108,7 +110,13 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
             facilityVOs.Add(new FacilityVO(facilityEntity.Id, facilityEntity.Name, facilityEntity.SupplierId, facilityEntity.GhgrpfacilityId, facilityEntity.IsActive, selectedSupplyChainStage, selectedReprtingType));
 
         }
-        var supplierVO = new SupplierVO(supplierEntity.Id, supplierEntity.Name, supplierEntity.IsActive, facilityVOs);
+
+        foreach(var contactEntity in supplierEntity.ContactEntities)
+        {
+            userVOs.Add(new UserVO(contactEntity.UserId, contactEntity.User.Name, contactEntity.User.Email, contactEntity.User.ContactNo, contactEntity.User.IsActive));
+        }
+
+        var supplierVO = new SupplierVO(supplierEntity.Id, supplierEntity.Name, supplierEntity.IsActive, facilityVOs,userVOs);
         return supplierVO;
     }
 
@@ -200,6 +208,34 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     }
 
 
+    public ReportingPeriodFacilityEntity ConvertReportingPeriodFacilityDomainToEntity(PeriodFacility periodFacility)
+    {
+        var periodFacilityEntity = new ReportingPeriodFacilityEntity();
+        periodFacilityEntity.Id = periodFacility.Id;
+        periodFacilityEntity.FacilityId = periodFacility.FacilityVO.Id;
+        periodFacilityEntity.FacilityReportingPeriodDataStatusId = periodFacility.FacilityReportingPeriodDataStatus.Id;
+        periodFacilityEntity.ReportingPeriodId = periodFacility.ReportingPeriodId;
+        periodFacilityEntity.ReportingTypeId = periodFacility.FacilityVO.ReportingType.Id;
+        periodFacilityEntity.GhgrpfacilityId = periodFacility.FacilityVO.GHGRPFacilityId;
+        periodFacilityEntity.SupplyChainStageId = periodFacility.FacilityVO.SupplyChainStage.Id;
+        periodFacilityEntity.ReportingPeriodSupplierId = periodFacility.ReportingPeriodSupplierId;
+        periodFacilityEntity.FercRegionId = periodFacility.FercRegion.Id;
+        periodFacilityEntity.IsActive = periodFacility.IsActive;
+
+        return periodFacilityEntity;
+    }
+
+    public IEnumerable<ReportingPeriodFacilityEntity> ConvertReportingPeriodFacilitiesDomainToEntity(IEnumerable<PeriodFacility> periodFacilities)
+    {
+        var periodFacilityEntities = new List<ReportingPeriodFacilityEntity>();
+        foreach (var periodFacility in periodFacilities)
+        {
+            periodFacilityEntities.Add(ConvertReportingPeriodFacilityDomainToEntity(periodFacility));
+        }
+        return periodFacilityEntities;
+    }
+
+
     #endregion
 
     #region PeriodFacility ElectricityGridMix
@@ -275,7 +311,101 @@ public class ReportingPeriodEntityDomainMapper : IReportingPeriodEntityDomainMap
     }
     #endregion
 
-    #region PeriodDocument
+    #region PeriodFacilityDocument
+
+    public ReportingPeriodFacilityDocumentEntity ConvertReportingPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument)
+    {
+        var periodFacilityDocumentEntity = new ReportingPeriodFacilityDocumentEntity();
+        periodFacilityDocumentEntity.Id = periodFacilityDocument.Id;
+        periodFacilityDocumentEntity.ReportingPeriodFacilityId = periodFacilityDocument.ReportingPeriodFacilityId;
+        periodFacilityDocumentEntity.Version = periodFacilityDocument.Version;
+        periodFacilityDocumentEntity.DisplayName = periodFacilityDocument.DisplayName;
+        periodFacilityDocumentEntity.StoredName = periodFacilityDocument.StoredName;
+        periodFacilityDocumentEntity.Path = periodFacilityDocument.Path;
+        periodFacilityDocumentEntity.DocumentStatusId = periodFacilityDocument.DocumentStatus.Id;
+        periodFacilityDocumentEntity.DocumentTypeId = periodFacilityDocument.DocumentType.Id;
+        periodFacilityDocumentEntity.ValidationError = periodFacilityDocument.ValidationError;
+        periodFacilityDocumentEntity.IsActive = true;
+
+        return periodFacilityDocumentEntity;
+    }
+
+
+    public ReportingPeriodFacilityDocumentEntity ConvertPeriodFacilityDocumentDomainToEntity(PeriodFacilityDocument periodFacilityDocument,int periodFacilityDocumentId)
+    {
+        var periodFacilityDocumentEntity = new ReportingPeriodFacilityDocumentEntity();
+        periodFacilityDocumentEntity.Id = periodFacilityDocumentId;
+        periodFacilityDocumentEntity.ReportingPeriodFacilityId = periodFacilityDocument.ReportingPeriodFacilityId;
+        periodFacilityDocumentEntity.Version = periodFacilityDocument.Version;
+        periodFacilityDocumentEntity.DisplayName = periodFacilityDocument.DisplayName;
+        periodFacilityDocumentEntity.StoredName = periodFacilityDocument.StoredName;
+        periodFacilityDocumentEntity.Path = periodFacilityDocument.Path;
+        periodFacilityDocumentEntity.DocumentStatusId = periodFacilityDocument.DocumentStatus.Id;
+        periodFacilityDocumentEntity.DocumentTypeId = periodFacilityDocument.DocumentType.Id;
+        periodFacilityDocumentEntity.ValidationError = periodFacilityDocument.ValidationError;
+        periodFacilityDocumentEntity.IsActive = true;
+
+        return periodFacilityDocumentEntity;
+    }
+    #endregion
+
+    #region FacilityRequiredDocumentType
+
+    public IEnumerable<FacilityRequiredDocumentType> ConvertFacilityRequiredDocumentTypeEntitiesToValueObjects(IEnumerable<FacilityRequiredDocumentTypeEntity> facilityRequiredDocumentTypeEntities, IEnumerable<ReportingType> reportingTypes, IEnumerable<SupplyChainStage> supplyChainStages, IEnumerable<DocumentType> documentTypes, IEnumerable<DocumentRequiredStatus> documentRequiredStatuses)
+    {
+        var list = new List<FacilityRequiredDocumentType>();
+        foreach (var facilityRequiredDocumentTypeEntity in facilityRequiredDocumentTypeEntities)
+        {
+            var reportingType = reportingTypes.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.ReportingTypeId);
+
+            var supplyChainStage = supplyChainStages.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.SupplyChainStageId);
+
+            var documentType = documentTypes.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.DocumentTypeId);
+
+            var documentRequiredStatus = documentRequiredStatuses.FirstOrDefault(x => x.Id == facilityRequiredDocumentTypeEntity.DocumentRequiredStatusId);
+
+            list.Add(ConvertFacilityRequiredDocumentTypeEntityToValueObject(reportingType, supplyChainStage, documentType, documentRequiredStatus));
+        }
+        return list;
+    }
+
+    public FacilityRequiredDocumentType ConvertFacilityRequiredDocumentTypeEntityToValueObject(ReportingType reportingType, SupplyChainStage supplyChainStage, DocumentType documentType, DocumentRequiredStatus documentRequiredStatus)
+    {
+        return new FacilityRequiredDocumentType(reportingType, supplyChainStage, documentType, documentRequiredStatus);
+    }
+    #endregion
+
+    #region PeriodSupplierDocument
+    public ReportingPeriodSupplierDocumentEntity ConvertReportingPeriodSupplierDocumentDomainToEntity(PeriodSupplierDocument periodSupplierDocument)
+    {
+        var periodSupplierDocumentEntity = new ReportingPeriodSupplierDocumentEntity();
+        periodSupplierDocumentEntity.Id= periodSupplierDocument.Id;
+        periodSupplierDocumentEntity.ReportingPeriodSupplierId = periodSupplierDocument.ReportingPeriodSupplierId;
+        periodSupplierDocumentEntity.Version = periodSupplierDocument.Version;
+        periodSupplierDocumentEntity.DisplayName = periodSupplierDocument.DisplayName;
+        periodSupplierDocumentEntity.StoredName= periodSupplierDocument.StoredName;
+        periodSupplierDocumentEntity.Path = periodSupplierDocument.Path;
+        periodSupplierDocumentEntity.DocumentStatusId = periodSupplierDocument.DocumentStatus.Id;
+        periodSupplierDocumentEntity.DocumentTypeId = periodSupplierDocument.DocumentType.Id;
+        periodSupplierDocumentEntity.IsActive = true;
+        return periodSupplierDocumentEntity;
+
+    }
+
+    public ReportingPeriodSupplierDocumentEntity ConvertPeriodSupplierDocumentDomainToEntity(PeriodSupplierDocument periodSupplierDocument, int periodSupplierDocumentId)
+    {
+        var periodSupplierDocumentEntity = new ReportingPeriodSupplierDocumentEntity();
+        periodSupplierDocumentEntity.Id = periodSupplierDocumentId;
+        periodSupplierDocumentEntity.ReportingPeriodSupplierId = periodSupplierDocument.ReportingPeriodSupplierId;
+        periodSupplierDocumentEntity.Version = periodSupplierDocument.Version;
+        periodSupplierDocumentEntity.DisplayName = periodSupplierDocument.DisplayName;
+        periodSupplierDocumentEntity.StoredName = periodSupplierDocument.StoredName;
+        periodSupplierDocumentEntity.Path = periodSupplierDocument.Path;
+        periodSupplierDocumentEntity.DocumentStatusId = periodSupplierDocument.DocumentStatus.Id;
+        periodSupplierDocumentEntity.DocumentTypeId = periodSupplierDocument.DocumentType.Id;
+        periodSupplierDocumentEntity.IsActive = true;
+        return periodSupplierDocumentEntity;
+    }
     #endregion
 
 }

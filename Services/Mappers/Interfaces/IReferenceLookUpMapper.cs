@@ -26,9 +26,16 @@ public interface IReferenceLookUpMapper
 
     IEnumerable<Site> GetSitesLookUp(IEnumerable<SiteEntity> siteEntities);
 
+    IEnumerable<DocumentStatus> GetDocumentStatusLookUp(IEnumerable<DocumentStatusEntity> documentStatusEntities);
+
+    IEnumerable<DocumentType> GetDocumentTypesLookUp(IEnumerable<DocumentTypeEntity> documentTypesEntities);
+
+    IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatusLookUp(IEnumerable<DocumentRequiredStatusEntity> documentRequiredStatusEntities);
+
+
     //Supplier
     IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities);
     IEnumerable<ReportingType> GetReportingTypeLookUp(IEnumerable<ReportingTypeEntity> reportingTypeEntities);
     IEnumerable<SupplyChainStage> GetSupplyChainStagesLookUp(IEnumerable<SupplyChainStageEntity> supplyChainStageEntities);
-
+    IEnumerable<EmailBlueprints> GetEmailBlueprintsLookUp(IEnumerable<EmailTemplateEntity> emailTemplateEntities);
 }

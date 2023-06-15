@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
-using DataAccess.Entities;
-using Microsoft.EntityFrameworkCore.Metadata;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DataAccess.DataActionContext;
 
@@ -23,6 +25,7 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<DocumentStatusEntity> DocumentStatusEntities { get; set; } = null!;
     public virtual DbSet<DocumentTypeEntity> DocumentTypeEntities { get; set; } = null!;
     public virtual DbSet<ElectricityGridMixComponentEntity> ElectricityGridMixComponentEntities { get; set; } = null!;
+    public virtual DbSet<EmailTemplateEntity> EmailTemplateEntities { get; set; } = null!;
     public virtual DbSet<FacilityEntity> FacilityEntities { get; set; } = null!;
     public virtual DbSet<FacilityReportingPeriodDataStatusEntity> FacilityReportingPeriodDataStatusEntities { get; set; } = null!;
     public virtual DbSet<FacilityRequiredDocumentTypeEntity> FacilityRequiredDocumentTypeEntities { get; set; } = null!;
@@ -126,6 +129,15 @@ public partial class SupplierPortalDBContext : DbContext
             entity.ToTable("ElectricityGridMixComponentEntity");
 
             entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<EmailTemplateEntity>(entity =>
+        {
+            entity.ToTable("EmailTemplateEntity");
+
+            entity.Property(e => e.NameCode).HasMaxLength(50);
+
+            entity.Property(e => e.Subject).HasMaxLength(100);
         });
 
         modelBuilder.Entity<FacilityEntity>(entity =>
@@ -271,8 +283,6 @@ public partial class SupplierPortalDBContext : DbContext
 
             entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
 
-            entity.Property(e => e.Version).HasMaxLength(50);
-
             entity.HasOne(d => d.DocumentStatus)
                 .WithMany(p => p.ReportingPeriodFacilityDocumentEntities)
                 .HasForeignKey(d => d.DocumentStatusId)
@@ -389,7 +399,7 @@ public partial class SupplierPortalDBContext : DbContext
                 .HasConstraintName("FK_ReportingPeriodFacilityGasSupplyBreakDownEntity_ReportingPeriodFacilityEntity");
 
             entity.HasOne(d => d.Site)
-                .WithMany(p => p.ReportingPeriodFacilityGasSupplyBreakdownEntities  )
+                .WithMany(p => p.ReportingPeriodFacilityGasSupplyBreakdownEntities)
                 .HasForeignKey(d => d.SiteId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFacilityGasSupplyBreakDownEntity_SiteEntity");
@@ -421,8 +431,6 @@ public partial class SupplierPortalDBContext : DbContext
             entity.Property(e => e.UpdatedBy).HasMaxLength(100);
 
             entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
-
-            entity.Property(e => e.Version).HasMaxLength(50);
 
             entity.HasOne(d => d.DocumentStatus)
                 .WithMany(p => p.ReportingPeriodSupplierDocumentEntities)
@@ -576,5 +584,3 @@ public partial class SupplierPortalDBContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-
-

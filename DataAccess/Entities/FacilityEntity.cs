@@ -5,6 +5,11 @@ namespace DataAccess.Entities
 {
     public partial class FacilityEntity
     {
+        public FacilityEntity()
+        {
+            ReportingPeriodFacilityEntities = new HashSet<ReportingPeriodFacilityEntity>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
@@ -24,6 +29,7 @@ namespace DataAccess.Entities
         public virtual ReportingTypeEntity ReportingType { get; set; } = null!;
         public virtual SupplierEntity Supplier { get; set; } = null!;
         public virtual SupplyChainStageEntity SupplyChainStage { get; set; } = null!;
+
         public virtual ICollection<ReportingPeriodFacilityEntity> ReportingPeriodFacilityEntities { get; set; }
     }
 }

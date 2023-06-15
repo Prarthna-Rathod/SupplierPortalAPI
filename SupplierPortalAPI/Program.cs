@@ -1,5 +1,6 @@
 using DataAccess.DataActionContext;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Extensions.DependencyInjection;
 using Serilog;
 using SupplierPortalAPI.Infrastructure.Builders;
 using SupplierPortalAPI.Infrastructure.Middleware;
@@ -20,6 +21,13 @@ builder.SecutitySchema();
 builder.AddSwaggerBuilder();
 builder.Services.ConfigureCors();
 builder.Services.AddDependancy(builder.Configuration);
+
+//sendGrid
+builder.Services.AddSendGrid(options =>
+{
+    options.ApiKey = builder.Configuration
+    .GetSection("SendGridEmailSettings").GetValue<string>("APIKey");
+});
 
 //serilog
 var _loggrer = new LoggerConfiguration()

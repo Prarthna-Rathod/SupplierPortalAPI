@@ -1,6 +1,7 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.ValueObjects;
+using BusinessLogic.SupplierRoot.DomainModels;
 using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using SupplierPortalAPI.Infrastructure.Middleware.Exceptions;
@@ -153,7 +154,6 @@ public class ReportingPeriod : IReportingPeriod
                     {
                         if (reportingPeriodStatus.Name == ReportingPeriodStatusValues.Close)
                         {
-                            //ReportingPeriodStatus = reportingPeriodStatus;
                             isActive = false;
                         }
                     }
@@ -329,22 +329,22 @@ public class ReportingPeriod : IReportingPeriod
 
     #region PeriodFacilityElectricGridMix
 
-    public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodSupplierId, int periodFacilityId,IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
+    public IEnumerable<PeriodFacilityElectricityGridMix> AddPeriodFacilityElectricityGridMix(int periodSupplierId, int periodFacilityId, IEnumerable<ReportingPeriodFacilityElectricityGridMixVO> reportingPeriodFacilityElectricityGridMixVOs, FercRegion fercRegion)
     {
 
-        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name==ReportingPeriodStatusValues.Complete) 
-            
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+
             throw new Exception("Reporting period Should Be Open");
 
         var periodSupplier = _periodSupplier.Where(x => x.Id == periodSupplierId).FirstOrDefault();
 
-        return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId,reportingPeriodFacilityElectricityGridMixVOs,fercRegion);
+        return periodSupplier.AddPeriodFacilityElectricityGridMix(periodFacilityId, reportingPeriodFacilityElectricityGridMixVOs, fercRegion);
     }
 
-    public bool LoadPeriodFacilityElectricityGridMix(int supplierId,int periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
+    public bool LoadPeriodFacilityElectricityGridMix(int supplierId, int periodfacilityid, ElectricityGridMixComponent electricityGridMixComponent, UnitOfMeasure unitOfMeasure, decimal content, bool isActive)
     {
-        var periodSupplier = _periodSupplier.Where(x => x.Supplier.Id== supplierId ).FirstOrDefault();
-        return periodSupplier.LoadPeriodFacilityElectricityGridMix(supplierId,periodfacilityid,electricityGridMixComponent,unitOfMeasure,content,isActive);
+        var periodSupplier = _periodSupplier.Where(x => x.Supplier.Id == supplierId).FirstOrDefault();
+        return periodSupplier.LoadPeriodFacilityElectricityGridMix(supplierId, periodfacilityid, electricityGridMixComponent, unitOfMeasure, content, isActive);
     }
 
     public bool RemovePeriodFacilityElectricityGridMix(int supplierId, int periodFacilityId)
@@ -362,7 +362,7 @@ public class ReportingPeriod : IReportingPeriod
     #region PeriodFacilityGasSupplyBreakDown
     public IEnumerable<PeriodFacilityGasSupplyBreakDown> AddPeriodFacilityGasSupplyBreakdown(int ReportingPeriodSupplierId, IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> reportingPeriodFacilityGasSupplyBreakDownVOs)
     {
-       var periodSupplier = _periodSupplier.Where(x=>x.Id==ReportingPeriodSupplierId).FirstOrDefault();
+        var periodSupplier = _periodSupplier.Where(x => x.Id == ReportingPeriodSupplierId).FirstOrDefault();
 
         if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
             throw new Exception("Reporting Period Should be Open or close !!");
@@ -372,15 +372,15 @@ public class ReportingPeriod : IReportingPeriod
 
     }
 
-    public bool LoadPeriodFacilityGasSupplyBreakdown(int id,int supplierId, int periodFacilityId, Site site, UnitOfMeasure unitOfMeasure, decimal content)
+    public bool LoadPeriodFacilityGasSupplyBreakdown(int id, int supplierId, int periodFacilityId, Site site, UnitOfMeasure unitOfMeasure, decimal content)
     {
-        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id==supplierId);
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
 
-        return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(id,supplierId,periodFacilityId,site,unitOfMeasure,content);
+        return periodSupplier.LoadPeriodFacilityGasSupplyBreakdown(id, supplierId, periodFacilityId, site, unitOfMeasure, content);
     }
 
     public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
-    { 
+    {
 
         var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
 
@@ -390,42 +390,162 @@ public class ReportingPeriod : IReportingPeriod
         return periodSupplier.RemovePeriodFacilityGasSupplyBreakdown(periodSupplierId);
     }
 
-    
+
+
+
     #endregion
 
-    #region Period Document
+    #region PeriodFacility Document
 
-    /*
-     public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
-     {
-         throw new NotImplementedException();
-     }
+    public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, string displayName, string? path, string? validationError, IEnumerable<DocumentStatus> documentStatuses, DocumentType documentType, IEnumerable<FacilityRequiredDocumentType> facilityRequiredDocumentTypes)
+    {
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close..!");
 
-     public void AddDocumentToPeriodSupplierFacility(DocumentType documentType, DocumentStatus documentStatus)
-     {
-         throw new NotImplementedException();
-     }
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
 
-    
-     public PeriodSupplierDocument AddSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, string documentName, DocumentType documentType, IEnumerable<DocumentStatus> documentStatus)
-     {
-         throw new NotImplementedException();
-     }
+        if (periodSupplier is null)
+            throw new NotFoundException("PeriodSupplier not found..!");
 
-     public PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId, int periodFacilityId, int documentId)
-     {
-         throw new NotImplementedException();
-     }
+        return periodSupplier.AddPeriodFacilityDocument(periodFacilityId, displayName, path, validationError, documentStatuses, documentType, facilityRequiredDocumentTypes, CollectionTimePeriod);
+    }
 
-     public PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, int documentId)
-     {
-         throw new NotImplementedException();
-     }
+    public bool LoadPeriodFacilityDocument(int periodFacilityDocumentId, int periodSupplierId, int periodFacilityId, int version, string displayName, string storedName, string path, DocumentStatus documentStatus, DocumentType documentType, string validationError)
+    {
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        if (periodSupplier is null) throw new Exception("PeriodSupplier not found..!");
+
+        return periodSupplier.LoadPeriodFacilityDocument(periodFacilityDocumentId, periodFacilityId, version, displayName, storedName, path, documentStatus, documentType, validationError);
+    }
+    public bool RemovePeriodFacilityDocument(int supplierId, int periodFacilityId, int periodFacilityDocumentId)
+    {
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+        if (periodSupplier is null)
+            throw new NotFoundException("PeriodSupplier not found..!");
+
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close..!");
 
 
 
-    */
+        return periodSupplier.RemovePeriodFacilityDocument(periodFacilityId, periodFacilityDocumentId);
+    }
+    #endregion
+
+    #region UpdateReportingPeriodFacilityDataStatuses
+    public bool UpdatePeriodFacilityDataStatusSubmittedToInProgress(int supplierId, int periodFacilityId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+    {
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Supplier.Id == supplierId);
+
+        if (periodSupplier is null) throw new Exception("PeriodSupplier not found..!");
+
+        return periodSupplier.UpdatePeriodFacilityDataStatusSubmittedToInProgress(periodFacilityId, facilityReportingPeriodDataStatus);
+    }
+    public IEnumerable<PeriodFacility> UpdatePeriodFacilityDataStatusCompleteToSubmitted(int periodSupplierId, FacilityReportingPeriodDataStatus facilityReportingPeriodDataStatus)
+    {
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close..!");
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+        if (periodSupplier is null) throw new Exception("PeriodSupplier not found..!");
+        return periodSupplier.UpdatePeriodFacilityDataStatusCompleteToSubmitted(facilityReportingPeriodDataStatus);
+    }
+
+    #endregion
+
+    #region PeriodSupplierDocument
+    public PeriodSupplierDocument AddSupplementalDataDocumentToReportingPeriodSupplier(int periodSupplierId, string? path, string? validationError, string displayName, DocumentType documentType, IEnumerable<DocumentStatus> documentStatus)
+    {
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close..!");
+
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        if (periodSupplier is null)
+            throw new NotFoundException("PeriodSupplier not found..!");
+
+        return periodSupplier.AddPeriodSupplierDocument(periodSupplierId, path, validationError, displayName, documentType, documentStatus, CollectionTimePeriod);
+    }
+    public bool LoadPeriodSupplierDocument(int periodSupplierDocumentId, int periodSupplierId, int version, string displayName, string storedName, string path, string validationError, DocumentStatus documentStatus, DocumentType documentType)
+    {
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        return periodSupplier.LoadPeriodSupplierDocument(periodSupplierDocumentId, version, displayName, storedName, path, validationError, documentStatus, documentType);
+    }
+
+    public bool RemovePeriodSupplierDocument(int periodSupplierId, int documentId)
+    {
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close..!");
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+        return periodSupplier.RemovePeriodSupplierDocument(documentId);
+    }
+    #endregion
+
+    #region SendEmail
+
+    public List<string> CheckInitialAndResendDataRequest(int periodSupplierId)
+    {
+        if (ReportingPeriodStatus.Name == ReportingPeriodStatusValues.InActive || ReportingPeriodStatus.Name == ReportingPeriodStatusValues.Complete)
+            throw new Exception("Reporting Period Should be Open or close..!");
+
+        var periodSupplier = _periodSupplier.FirstOrDefault(x => x.Id == periodSupplierId);
+
+        if (periodSupplier is null)
+            throw new NotFoundException("PeriodSupplier not found..!");
+        return periodSupplier.CheckInitialAndResendDataRequest(EndDate);
+    }
 
     #endregion
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//public PeriodFacilityDocument AddDataSubmissionDocumentForReportingPeriod(int supplierId, int periodFacilityId, FacilityRequiredDocumentTypeEntity facilityRequiredDocumentType, IEnumerable<DocumentRequirementStatus> documentRequirementStatus)
+//{
+//    throw new NotImplementedException();
+//}
+
+//public void AddDocumentToPeriodSupplierFacility(DocumentType documentType, DocumentStatus documentStatus)
+//{
+//    throw new NotImplementedException();
+//}
+
+
+
+
+
+//public PeriodFacilityDocument RemoveDocumentFromPeriodSupplierFacility(int supplierId, int periodFacilityId, int documentId)
+//{
+//    throw new NotImplementedException();
+//}
+
+
+
+//public PeriodSupplierDocument RemoveSupplementalDataDocumentToReportingPeriodSupplier(int supplierId, int documentId)
+//{
+//    throw new NotImplementedException();
+//}

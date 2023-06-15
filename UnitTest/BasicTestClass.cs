@@ -28,34 +28,7 @@ namespace UnitTest
         private DateTime? endDate = null;
         private bool isActive = true;
 
-        #region Supplier
-        protected IEnumerable<ReportingType> GenerateReportingType()
-        {
-            var reportingTypes = new List<ReportingType>();
-            reportingTypes.Add(new ReportingType(1, "GHGRP"));
-            reportingTypes.Add(new ReportingType(2, "NonGHGRP"));
-            return reportingTypes;
-        }
-
-        protected IEnumerable<SupplyChainStage> GenerateSupplyChainStage()
-        {
-            var supplyChainStgaes = new List<SupplyChainStage>();
-            supplyChainStgaes.Add(new SupplyChainStage(1, "Production"));
-            supplyChainStgaes.Add(new SupplyChainStage(2, "Processing"));
-            supplyChainStgaes.Add(new SupplyChainStage(3, "Transmission Compression"));
-            supplyChainStgaes.Add(new SupplyChainStage(4, "Transmission Pipeline"));
-            return supplyChainStgaes;
-        }
-
-        protected IEnumerable<AssociatePipeline> GenerateAssociatePipelines()
-        {
-            var associatePipelines = new List<AssociatePipeline>();
-            associatePipelines.Add(new AssociatePipeline(1, "Pipeline 1"));
-            associatePipelines.Add(new AssociatePipeline(2, "Pipeline 2"));
-            return associatePipelines;
-        }
-
-        
+        #region Supplier        
         protected Supplier GetSupplierDomain()
         {
             var supplierEntity = CreateSupplierEntity();
@@ -240,6 +213,31 @@ namespace UnitTest
         #endregion
 
         #region ReportingPeriod
+        protected IEnumerable<ReportingType> GenerateReportingType()
+        {
+            var reportingTypes = new List<ReportingType>();
+            reportingTypes.Add(new ReportingType(1, "GHGRP"));
+            reportingTypes.Add(new ReportingType(2, "NonGHGRP"));
+            return reportingTypes;
+        }
+
+        protected IEnumerable<SupplyChainStage> GenerateSupplyChainStage()
+        {
+            var supplyChainStgaes = new List<SupplyChainStage>();
+            supplyChainStgaes.Add(new SupplyChainStage(1, "Production"));
+            supplyChainStgaes.Add(new SupplyChainStage(2, "Processing"));
+            supplyChainStgaes.Add(new SupplyChainStage(3, "Transmission Compression"));
+            supplyChainStgaes.Add(new SupplyChainStage(4, "Transmission Pipeline"));
+            return supplyChainStgaes;
+        }
+
+        protected IEnumerable<AssociatePipeline> GenerateAssociatePipelines()
+        {
+            var associatePipelines = new List<AssociatePipeline>();
+            associatePipelines.Add(new AssociatePipeline(1, "Pipeline 1"));
+            associatePipelines.Add(new AssociatePipeline(2, "Pipeline 2"));
+            return associatePipelines;
+        }
 
         protected IEnumerable<ReportingPeriodType> GetAndConvertReportingPeriodTypes()
         {
@@ -331,6 +329,44 @@ namespace UnitTest
 
         }
 
+        protected IEnumerable<Site> GetSites()
+        {
+            var sites = new List<Site>();
+            sites.Add(new Site(1, "SPL"));
+            sites.Add(new Site(2, "CCL"));
+            return sites;
+        }
+
+        protected IEnumerable<DocumentStatus> GetDocumentStatuses()
+        {
+            var documentStatuses = new List<DocumentStatus>();
+            documentStatuses.Add(new DocumentStatus(1, "Not-validated"));
+            documentStatuses.Add(new DocumentStatus(2, "Validated"));
+            documentStatuses.Add(new DocumentStatus(3, "Has errors"));
+            documentStatuses.Add(new DocumentStatus(4, "Processing"));
+            return documentStatuses;
+        }
+
+        protected IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatuses()
+        {
+            var documentRequiredStatues = new List<DocumentRequiredStatus>();
+            documentRequiredStatues.Add(new DocumentRequiredStatus(1, "Optional"));
+            documentRequiredStatues.Add(new DocumentRequiredStatus(2, "Required"));
+            documentRequiredStatues.Add(new DocumentRequiredStatus(3, "Not-allowed"));
+            return documentRequiredStatues;
+
+        }
+        protected IEnumerable<DocumentType> GetDocumentTypes()
+        {
+            var documentTypes = new List<DocumentType>();
+            documentTypes.Add(new DocumentType(1, "Subpart C"));
+            documentTypes.Add(new DocumentType(2, "Subpart W"));
+            documentTypes.Add(new DocumentType(3, "Non-GHGRP"));
+            documentTypes.Add(new DocumentType(4, "Supplemental"));
+            return documentTypes;
+
+        }
+
         #region ReportingPeriod methods
 
         protected ReportingPeriod GetReportingPeriodDomain()
@@ -362,9 +398,6 @@ namespace UnitTest
         #endregion
 
         #region PeriodSupplier methods
-
-
-
 
         protected ReportingPeriodSupplierEntity CreateReportingPeriodSupplierEntity()
         {
@@ -419,8 +452,21 @@ namespace UnitTest
 
             return periodFacilityEntity;
         }
-        #endregion
 
+        protected ReportingPeriodFacilityEntity CreatePeriodFacilityEntity()
+        {
+            var periodFacilityEntity = new ReportingPeriodFacilityEntity();
+            periodFacilityEntity.Id = 1;
+            periodFacilityEntity.FacilityId = 1;
+            periodFacilityEntity.ReportingPeriodId = 1;
+            periodFacilityEntity.FacilityReportingPeriodDataStatusId = GetFacilityReportingPeriodDataStatus().First(x => x.Name == FacilityReportingPeriodDataStatusValues.InProgress).Id;
+            periodFacilityEntity.ReportingPeriodSupplierId = 1;
+
+            return periodFacilityEntity;
+        }
+
+    
+        #endregion
 
         #region PeriodFacilityElctricityGridMix methods
 
@@ -441,23 +487,73 @@ namespace UnitTest
             return periodFacilityElectricityGridMixVO;
         }
 
-        protected AddMultiplePeriodFacilityElectricityGridMixDto CreateReportingPeriodFacilityElecticityGridMixDto()
+        //protected AddMultiplePeriodFacilityElectricityGridMixDto CreateReportingPeriodFacilityElecticityGridMixDto()
+        //{
+        //    return new AddMultiplePeriodFacilityElectricityGridMixDto(1,1,1,1);
+        //}
+        #endregion
+
+        #region PeriodFacilityGasSupplyBreakdown
+
+        protected ReportingPeriodFacilityGasSupplyBreakdownEntity CreatePeriodFacilityGasSupplyBreakdownEntity()
         {
-            var electricityGridMixDto = new AddMultiplePeriodFacilityElectricityGridMixDto();
+            var periodFacilityEntity = CreatePeriodFacilityEntity();
+            var gasSupplyBreakdownEntity = new ReportingPeriodFacilityGasSupplyBreakdownEntity();
+            gasSupplyBreakdownEntity.Id = 1;
+            gasSupplyBreakdownEntity.PeriodFacilityId = 1;
+            gasSupplyBreakdownEntity.PeriodFacility = periodFacilityEntity;
+            gasSupplyBreakdownEntity.SiteId = 1;
+            gasSupplyBreakdownEntity.UnitOfMeasureId = 1;
+            gasSupplyBreakdownEntity.Content = (decimal)100.00;
 
-            electricityGridMixDto.ReportingPeriodId = 1;
-            electricityGridMixDto.ReportingPeriodFacilityId = 1;
-            electricityGridMixDto.ReportingPeriodSupplierId= 1;
-            electricityGridMixDto.FercRegionId = 12;
+            return gasSupplyBreakdownEntity;
+        }
 
+        protected IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> GetPeriodFacilityGasSupplyBreakdowns()
+        {
+            var list = new List<ReportingPeriodFacilityGasSupplyBreakDownVO>();
+            var site = GetSites();
+            var unitOfMeasure = GetUnitOfMeasures().FirstOrDefault();
+            list.Add(new ReportingPeriodFacilityGasSupplyBreakDownVO(1, 1, unitOfMeasure, site.FirstOrDefault(), (decimal)100.00));
+            list.Add(new ReportingPeriodFacilityGasSupplyBreakDownVO(2, 1,unitOfMeasure, site.FirstOrDefault(x=>x.Id==2), (decimal)100.00));
+          
+            return list;
+        }
 
-            return electricityGridMixDto;
+        protected IEnumerable<ReportingPeriodFacilityGasSupplyBreakDownVO> GetGasSupplyBreakdowns2()
+        {
+            var list = new List<ReportingPeriodFacilityGasSupplyBreakDownVO>();
+            var site = GetSites();
+            var unitOfMeasure = GetUnitOfMeasures().First();
+            list.Add(new ReportingPeriodFacilityGasSupplyBreakDownVO(1, 1, unitOfMeasure, site.First(),(decimal)100.00));
+            return list;
+        }
+
+        protected ReportingPeriodFacilityGasSupplyBreakdownDto PeriodFacilityGasSupplyBreakdownDto()
+        {
+            return new ReportingPeriodFacilityGasSupplyBreakdownDto(1, 1, "Test facility 1", 1, "abc", 1, "Biomass", (decimal)100.00);
+        }
+
+        #endregion
+
+        #region PeriodFacilityDocument
+        protected IEnumerable<FacilityRequiredDocumentType> GetFacilityRequiredDocumentTypes() { 
+            var facilityRequiredDocumentTypes = new List<FacilityRequiredDocumentType>();
+            var reportingTypes = GenerateReportingType();
+            var supplyChainStages = GenerateSupplyChainStage();
+            var documentTypes = GetDocumentTypes();
+            var documentRequiredStatus =GetDocumentRequiredStatuses();
+            facilityRequiredDocumentTypes.Add(new FacilityRequiredDocumentType(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 3), documentTypes.First(x => x.Id == 1), documentRequiredStatus.First(x => x.Id == 2)));
+            facilityRequiredDocumentTypes.Add(new FacilityRequiredDocumentType(reportingTypes.First(x=>x.Id ==1),supplyChainStages.First(x=>x.Id==1),documentTypes.First(x=>x.Id==2),documentRequiredStatus.First(x=>x.Id==3)));
+            facilityRequiredDocumentTypes.Add(new FacilityRequiredDocumentType(reportingTypes.First(x => x.Id == 1), supplyChainStages.First(x => x.Id == 1), documentTypes.First(x => x.Id == 3), documentRequiredStatus.First(x => x.Id == 3)));
+            facilityRequiredDocumentTypes.Add(new FacilityRequiredDocumentType(reportingTypes.First(x=>x.Id==1), supplyChainStages.First(x=>x.Id==2), documentTypes.First(x=>x.Id==1),documentRequiredStatus.First(x=>x.Id==2)));
+            return facilityRequiredDocumentTypes;
         }
         #endregion
 
-    #region All ValueObjects methods
+        #region All ValueObjects methods
 
-    protected SupplierVO GetAndConvertSupplierValueObject()
+        protected SupplierVO GetAndConvertSupplierValueObject()
     {
         var supplierEntity = CreateSupplierEntity();
         var reportingTypes = GenerateReportingType();
@@ -506,7 +602,8 @@ namespace UnitTest
         #endregion
 
 
-        protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
+
+    protected ReportingPeriodEntityDomainMapper CreateInstanceOfReportingPeriodEntityDomainMapper()
     {
         return new ReportingPeriodEntityDomainMapper();
     }

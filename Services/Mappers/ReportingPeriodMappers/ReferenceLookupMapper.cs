@@ -68,6 +68,31 @@ namespace Services.Mappers.ReportingPeriodMappers
             }
         }
 
+        public IEnumerable<DocumentStatus> GetDocumentStatusLookUp(IEnumerable<DocumentStatusEntity> documentStatusEntities)
+        {
+            foreach(var item in documentStatusEntities)
+            {
+                yield return new DocumentStatus(item.Id, item.Name);
+            }
+        }
+
+        public IEnumerable<DocumentType> GetDocumentTypesLookUp(IEnumerable<DocumentTypeEntity> documentTypesEntities)
+        {
+            foreach(var item in documentTypesEntities)
+            {
+                yield return new DocumentType(item.Id, item.Name);
+            }
+        }
+
+        public IEnumerable<DocumentRequiredStatus> GetDocumentRequiredStatusLookUp(IEnumerable<DocumentRequiredStatusEntity> documentRequiredStatusEntities)
+        {
+             foreach(var item in documentRequiredStatusEntities)
+            {
+                yield return new DocumentRequiredStatus(item.Id, item.Name);
+            }
+        }
+
+
         //SupplierFacility
         public IEnumerable<AssociatePipeline> GetAssociatePipelinesLookUp(IEnumerable<AssociatePipelineEntity> associatePipelineEntities)
         {
@@ -98,6 +123,14 @@ namespace Services.Mappers.ReportingPeriodMappers
             foreach(var item in siteEntities)
             {
                 yield return new Site(item.Id, item.Name);
+            }
+        }
+
+        public IEnumerable<EmailBlueprints> GetEmailBlueprintsLookUp(IEnumerable<EmailTemplateEntity> emailTemplateEntities)
+        {
+            foreach(var item in emailTemplateEntities) 
+            { 
+                yield return new EmailBlueprints(item.Id,item.NameCode); 
             }
         }
     }

@@ -1,7 +1,10 @@
 using DataAccess.DataActionContext;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 namespace DataAccess.DataActions;
 
@@ -38,7 +41,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.SaveChanges();
         return true;
     }
-
     public bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity, int id)
     {
         var allSuppliers = _context.ReportingPeriodSupplierEntities.Where(x => x.ReportingPeriodId == id);
@@ -74,7 +76,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.SaveChanges();
         return true;
     }
-
     public bool AddRemovePeriodFacility(IEnumerable<ReportingPeriodFacilityEntity> reportingPeriodFacilityEntity, int periodSupplierId)
     {
         var allPeriodfacilities = _context.ReportingPeriodFacilityEntities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId);
@@ -102,9 +103,41 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.SaveChanges();
         return true;
     }
+    public IEnumerable<ReportingPeriodFacilityEntity> UpdatePeriodFacilities(IEnumerable<ReportingPeriodFacilityEntity> periodFacilityEntities)
+    {
+        var updatedPeriodFacilities = new List<ReportingPeriodFacilityEntity>();
 
+        var reportingPeriodId = periodFacilityEntities.First().ReportingPeriodId;
+        var allPeriodFacilities = _context.ReportingPeriodFacilityEntities.Where(x => x.ReportingPeriodId == reportingPeriodId).ToList();
 
-    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity,int periodFacilityId,int fercRegionId)
+        foreach (var periodFacility in periodFacilityEntities)
+        {
+            var updatePeriodFacility = allPeriodFacilities
+            .Where(x => x.Id == periodFacility.Id).FirstOrDefault();
+
+            if (updatePeriodFacility == null)
+                throw new Exception("PeriodFacilityEntity not found for update !!");
+
+            updatePeriodFacility.FacilityReportingPeriodDataStatusId = periodFacility.FacilityReportingPeriodDataStatusId;
+
+            updatedPeriodFacilities.Add(updatePeriodFacility);
+        }
+
+        _context.SaveChanges();
+        return updatedPeriodFacilities;
+    }
+    public bool UpdateReportingPeriodFacilityDataStatus(int periodFacilityId, int periodFacilityDataStatusId)
+    {
+        var periodFacility = _context.ReportingPeriodFacilityEntities.Where(x => x.Id == periodFacilityId).Include(x => x.ReportingPeriodFacilityDocumentEntities).FirstOrDefault();
+
+        periodFacility.FacilityReportingPeriodDataStatusId = periodFacilityDataStatusId;
+
+        _context.ReportingPeriodFacilityEntities.Update(periodFacility);
+
+        _context.SaveChanges();
+        return true;
+    }
+    public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity, int periodFacilityId, int fercRegionId)
     {
 
         var electicityGridMixEntities = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId);
@@ -113,7 +146,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
 
 
-        periodFacilityEntity.FercRegionId=fercRegionId; //Update FercRegionId in PeriodFacility
+        periodFacilityEntity.FercRegionId = fercRegionId; //Update FercRegionId in PeriodFacility
 
         _context.ReportingPeriodFacilityElectricityGridMixEntities.RemoveRange(electicityGridMixEntities);
         _context.ReportingPeriodFacilityElectricityGridMixEntities.AddRange(periodFacilityElectricityGridMixEntity);
@@ -124,16 +157,16 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     }
     public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId)
     {
-        var periodFacilityEntities = _context.ReportingPeriodFacilityEntities.Where(x=>x.ReportingPeriodSupplierId== periodSupplierId);
+        var periodFacilityEntities = _context.ReportingPeriodFacilityEntities.Where(x => x.ReportingPeriodSupplierId == periodSupplierId);
 
-      
+
         foreach (var periodFacility in periodFacilityEntities)
-         {
-             var existingEntity = periodFacility.ReportingPeriodFacilityGasSupplyBreakdownEntities.Where(x => x.PeriodFacilityId == periodFacility.Id).ToList();
+        {
+            var existingEntity = periodFacility.ReportingPeriodFacilityGasSupplyBreakdownEntities.Where(x => x.PeriodFacilityId == periodFacility.Id).ToList();
 
-             if (existingEntity.Count() != 0)
-                    _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
-         }
+            if (existingEntity.Count() != 0)
+                _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
+        }
 
 
         foreach (var gasSupplyBreakdownList in periodFacilityGasSupplyBreakDownEntities)
@@ -144,30 +177,66 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         }
         _context.SaveChanges();
         return true;
-      
+
 
     }
-
-    public async Task<bool> AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
+    public int AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
     {
-        await _context.ReportingPeriodFacilityDocumentEntities.AddAsync(reportingPeriodFacilityDocument);
+        var isExist = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.Id == reportingPeriodFacilityDocument.Id && x.ReportingPeriodFacilityId == reportingPeriodFacilityDocument.ReportingPeriodFacilityId).FirstOrDefault();
 
-        reportingPeriodFacilityDocument.CreatedBy = "System";
-        reportingPeriodFacilityDocument.CreatedOn = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
-        return true;
+        if (isExist is null)
+        {
+            reportingPeriodFacilityDocument.CreatedBy = "System";
+            reportingPeriodFacilityDocument.CreatedOn = DateTime.UtcNow;
+            _context.ReportingPeriodFacilityDocumentEntities.Add(reportingPeriodFacilityDocument);
+        }
+        else
+        {
+            isExist.ReportingPeriodFacilityId = reportingPeriodFacilityDocument.ReportingPeriodFacilityId;
+            isExist.Version = reportingPeriodFacilityDocument.Version;
+            isExist.DisplayName = reportingPeriodFacilityDocument.DisplayName;
+            isExist.StoredName = reportingPeriodFacilityDocument.StoredName;
+            isExist.Path = reportingPeriodFacilityDocument.Path;
+            isExist.DocumentStatusId = reportingPeriodFacilityDocument.DocumentStatusId;
+            isExist.DocumentTypeId = reportingPeriodFacilityDocument.DocumentTypeId;
+            isExist.ValidationError = reportingPeriodFacilityDocument.ValidationError;
+            isExist.UpdatedBy = "System";
+            isExist.UpdatedOn = DateTime.UtcNow;
+
+            _context.ReportingPeriodFacilityDocumentEntities.Update(isExist);
+        }
+        _context.SaveChanges();
+        return reportingPeriodFacilityDocument.Id;
     }
-
-    public async Task<bool> AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
+    public int AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
     {
-        await _context.ReportingPeriodSupplierDocumentEntities.AddAsync(reportingPeriodSupplierDocument);
+        var isExist = _context.ReportingPeriodSupplierDocumentEntities.Where(x => x.Id == reportingPeriodSupplierDocument.Id && x.ReportingPeriodSupplierId == reportingPeriodSupplierDocument.ReportingPeriodSupplierId).FirstOrDefault();
 
-        reportingPeriodSupplierDocument.CreatedBy = "System";
-        reportingPeriodSupplierDocument.CreatedOn = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
-        return true;
+        if (isExist == null)
+        {
+            reportingPeriodSupplierDocument.CreatedBy = "System";
+            reportingPeriodSupplierDocument.CreatedOn = DateTime.UtcNow;
+            _context.ReportingPeriodSupplierDocumentEntities.Add(reportingPeriodSupplierDocument);
+        }
+        else
+        {
+            isExist.ReportingPeriodSupplierId = reportingPeriodSupplierDocument.ReportingPeriodSupplierId;
+            isExist.Version = reportingPeriodSupplierDocument.Version;
+            isExist.DisplayName = reportingPeriodSupplierDocument.DisplayName;
+            isExist.StoredName = reportingPeriodSupplierDocument.StoredName;
+            isExist.Path = reportingPeriodSupplierDocument.Path;
+            isExist.DocumentStatusId = reportingPeriodSupplierDocument.DocumentStatusId;
+            isExist.DocumentTypeId = reportingPeriodSupplierDocument.DocumentTypeId;
+            isExist.ValidationError = reportingPeriodSupplierDocument.ValidationError;
+            isExist.UpdatedBy = "System";
+            isExist.UpdatedOn = DateTime.UtcNow;
+
+            _context.ReportingPeriodSupplierDocumentEntities.Update(isExist);
+        }
+        _context.SaveChanges();
+        return reportingPeriodSupplierDocument.Id;
     }
 
     #endregion
@@ -200,62 +269,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.SaveChanges();
         return true;
     }
-
-
-
-    public async Task<bool> UpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
-    {
-        var existingfacilitydocument = await _context.ReportingPeriodFacilityDocumentEntities.FirstOrDefaultAsync(x => x.Id == reportingPeriodFacilityDocument.Id);
-
-        if (existingfacilitydocument == null)
-        {
-            throw new Exception("Facility Document Not found");
-        }
-
-        existingfacilitydocument.ReportingPeriodFacilityId = reportingPeriodFacilityDocument.ReportingPeriodFacilityId;
-        existingfacilitydocument.Version = reportingPeriodFacilityDocument.Version;
-        existingfacilitydocument.DisplayName = reportingPeriodFacilityDocument.DisplayName;
-        existingfacilitydocument.StoredName = reportingPeriodFacilityDocument.StoredName;
-        existingfacilitydocument.Path = reportingPeriodFacilityDocument.Path;
-        existingfacilitydocument.DocumentStatusId = reportingPeriodFacilityDocument.DocumentStatusId;
-        existingfacilitydocument.DocumentTypeId = reportingPeriodFacilityDocument.DocumentTypeId;
-        existingfacilitydocument.ValidationError = reportingPeriodFacilityDocument.ValidationError;
-        existingfacilitydocument.UpdatedBy = "System";
-        existingfacilitydocument.UpdatedOn = DateTime.UtcNow;
-
-        _context.ReportingPeriodFacilityDocumentEntities.Update(existingfacilitydocument);
-        await _context.SaveChangesAsync();
-
-        return true;
-    }
-
-
-
-    public async Task<bool> UpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
-    {
-        var existingsupplierdocument = await _context.ReportingPeriodSupplierDocumentEntities.FirstOrDefaultAsync(x => x.Id == reportingPeriodSupplierDocument.Id);
-
-        if (existingsupplierdocument == null)
-        {
-            throw new Exception("Supplier Document Not found");
-        }
-
-        existingsupplierdocument.ReportingPeriodSupplierId = reportingPeriodSupplierDocument.ReportingPeriodSupplierId;
-        existingsupplierdocument.Version = reportingPeriodSupplierDocument.Version;
-        existingsupplierdocument.DisplayName = reportingPeriodSupplierDocument.DisplayName;
-        existingsupplierdocument.StoredName = reportingPeriodSupplierDocument.StoredName;
-        existingsupplierdocument.Path = reportingPeriodSupplierDocument.Path;
-        existingsupplierdocument.DocumentStatusId = reportingPeriodSupplierDocument.DocumentStatusId;
-        existingsupplierdocument.DocumentTypeId = reportingPeriodSupplierDocument.DocumentTypeId;
-        existingsupplierdocument.ValidationError = reportingPeriodSupplierDocument.ValidationError;
-        existingsupplierdocument.UpdatedBy = "System";
-        existingsupplierdocument.UpdatedOn = DateTime.UtcNow;
-
-        _context.ReportingPeriodSupplierDocumentEntities.Update(existingsupplierdocument);
-        await _context.SaveChangesAsync();
-
-        return true;
-    }
     public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
     {
         var updatedReportingPeriodSuppliers = new List<ReportingPeriodSupplierEntity>();
@@ -283,8 +296,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     #endregion
 
     #region Remove Methods
-
-
     public bool RemovePeriodFacilityElectricityGridMix(int periodFacilityId)
     {
         var existingFacility = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId).ToList();
@@ -298,7 +309,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.SaveChanges();
         return true;
     }
-
     public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
     {
         var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
@@ -317,11 +327,65 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.SaveChanges();
         return true;
     }
+    public bool RemovePeriodFacilityDocument(int documentId)
+    {
+        var periodFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.Id == documentId).FirstOrDefault();
+
+        var isDeletedFile = DeleteFile(periodFacilityDocument.Path);
+        _context.ReportingPeriodFacilityDocumentEntities.Remove(periodFacilityDocument);
+        _context.SaveChanges();
+        return true;
+        //if (isDeletedFile)
+        //{
+            
+        //}
+        //else
+        //    throw new Exception("File Path is Required to remove periodFacilityDocument..!");
+    }
+    public bool RemovePeriodSupplierDocument(int documentId)
+    {
+        var periodSupplierDocument=_context.ReportingPeriodSupplierDocumentEntities.Where(x=>x.Id==documentId).FirstOrDefault();
+
+        var isDeletedFile = DeleteFile(periodSupplierDocument.Path);
+        _context.ReportingPeriodSupplierDocumentEntities.Remove(periodSupplierDocument);
+        _context.SaveChanges();
+        return true;
+    }
+    private bool DeleteFile(string path)
+    {
+        FileInfo file = new FileInfo(path);
+        if (file.Exists)
+        {
+            file.Delete();
+            return true;
+        }
+        else
+            return false;
+    }
 
     #endregion
 
-    #region GetAll Methods
+    #region SendMail
+    public bool SendInitialAndResendDataRequestEmail(int periodSupplierId)
+    {
+        var periodSupplierEntity = _context.ReportingPeriodSupplierEntities.Where(x => x.Id == periodSupplierId).FirstOrDefault();
 
+        if (periodSupplierEntity is null)
+            throw new Exception("PeriodSupplierEntity is not found !!");
+
+        if (periodSupplierEntity.InitialDataRequestDate is null)
+            periodSupplierEntity.InitialDataRequestDate = DateTime.UtcNow;
+        else
+            periodSupplierEntity.ResendDataRequestDate = DateTime.UtcNow;
+
+        _context.ReportingPeriodSupplierEntities.Update(periodSupplierEntity);
+        _context.SaveChanges();
+        return true;
+
+    }
+    #endregion
+
+    #region GetAll Methods
     public IEnumerable<SupplierEntity> GetSuppliers(IEnumerable<int> id)
     {
         var suppliers = new List<SupplierEntity>();
@@ -333,17 +397,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         }
         return suppliers;
     }
-
     public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypes()
     {
         return _context.ReportingPeriodTypeEntities;
     }
-
     public IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatus()
     {
         return _context.ReportingPeriodStatusEntities;
     }
-
     public IEnumerable<ReportingPeriodEntity> GetReportingPeriods()
     {
         var reportingPeriods = _context.ReportingPeriodEntities
@@ -354,12 +415,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         return reportingPeriods;
     }
-
     public IEnumerable<SupplierReportingPeriodStatusEntity> GetSupplierReportingPeriodStatus()
     {
         return _context.SupplierReportingPeriodStatusEntities;
     }
-
     public IEnumerable<ReportingPeriodSupplierEntity> GetPeriodSuppliers()
     {
         var periodSuppliers = _context.ReportingPeriodSupplierEntities
@@ -369,27 +428,22 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                 .ToList();
         return periodSuppliers;
     }
-
     public IEnumerable<DocumentRequiredStatusEntity> GetDocumentRequiredStatus()
     {
         return _context.DocumentRequiredStatusEntities.ToList();
     }
-
     public IEnumerable<DocumentStatusEntity> GetDocumentStatus()
     {
         return _context.DocumentStatusEntities.ToList();
     }
-
     public IEnumerable<DocumentTypeEntity> GetDocumentType()
     {
         return _context.DocumentTypeEntities.ToList();
     }
-
     public IEnumerable<FacilityReportingPeriodDataStatusEntity> GetFacilityReportingPeriodDataStatus()
     {
         return _context.FacilityReportingPeriodDataStatusEntities.ToList();
     }
-
     public IEnumerable<FacilityRequiredDocumentTypeEntity> GetFacilityRequiredDocumentType()
     {
         return _context.FacilityRequiredDocumentTypeEntities
@@ -399,17 +453,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                                     .Include(x => x.DocumentRequiredStatus)
                                     .ToList();
     }
-
     public IEnumerable<ReportingTypeEntity> GetReportingTypes()
     {
         return _context.ReportingTypeEntities;
     }
-
     public IEnumerable<ElectricityGridMixComponentEntity> GetElectricityGridMixComponentEntities()
     {
         return _context.ElectricityGridMixComponentEntities;
     }
-
     public IEnumerable<UnitOfMeasureEntity> GetUnitOfMeasureEntities()
     {
         return _context.UnitOfMeasureEntities;
@@ -418,13 +469,18 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     {
         return _context.FercRegionEntities;
     }
-
     public IEnumerable<SiteEntity> GetSiteEntities()
     {
         return _context.SiteEntities;
     }
-
-
+    public IEnumerable<EmailTemplateEntity> GetEmailTemplateBynameCode()
+    {
+        return _context.EmailTemplateEntities;
+    }
+    public IEnumerable<EmailTemplateEntity> GetEmailBlueprints()
+    {
+        return _context.EmailTemplateEntities;
+    }
     #endregion
 
     #region GetById
@@ -432,111 +488,64 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     {
         var reportingPeriod = _context.ReportingPeriodEntities
                                 .Where(x => x.Id == reportingPeriodId)
-                                .Include(x => x.ReportingPeriodType)
-                                .Include(x => x.ReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodSupplierEntities)
+                                    .ThenInclude(x => x.ReportingPeriodSupplierDocumentEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakdownEntities)
+                                .Include(x => x.ReportingPeriodFacilityEntities)
+                                    .ThenInclude(x => x.ReportingPeriodFacilityDocumentEntities)
                                 .FirstOrDefault();
 
         return reportingPeriod;
     }
-
-    public IEnumerable<ReportingPeriodTypeEntity> GetReportingPeriodTypeById(int reportingPeriodTypeId)
-    {
-        var reportingPeriodType = _context.ReportingPeriodTypeEntities.Where(x => x.Id == reportingPeriodTypeId).ToList();
-
-        return reportingPeriodType;
-    }
-
-    public IEnumerable<ReportingPeriodStatusEntity> GetReportingPeriodStatusById(int reportingPeriodStatusId)
-    {
-        var reportingPeriodStatus = _context.ReportingPeriodStatusEntities.Where(x => x.Id == reportingPeriodStatusId).ToList();
-        return reportingPeriodStatus;
-    }
-
-    public IEnumerable<ReportingPeriodSupplierEntity> GetReportingPeriodSuppliers(int reportingPeriodId)
-    {
-        var reportingPeriodSupplier =
-            _context.ReportingPeriodSupplierEntities
-                                    .Where(x => x.ReportingPeriodId == reportingPeriodId)
-                                    .Include(x => x.Supplier)
-                                    .Include(x => x.ReportingPeriod)
-                                    .Include(x => x.SupplierReportingPeriodStatus)
-                                    .ToList();
-        return reportingPeriodSupplier;
-
-    }
-
     public ReportingPeriodSupplierEntity GetPeriodSupplierById(int periodSupplierId)
     {
         var periodSupplier = _context.ReportingPeriodSupplierEntities
                                 .Include(x => x.Supplier)
                                 .Include(x => x.ReportingPeriod)
-                                .Include(x => x.SupplierReportingPeriodStatus)
                                 .Include(x => x.ReportingPeriodFacilityEntities)
                                     .ThenInclude(x => x.ReportingPeriodFacilityGasSupplyBreakdownEntities)
+                                .Include(x => x.ReportingPeriodSupplierDocumentEntities)
                                 .FirstOrDefault(x => x.Id == periodSupplierId);
         return periodSupplier;
     }
-
-    public async Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities(int SupplierId, int ReportingPeriodId)
+    public ReportingPeriodFacilityEntity GetPeriodFacilityById(int periodFacilityId)
     {
-        return await _context.ReportingPeriodFacilityEntities
-                                    .Include(x => x.Facility)
-                                    .Include(x => x.FacilityReportingPeriodDataStatus)
-                                    .Include(x => x.ReportingPeriod)
-                                    .Include(x => x.ReportingPeriodSupplier)
-                                    .ToListAsync();
+        var periodFacility = _context.ReportingPeriodFacilityEntities
+                                .Include(x => x.ReportingPeriod)
+                                .Include(x => x.ReportingPeriodSupplier)
+                                .Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
+                                .Include(x => x.ReportingPeriodFacilityDocumentEntities)
+                                .FirstOrDefault(x => x.Id == periodFacilityId);
+        return periodFacility;
     }
-
-    public async Task<IEnumerable<ReportingPeriodFacilityEntity>> GetReportingPeriodFacilities()
+    public ReportingPeriodFacilityDocumentEntity GetReportingPeriodFacilityDocumentById(int documentId)
     {
-        return await _context.ReportingPeriodFacilityEntities.Include(x => x.Facility)
-            .Include(x => x.FacilityReportingPeriodDataStatus)
-            .Include(x => x.ReportingPeriod)
-            .Include(x => x.ReportingPeriodSupplier).ToListAsync();
-
+        var periodFacilityDocument = _context.ReportingPeriodFacilityDocumentEntities
+                                    .Include(x => x.ReportingPeriodFacility)
+                                    .FirstOrDefault(x => x.Id == documentId);
+        return periodFacilityDocument;
     }
-
-    public async Task<IEnumerable<ReportingPeriodFacilityDocumentEntity>> GetReportingPeriodFacilitiesDocument(int DocumentId)
+    public ReportingPeriodSupplierDocumentEntity GetReportingPeriodSuppliersDocumentById(int documentId)
     {
-        return await _context.ReportingPeriodFacilityDocumentEntities
-                                .Include(x => x.ReportingPeriodFacility)
-                                .Include(x => x.DocumentStatus)
-                                .Include(x => x.DocumentType)
-                                .ToListAsync();
+        var periodSupplierDocument = _context.ReportingPeriodSupplierDocumentEntities
+                                     .Include(x=>x.ReportingPeriodSupplier)
+                                     .FirstOrDefault(x=>x.Id== documentId);
+        return periodSupplierDocument;
     }
-
-    public async Task<IEnumerable<ReportingPeriodSupplierDocumentEntity>> GetReportingPeriodSuppliersDocument(int DocumentId)
-    {
-        return await _context.ReportingPeriodSupplierDocumentEntities
-                                    .Include(x => x.ReportingPeriodSupplier)
-                                    .Include(x => x.DocumentStatus)
-                                    .Include(x => x.DocumentType)
-                                    .ToListAsync();
-    }
-
-    public async Task<IEnumerable<ReportingPeriodEntity>> GetReportingPeriods(int ReportingPeriodId)
-    {
-        return await _context.ReportingPeriodEntities
-                                .Include(x => x.ReportingPeriodType)
-                                .Include(x => x.ReportingPeriodStatus)
-                                .ToListAsync();
-    }
-
     public ReportingPeriodFacilityEntity GetReportingPeriodFacility(int periodFacilityId)
     {
         var periodFacility = _context.ReportingPeriodFacilityEntities.Include(x => x.ReportingPeriodSupplier)
                                                                       .Include(x => x.ReportingPeriod)
                                                                       .Include(x => x.ReportingPeriodFacilityElectricityGridMixEntities)
-                                                                      .Include(x=>x.FercRegion)
+                                                                      .Include(x => x.FercRegion)
                                                                       .FirstOrDefault(x => x.Id == periodFacilityId);
 
 
         return periodFacility;
     }
-
 
     #endregion
 
@@ -558,6 +567,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         GC.SuppressFinalize(this);
     }
 
-   
+
+
     #endregion
 }

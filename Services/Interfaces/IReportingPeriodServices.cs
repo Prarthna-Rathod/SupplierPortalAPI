@@ -1,6 +1,7 @@
 using BusinessLogic.ReferenceLookups;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using DataAccess.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
 using System;
@@ -13,7 +14,6 @@ namespace Services.Interfaces;
 
 public interface IReportingPeriodServices
 {
-
     #region ReportingPeriod
 
     /// <summary>
@@ -144,13 +144,80 @@ public interface IReportingPeriodServices
     /// <returns></returns>
     string RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId);
 
+    #endregion
+
+    #region PeriodFacilityDocument
+
+    /// <summary>
+    /// SetReportingPeriodFacilityDocument
+    /// </summary>
+    /// <param name="reportingPeriodFacilityDocumentDto"></param>
+    /// <returns></returns>
+    string AddUpdateReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentDto reportingPeriodFacilityDocumentDto);
+    /// <summary>
+    /// Remove PeriodFacility Document
+    /// </summary>
+    /// <param name="DocumentId"></param>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    string RemovePeriodFacilityDocument(int supplierId,int documentId);
+
+    /// <summary>
+    /// Get PeriodFacility ElectricityGridMix & Document
+    /// </summary>
+    /// <param name="periodFacilityId"></param>
+    /// <returns></returns>
+    ReportingPeriodFacilityGridMixAndDocumentDto GetReportingPeriodFacilityGridMixAndDocuments(int supplierId,int periodFacilityId);
+    /// <summary>
+    /// Document FacilityDocument
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    FileStreamResult DownloadFacilityDocument(int documentId);
+    /// <summary>
+    /// Update FacilityDataStatus
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    string UpdatePeriodFacilityDataStatusCompleteToSubmitted(int periodSupplierId);
 
 
     #endregion
 
-    #region ReportingPeriodDocuments
+    #region PeriodSupplierDocument
+    /// <summary>
+    /// AddUpdate periodSupplierDocument
+    /// </summary>
+    /// <param name="reportingPeriodSupplierDocumentDto"></param>
+    /// <returns></returns>
+    string AddUpdateReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentDto reportingPeriodSupplierDocumentDto);
+    /// <summary>
+    /// Remove PeriodSupplierDocument
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    string RemoveReportingPeriodSupplierDocument(int periodSupplierId, int documentId);
+    /// <summary>
+    /// Get PeriodSupplierGasSupplyBreakdownAndDocuments
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <returns></returns>
+    ReportingPeriodSupplierGasSupplyAndDocumentDto GetReportingPeriodSupplierGasSupplyAndDocuments(int periodSupplierId);
+    /// <summary>
+    /// DownloadPeriodSupplierDocument
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    FileStreamResult DownloadSupplierDocument(int documentId);
+    /// <summary>
+    /// SendEmail InitialDataRequest and ResendDataRequest
+    /// </summary>
+    /// <param name="periodSupplierId"></param>
+    /// <param name="cCEmail"></param>
+    /// <param name="bCCEmail"></param>
+    /// <returns></returns>
+    string SendEmailInitialAndResendDataRequest(int periodSupplierId, string? cCEmail, string? bCCEmail);
     #endregion
-
-
 
 }
