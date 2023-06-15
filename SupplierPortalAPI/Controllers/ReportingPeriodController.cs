@@ -85,7 +85,7 @@ namespace SupplierPortalAPI.Controllers
             return _services.UpdatePeriodFacilityStatusSubmitted(reportingPeriodId, supplierId);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Internal")]
         [HttpPut("LockUnlockPeriodSupplierStatus")]
         public string LockUnlockPeriodSupplierStatus(int periodSupplierId)
         {

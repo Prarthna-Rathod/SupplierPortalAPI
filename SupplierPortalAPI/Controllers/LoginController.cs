@@ -12,20 +12,18 @@ namespace SupplierPortalAPI.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IJwtTokenService _jwtTokenService;
-        private readonly SupplierPortalDBContext _context;
+        private readonly ILoginAndTokenService _loginAndTokenService;
 
-        public LoginController(IJwtTokenService jwtTokenService, SupplierPortalDBContext context)
+        public LoginController(ILoginAndTokenService loginAndTokenService)
         {
-            _jwtTokenService = jwtTokenService;
-            _context = context;
+            _loginAndTokenService = loginAndTokenService;
         }
 
         [AllowAnonymous]
         [HttpPost("LoginAndGenerateToken")]
         public string LoginAndGenerateToken(string email, string password)
         {
-            return _jwtTokenService.LoginAndTokenGeneration(email, password);
+            return _loginAndTokenService.LoginAndTokenGeneration(email, password);
         }
 
         [Authorize]
@@ -40,8 +38,8 @@ namespace SupplierPortalAPI.Controllers
         [HttpGet("GetSupplierName")]
         public string GetSupplierName()
         {
-            var userId = HttpContext.FindLoginUserEmail();
-            return _context.FindLoginUserSupplierName(userId);
+            var userEmailId = HttpContext.FindLoginUserEmail();
+            return _loginAndTokenService.FindLoginUserSupplierName(userEmailId);
         }
 
     }

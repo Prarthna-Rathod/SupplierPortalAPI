@@ -184,7 +184,10 @@ namespace DataAccess.DataActions
 
         public IEnumerable<ContactEntity> GetAllContacts()
         {
-            var allContacts = _context.ContactEntities.Include(x => x.User).ToList();
+            var allContacts = _context.ContactEntities
+                                        .Include(x => x.Supplier)
+                                        .Include(x => x.User)
+                                        .ToList();
             return allContacts;
         }
         public IEnumerable<SupplyChainStageEntity> GetSupplyChainStages()

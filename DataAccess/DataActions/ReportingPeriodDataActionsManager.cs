@@ -44,11 +44,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         if (loginUserRoleName == USER_ROLE_EXTERNAL)
         {
-            var loginUserSupplierName = _context.FindLoginUserSupplierName(loginUserEmail);
             var isLoginUser = allContacts.Any(x => x.User.Email == loginUserEmail);
 
             if (!isLoginUser)
-                throw new Exception($"You have LoggedIn for Supplier {loginUserSupplierName} !! Can't add/update FacilityDocument data for other Supplier !!");
+                throw new Exception($"You are not authorized for Supplier {periodFacility.ReportingPeriodSupplier.Supplier.Name} !! Can't add/update FacilityDocument data for other Supplier !!");
         }
     }
 
@@ -69,11 +68,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         if (loginUserRoleName == USER_ROLE_EXTERNAL)
         {
-            var loginUserSupplierName = _context.FindLoginUserSupplierName(loginUserEmail);
             var isLoginUser = allContacts.Any(x => x.User.Email == loginUserEmail);
 
             if (!isLoginUser)
-                throw new Exception($"You have LoggedIn for Supplier {loginUserSupplierName} !! Can't add/update SupplierDocument data for other Supplier !!");
+                throw new Exception($"You are not Authorized person for Supplier {periodSupplier.Supplier.Name}!! Can't add/update SupplierDocument data for other Supplier !!");
         }
     }
 
@@ -328,7 +326,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
     public bool UpdateReportingPeriodSupplierLockUnlockStatus(ReportingPeriodSupplierEntity periodSupplierEntity)
     {
-        FindSupplierAndCheckSupplierContactLoginOrNot(periodSupplierEntity.Id);
         var periodSupplier = _context.ReportingPeriodSupplierEntities.FirstOrDefault(x => x.Id == periodSupplierEntity.Id);
 
         if (periodSupplier == null)

@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Services.Interfaces
 {
-    public interface IJwtTokenService
+    public interface ILoginAndTokenService
     {
         string LoginAndTokenGeneration(string emailId, string password);
+        string FindLoginUserSupplierName(string emailId);
     }
 }

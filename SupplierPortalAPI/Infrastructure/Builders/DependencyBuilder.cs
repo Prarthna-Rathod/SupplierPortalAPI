@@ -41,7 +41,7 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddScoped<ISerilog, SerilogFunction>();
             services.AddHttpContextAccessor();
             //Authorization
-            services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<ILoginAndTokenService, LoginAndTokenService>();
         }
 
     }
