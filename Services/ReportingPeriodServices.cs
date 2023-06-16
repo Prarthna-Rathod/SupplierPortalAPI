@@ -5,6 +5,7 @@ using BusinessLogic.SupplierRoot.ValueObjects;
 using BusinessLogic.ValueConstants;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
+using DataAccess.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Services.DTOs;
 using Services.DTOs.ReadOnlyDTOs;
@@ -25,6 +26,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
     private ISupplierDataActions _supplierDataActions;
     private IReferenceLookUpMapper _referenceLookUpMapper;
     private IReportingPeriodDomainDtoMapper _reportingPeriodDomainDtoMapper;
+    private ILogging _logging;
 
     public ReportingPeriodServices(IReportingPeriodFactory reportingPeriodFactory, IReportingPeriodEntityDomainMapper reportingPeriodEntityDomainMapper,
       IReportingPeriodDataActions reportingPeriodDataActions,
@@ -32,7 +34,8 @@ public class ReportingPeriodServices : IReportingPeriodServices
       ISendEmailService sendEmailService,
       ISupplierDataActions supplierDataActions,
       IReferenceLookUpMapper referenceLookUpMapper,
-      IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper)
+      IReportingPeriodDomainDtoMapper reportingPeriodDomainDtoMapper,
+      ILogging logging)
     {
         _reportingPeriodFactory = reportingPeriodFactory;
         _reportingPeriodEntityDomainMapper = reportingPeriodEntityDomainMapper;
@@ -42,6 +45,7 @@ public class ReportingPeriodServices : IReportingPeriodServices
         _supplierDataActions = supplierDataActions;
         _referenceLookUpMapper = referenceLookUpMapper;
         _reportingPeriodDomainDtoMapper = reportingPeriodDomainDtoMapper;
+        _logging = logging;
 
     }
 
@@ -459,6 +463,8 @@ public class ReportingPeriodServices : IReportingPeriodServices
             var reportingPeriod = _reportingPeriodFactory.CreateNewReportingPeriod(reportingPeriodType, reportingPeriodDto.CollectionTimePeriod, reportingPeriodStatus, reportingPeriodDto.StartDate, reportingPeriodDto.EndDate, reportingPeriodDto.IsActive);
 
             var reportingPeriodEntity = _reportingPeriodEntityDomainMapper.ConvertReportingPeriodDomainToEntity(reportingPeriod);
+
+
             _reportingPeriodDataActions.AddReportingPeriod(reportingPeriodEntity);
         }
         else

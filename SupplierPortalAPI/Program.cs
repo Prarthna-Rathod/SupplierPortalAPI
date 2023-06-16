@@ -1,4 +1,5 @@
 using DataAccess.DataActionContext;
+using DataAccess.Logging;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Extensions.DependencyInjection;
 using Serilog;
@@ -30,10 +31,15 @@ builder.Services.AddSendGrid(options =>
 });
 
 //serilog
-var _loggrer = new LoggerConfiguration()
-.ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext()
-.CreateLogger();
-builder.Logging.AddSerilog(_loggrer);
+
+LoggerClass.InitializeLoggers(builder.Configuration);
+builder.Host.UseSerilog();
+
+//var _loggrer = new LoggerConfiguration()
+//.ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext()
+//.CreateLogger();
+//builder.Logging.AddSerilog(_loggrer);
+
 //Serilog
 
 var app = builder.Build();

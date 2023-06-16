@@ -1,6 +1,7 @@
 using DataAccess.DataActionContext;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
+using DataAccess.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,11 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 {
     private readonly SupplierPortalDBContext _context;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context)
+    private readonly ILogging _logger;
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context,ILogging logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     #region Add Methods
@@ -38,7 +41,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         entity.CreatedOn = DateTime.UtcNow;
 
         _context.ReportingPeriodEntities.Add(entity);
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return true;
     }
     public bool AddRemovePeriodSupplier(IEnumerable<ReportingPeriodSupplierEntity> reportingPeriodSupplierEntity, int id)
@@ -72,8 +76,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
 
 
-
-        _context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
+        //_context.SaveChanges();
         return true;
     }
     public bool AddRemovePeriodFacility(IEnumerable<ReportingPeriodFacilityEntity> reportingPeriodFacilityEntity, int periodSupplierId)
@@ -100,7 +104,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             }
 
         }
-        _context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
+        //_context.SaveChanges();
         return true;
     }
     public IEnumerable<ReportingPeriodFacilityEntity> UpdatePeriodFacilities(IEnumerable<ReportingPeriodFacilityEntity> periodFacilityEntities)
@@ -122,8 +127,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             updatedPeriodFacilities.Add(updatePeriodFacility);
         }
-
-        _context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
+        //_context.SaveChanges();
         return updatedPeriodFacilities;
     }
     public bool UpdateReportingPeriodFacilityDataStatus(int periodFacilityId, int periodFacilityDataStatusId)
@@ -134,7 +139,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         _context.ReportingPeriodFacilityEntities.Update(periodFacility);
 
-        _context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
+        //_context.SaveChanges();
         return true;
     }
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity, int periodFacilityId, int fercRegionId)
@@ -150,9 +156,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         _context.ReportingPeriodFacilityElectricityGridMixEntities.RemoveRange(electicityGridMixEntities);
         _context.ReportingPeriodFacilityElectricityGridMixEntities.AddRange(periodFacilityElectricityGridMixEntity);
-        _context.SaveChanges();
+        //_context.SaveChanges();
 
-
+        _context.LogExtensionMethod(_logger);
         return true;
     }
     public bool AddPeriodFacilityGasSupplyBreakdown(IEnumerable<ReportingPeriodFacilityGasSupplyBreakdownEntity> periodFacilityGasSupplyBreakDownEntities, int periodSupplierId)
@@ -175,7 +181,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 throw new Exception("PeriodFacilityGasSupplyBreakdown is not found !!");
             _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.Add(gasSupplyBreakdownList);
         }
-        _context.SaveChanges();
+
+        _context.LogExtensionMethod(_logger);
+        //_context.SaveChanges();
         return true;
 
 
@@ -206,7 +214,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodFacilityDocumentEntities.Update(isExist);
         }
-        _context.SaveChanges();
+
+        _context.LogExtensionMethod(_logger);
+       // _context.SaveChanges();
         return reportingPeriodFacilityDocument.Id;
     }
     public int AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
@@ -235,12 +245,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodSupplierDocumentEntities.Update(isExist);
         }
-        _context.SaveChanges();
+
+        _context.LogExtensionMethod(_logger);
+        //_context.SaveChanges();
         return reportingPeriodSupplierDocument.Id;
     }
 
     #endregion
-
+   
     #region Update Methods
     public bool UpdateReportingPeriod(ReportingPeriodEntity reportingPeriod)
     {
@@ -266,7 +278,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         reportingPeriodEntity.UpdatedBy = "System";
 
         _context.ReportingPeriodEntities.Update(reportingPeriodEntity);
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return true;
     }
     public IEnumerable<ReportingPeriodSupplierEntity> UpdateReportingPeriodSuppliers(IEnumerable<ReportingPeriodSupplierEntity> periodSuppliers)
@@ -288,8 +301,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             updatedReportingPeriodSuppliers.Add(updatePeriodSupplier);
         }
-
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return updatedReportingPeriodSuppliers;
     }
 
@@ -306,7 +319,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
         }
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return true;
     }
     public bool RemovePeriodFacilityGasSupplyBreakdown(int periodSupplierId)
@@ -323,8 +337,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
 
         }
-
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return true;
     }
     public bool RemovePeriodFacilityDocument(int documentId)
@@ -333,7 +347,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         var isDeletedFile = DeleteFile(periodFacilityDocument.Path);
         _context.ReportingPeriodFacilityDocumentEntities.Remove(periodFacilityDocument);
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return true;
         //if (isDeletedFile)
         //{
@@ -348,7 +363,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         var isDeletedFile = DeleteFile(periodSupplierDocument.Path);
         _context.ReportingPeriodSupplierDocumentEntities.Remove(periodSupplierDocument);
-        _context.SaveChanges();
+        //_context.SaveChanges();
+        _context.LogExtensionMethod(_logger);
         return true;
     }
     private bool DeleteFile(string path)

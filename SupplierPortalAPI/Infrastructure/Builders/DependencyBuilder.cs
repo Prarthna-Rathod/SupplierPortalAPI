@@ -10,6 +10,7 @@ using Services.Mappers.SupplierMappers;
 using BusinessLogic.ReportingPeriodRoot.Interfaces;
 using BusinessLogic.ReportingPeriodRoot.DomainModels;
 using Services.Mappers.ReportingPeriodMappers;
+using DataAccess.Logging;
 
 namespace SupplierPortalAPI.Infrastructure.Builders
 {
@@ -18,8 +19,6 @@ namespace SupplierPortalAPI.Infrastructure.Builders
 
         public static void AddDependancy(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddScoped<ISupplierServices, SupplierServices>();
-
             //Supplier
             services.AddScoped<ISupplierServices, SupplierServices>();
             services.AddScoped<ISupplierDataActions, SupplierDataActionsManager>();
@@ -32,13 +31,15 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddScoped<IReportingPeriodServices, ReportingPeriodServices>();
             services.AddScoped<IReportingPeriodDataActions, ReportingPeriodDataActionsManager>();
             services.AddScoped<IUploadDocumentDataActions,UploadDocumentDataActionManager>();
-            services.AddScoped<ISendEmailService, SendEmailService>();
             services.AddScoped<IReportingPeriodFactory, ReportingPeriodFactory>();
+
+            //Other
+            services.AddScoped<ISendEmailService, SendEmailService>();
+            services.AddScoped<ILogging, Logging>();
             services.AddSingleton<IReportingPeriodDomainDtoMapper, ReportingPeriodDomainDtoMapper>();
             services.AddSingleton<IReportingPeriodEntityDomainMapper, ReportingPeriodEntityDomainMapper>();
             services.AddSingleton<IReadOnlyEntityToDtoMapper, ReadOnlyEntityToDtoMapper>();
-            services.AddSingleton<IReferenceLookUpMapper, ReferenceLookupMapper>();
-            //services.AddScoped<IServiceCollection, ServiceCollection>();    
+            services.AddSingleton<IReferenceLookUpMapper, ReferenceLookupMapper>();  
         }
 
     }

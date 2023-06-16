@@ -30,7 +30,6 @@ public partial class SupplierPortalDBContext : DbContext
     public virtual DbSet<FacilityReportingPeriodDataStatusEntity> FacilityReportingPeriodDataStatusEntities { get; set; } = null!;
     public virtual DbSet<FacilityRequiredDocumentTypeEntity> FacilityRequiredDocumentTypeEntities { get; set; } = null!;
     public virtual DbSet<FercRegionEntity> FercRegionEntities { get; set; } = null!;
-    public virtual DbSet<Log> Logs { get; set; } = null!;
     public virtual DbSet<ReportingPeriodEntity> ReportingPeriodEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityDocumentEntity> ReportingPeriodFacilityDocumentEntities { get; set; } = null!;
     public virtual DbSet<ReportingPeriodFacilityElectricityGridMixEntity> ReportingPeriodFacilityElectricityGridMixEntities { get; set; } = null!;
@@ -229,11 +228,6 @@ public partial class SupplierPortalDBContext : DbContext
             entity.ToTable("FercRegionEntity");
 
             entity.Property(e => e.Name).HasMaxLength(100);
-        });
-
-        modelBuilder.Entity<Log>(entity =>
-        {
-            entity.Property(e => e.TimeStamp).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<ReportingPeriodEntity>(entity =>

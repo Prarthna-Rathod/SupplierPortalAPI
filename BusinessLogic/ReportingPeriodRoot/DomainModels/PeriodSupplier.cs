@@ -404,7 +404,7 @@ public class PeriodSupplier
     internal List<string> CheckInitialAndResendDataRequest(DateTime? endDate)
     {
         //Get recipients 
-        var emailList = Supplier.Users.Where(x => x.IsActive == true).Select(x => x.Email).ToList();
+        var emailList = Supplier.Users.Where(x => x.IsActive).Select(x => x.Email).ToList();
         if (emailList.Count() == 0)
             throw new NotFoundException("Recipients are not found !!");
         if (InitialDataRequestDate is null)
