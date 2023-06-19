@@ -5,7 +5,7 @@ using Services.Interfaces;
 
 namespace SupplierPortalAPI.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Internal")]
     [Route("api/[controller]")]
     [ApiController]
     public class SupplierController : ControllerBase

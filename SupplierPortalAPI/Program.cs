@@ -18,7 +18,10 @@ builder.Services.AddEndpointsApiExplorer();
 //Infrastructure=>Builder
 
 builder.BuilderDbContext();
+
+//Authentication
 builder.SecutitySchema();
+
 builder.AddSwaggerBuilder();
 builder.Services.ConfigureCors();
 builder.Services.AddDependancy(builder.Configuration);

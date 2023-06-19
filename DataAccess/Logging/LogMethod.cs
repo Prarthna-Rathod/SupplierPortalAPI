@@ -9,18 +9,18 @@ namespace DataAccess.Logging
 {
     public static class LogMethod
     {
-        private static SupplierPortalDBContext _context;
+        //private static SupplierPortalDBContext _context;
         private static ILogging _logging;
 
         public static int LogExtensionMethod(this SupplierPortalDBContext context, ILogging logging)
         {
-            _context = context;
+            //_context = context;
             _logging = logging;
 
-            var allEntries = _context.ChangeTracker.Entries();
+            var allEntries = context.ChangeTracker.Entries();
             var filterEntries = allEntries.Where(entry => entry.State.ToString() != "Unchanged").ToList();
             _logging.PushSerilog(filterEntries);
-            return _context.SaveChanges();
+            return context.SaveChanges();
         }
     }
 }

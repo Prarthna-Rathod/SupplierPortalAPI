@@ -2,10 +2,9 @@ using DataAccess.DataActionContext;
 using DataAccess.DataActions.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Logging;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace DataAccess.DataActions;
 
@@ -14,10 +13,17 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
     private readonly SupplierPortalDBContext _context;
     private readonly string REPORTING_PERIOD_STATUS_CLOSE = "Closed";
     private readonly ILogging _logger;
-    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context,ILogging logger)
-    {
+    private readonly IHttpContextAccessor _httpContext;
+
+    public ReportingPeriodDataActionsManager(SupplierPortalDBContext context,ILogging logger, IHttpContextAccessor httpContext)    {
         _context = context;
         _logger = logger;
+        _httpContext = httpContext;
+    }
+
+    private string FindLoggedUser()
+    {
+        return _httpContext.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
     }
 
     #region Add Methods
@@ -37,11 +43,10 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         entity.StartDate = reportingPeriod.StartDate.Date;
         entity.EndDate = reportingPeriod.EndDate;
         entity.IsActive = reportingPeriod.IsActive;
-        entity.CreatedBy = "System";
+        entity.CreatedBy = FindLoggedUser();
         entity.CreatedOn = DateTime.UtcNow;
 
         _context.ReportingPeriodEntities.Add(entity);
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return true;
     }
@@ -73,11 +78,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 _context.ReportingPeriodSupplierEntities.Remove(entity);
             }
         }
-
-
-
         _context.LogExtensionMethod(_logger);
-        //_context.SaveChanges();
         return true;
     }
     public bool AddRemovePeriodFacility(IEnumerable<ReportingPeriodFacilityEntity> reportingPeriodFacilityEntity, int periodSupplierId)
@@ -92,9 +93,7 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
                 _context.ReportingPeriodFacilityEntities.Add(entity);
             }
-
         }
-
         foreach (var existingPeriodFacility in allPeriodfacilities)
         {
             var isExist = reportingPeriodFacilityEntity.FirstOrDefault(x => x.Id == existingPeriodFacility.Id);
@@ -102,10 +101,8 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             {
                 _context.Remove(existingPeriodFacility);
             }
-
         }
         _context.LogExtensionMethod(_logger);
-        //_context.SaveChanges();
         return true;
     }
     public IEnumerable<ReportingPeriodFacilityEntity> UpdatePeriodFacilities(IEnumerable<ReportingPeriodFacilityEntity> periodFacilityEntities)
@@ -128,7 +125,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             updatedPeriodFacilities.Add(updatePeriodFacility);
         }
         _context.LogExtensionMethod(_logger);
-        //_context.SaveChanges();
         return updatedPeriodFacilities;
     }
     public bool UpdateReportingPeriodFacilityDataStatus(int periodFacilityId, int periodFacilityDataStatusId)
@@ -138,26 +134,18 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         periodFacility.FacilityReportingPeriodDataStatusId = periodFacilityDataStatusId;
 
         _context.ReportingPeriodFacilityEntities.Update(periodFacility);
-
         _context.LogExtensionMethod(_logger);
-        //_context.SaveChanges();
         return true;
     }
     public bool AddPeriodFacilityElectricityGridMix(IEnumerable<ReportingPeriodFacilityElectricityGridMixEntity> periodFacilityElectricityGridMixEntity, int periodFacilityId, int fercRegionId)
     {
 
         var electicityGridMixEntities = _context.ReportingPeriodFacilityElectricityGridMixEntities.Where(x => x.ReportingPeriodFacilityId == periodFacilityId);
-
         var periodFacilityEntity = _context.ReportingPeriodFacilityEntities.FirstOrDefault(x => x.Id == periodFacilityId);
-
-
-
         periodFacilityEntity.FercRegionId = fercRegionId; //Update FercRegionId in PeriodFacility
 
         _context.ReportingPeriodFacilityElectricityGridMixEntities.RemoveRange(electicityGridMixEntities);
         _context.ReportingPeriodFacilityElectricityGridMixEntities.AddRange(periodFacilityElectricityGridMixEntity);
-        //_context.SaveChanges();
-
         _context.LogExtensionMethod(_logger);
         return true;
     }
@@ -173,8 +161,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             if (existingEntity.Count() != 0)
                 _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
         }
-
-
         foreach (var gasSupplyBreakdownList in periodFacilityGasSupplyBreakDownEntities)
         {
             if (gasSupplyBreakdownList == null)
@@ -183,19 +169,14 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         }
 
         _context.LogExtensionMethod(_logger);
-        //_context.SaveChanges();
         return true;
-
-
     }
     public int AddReportingPeriodFacilityDocument(ReportingPeriodFacilityDocumentEntity reportingPeriodFacilityDocument)
     {
         var isExist = _context.ReportingPeriodFacilityDocumentEntities.Where(x => x.Id == reportingPeriodFacilityDocument.Id && x.ReportingPeriodFacilityId == reportingPeriodFacilityDocument.ReportingPeriodFacilityId).FirstOrDefault();
-
-
         if (isExist is null)
         {
-            reportingPeriodFacilityDocument.CreatedBy = "System";
+            reportingPeriodFacilityDocument.CreatedBy = FindLoggedUser();
             reportingPeriodFacilityDocument.CreatedOn = DateTime.UtcNow;
             _context.ReportingPeriodFacilityDocumentEntities.Add(reportingPeriodFacilityDocument);
         }
@@ -209,24 +190,21 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             isExist.DocumentStatusId = reportingPeriodFacilityDocument.DocumentStatusId;
             isExist.DocumentTypeId = reportingPeriodFacilityDocument.DocumentTypeId;
             isExist.ValidationError = reportingPeriodFacilityDocument.ValidationError;
-            isExist.UpdatedBy = "System";
+            isExist.UpdatedBy = FindLoggedUser();
             isExist.UpdatedOn = DateTime.UtcNow;
 
             _context.ReportingPeriodFacilityDocumentEntities.Update(isExist);
         }
-
         _context.LogExtensionMethod(_logger);
-       // _context.SaveChanges();
         return reportingPeriodFacilityDocument.Id;
     }
     public int AddReportingPeriodSupplierDocument(ReportingPeriodSupplierDocumentEntity reportingPeriodSupplierDocument)
     {
         var isExist = _context.ReportingPeriodSupplierDocumentEntities.Where(x => x.Id == reportingPeriodSupplierDocument.Id && x.ReportingPeriodSupplierId == reportingPeriodSupplierDocument.ReportingPeriodSupplierId).FirstOrDefault();
 
-
         if (isExist == null)
         {
-            reportingPeriodSupplierDocument.CreatedBy = "System";
+            reportingPeriodSupplierDocument.CreatedBy = FindLoggedUser();
             reportingPeriodSupplierDocument.CreatedOn = DateTime.UtcNow;
             _context.ReportingPeriodSupplierDocumentEntities.Add(reportingPeriodSupplierDocument);
         }
@@ -240,14 +218,12 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
             isExist.DocumentStatusId = reportingPeriodSupplierDocument.DocumentStatusId;
             isExist.DocumentTypeId = reportingPeriodSupplierDocument.DocumentTypeId;
             isExist.ValidationError = reportingPeriodSupplierDocument.ValidationError;
-            isExist.UpdatedBy = "System";
+            isExist.UpdatedBy = FindLoggedUser();
             isExist.UpdatedOn = DateTime.UtcNow;
 
             _context.ReportingPeriodSupplierDocumentEntities.Update(isExist);
         }
-
         _context.LogExtensionMethod(_logger);
-        //_context.SaveChanges();
         return reportingPeriodSupplierDocument.Id;
     }
 
@@ -275,10 +251,9 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         }
 
         reportingPeriodEntity.UpdatedOn = DateTime.UtcNow;
-        reportingPeriodEntity.UpdatedBy = "System";
+        reportingPeriodEntity.UpdatedBy = FindLoggedUser();
 
         _context.ReportingPeriodEntities.Update(reportingPeriodEntity);
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return true;
     }
@@ -301,7 +276,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             updatedReportingPeriodSuppliers.Add(updatePeriodSupplier);
         }
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return updatedReportingPeriodSuppliers;
     }
@@ -319,7 +293,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
             _context.ReportingPeriodFacilityElectricityGridMixEntities.Remove(facility);
         }
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return true;
     }
@@ -337,7 +310,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
                 _context.ReportingPeriodFacilityGasSupplyBreakDownEntities.RemoveRange(existingEntity);
 
         }
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return true;
     }
@@ -347,7 +319,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         var isDeletedFile = DeleteFile(periodFacilityDocument.Path);
         _context.ReportingPeriodFacilityDocumentEntities.Remove(periodFacilityDocument);
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return true;
         //if (isDeletedFile)
@@ -363,7 +334,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
 
         var isDeletedFile = DeleteFile(periodSupplierDocument.Path);
         _context.ReportingPeriodSupplierDocumentEntities.Remove(periodSupplierDocument);
-        //_context.SaveChanges();
         _context.LogExtensionMethod(_logger);
         return true;
     }
@@ -378,7 +348,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         else
             return false;
     }
-
     #endregion
 
     #region SendMail
@@ -397,7 +366,6 @@ public class ReportingPeriodDataActionsManager : IReportingPeriodDataActions
         _context.ReportingPeriodSupplierEntities.Update(periodSupplierEntity);
         _context.SaveChanges();
         return true;
-
     }
     #endregion
 

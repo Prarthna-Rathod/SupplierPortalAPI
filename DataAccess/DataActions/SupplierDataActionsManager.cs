@@ -16,7 +16,6 @@ namespace DataAccess.DataActions
         }
 
         #region Dispose Methods
-
         protected void Dispose(bool disposing)
         {
             if (disposing)
@@ -27,17 +26,14 @@ namespace DataAccess.DataActions
                 }
             }
         }
-
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         #endregion
 
         #region Add Methods
-
         //User
         public UserEntity AddUser(UserEntity userEntity)
         {
@@ -148,16 +144,14 @@ namespace DataAccess.DataActions
         #region GetAll Methods
         public IEnumerable<UserEntity> GetAllUsers()
         {
-            var allUsers = _context.UserEntities.ToList();
+            var allUsers = _context.UserEntities.Include(x=>x.Role).ToList();
             return allUsers;
         }
-
         public IEnumerable<UserEntity> GetAllUsersByRoleId(int roleId)
         {
             var allUsersByRole = _context.UserEntities.Where(x => x.RoleId == roleId).ToList();
             return allUsersByRole;
         }
-
         public IEnumerable<SupplierEntity> GetAllSuppliers()
         {
             var allSuppliers = _context.SupplierEntities.Include(x => x.ContactEntities)
@@ -167,7 +161,6 @@ namespace DataAccess.DataActions
                                                         .ToList();
             return allSuppliers;
         }
-
         public IEnumerable<ContactEntity> GetAllContacts()
         {
             var allContacts = _context.ContactEntities.Include(x => x.User).ToList();
@@ -313,7 +306,6 @@ namespace DataAccess.DataActions
                 return entity;
             }
         }
-
         public bool UpdateSupplier(SupplierEntity supplier)
         {
             var supplierEntity = _context.SupplierEntities.Where(x => x.Id == supplier.Id)
@@ -348,7 +340,6 @@ namespace DataAccess.DataActions
                 return true;
             }
         }
-
         public bool UpdateContact(ContactEntity contact)
         {
             var contactEntity = _context.ContactEntities.Where(x => x.Id == contact
@@ -383,8 +374,6 @@ namespace DataAccess.DataActions
             _context.SaveChanges();
             return true;
         }
-
-       
         public bool UpdateAllFacilities(IEnumerable<FacilityEntity> facilityEntities)
         {
             var supplierId = facilityEntities.First().SupplierId;
@@ -424,18 +413,6 @@ namespace DataAccess.DataActions
             _context.SaveChanges();
             return true;
         }
-
-      /*  private FacilityEntity FindExistingFacility(string? ghgrpFacilityId)
-        {
-            var existingFacility = _context.FacilityEntities.Where(x =>
-                        x.ReportingType.Name == REPORTING_TYPE_GHGRP &&
-                        x.GhgrpfacilityId == ghgrpFacilityId &&
-                        x.IsPrimary && x.IsActive)
-                        .FirstOrDefault();
-
-            return existingFacility;
-        }
-*/
         public bool UpdateAssociatePipeline(AssociatePipelineEntity associatePipeline, int associatePipelineId)
         {
             var associatePipelineEntity = _context.AssociatePipelineEntities.Where(x => x.Id == associatePipelineId).FirstOrDefault();
@@ -448,7 +425,6 @@ namespace DataAccess.DataActions
             return true;
 
         }
-
         #endregion
 
         #region Private Method

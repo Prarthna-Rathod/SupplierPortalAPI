@@ -39,7 +39,10 @@ namespace SupplierPortalAPI.Infrastructure.Builders
             services.AddSingleton<IReportingPeriodDomainDtoMapper, ReportingPeriodDomainDtoMapper>();
             services.AddSingleton<IReportingPeriodEntityDomainMapper, ReportingPeriodEntityDomainMapper>();
             services.AddSingleton<IReadOnlyEntityToDtoMapper, ReadOnlyEntityToDtoMapper>();
-            services.AddSingleton<IReferenceLookUpMapper, ReferenceLookupMapper>();  
+            services.AddSingleton<IReferenceLookUpMapper, ReferenceLookupMapper>();
+
+            services.AddScoped<ILoginService, LoginService>();
+            services.AddHttpContextAccessor();
         }
 
     }
